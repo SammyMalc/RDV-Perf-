@@ -730,13 +730,26 @@ function doLogout() {
 }
 
 async function afterLogin() {
-  await loadState();
+  // 1. Affiche immédiatement avec les données locales (instantané)
+  localLoad();
   if(currentUser.role==='manager'){
     renderHome();
     goScreen('screen-home');
   } else {
     renderAdvisor(currentUser.id);
     goScreen('screen-advisor');
+  }
+  // 2. Rafraîchit en arrière-plan depuis JSONBin (sans bloquer l'affichage)
+  const remote = await remoteRead();
+  if(remote && remote.objectifs && remote.resultats){
+    state = remote;
+    localSave();
+    // Re-render silencieux si les données ont changé
+    if(currentUser.role==='manager'){
+      renderHome();
+    } else {
+      renderAdvisor(currentUser.id);
+    }
   }
 }
 
