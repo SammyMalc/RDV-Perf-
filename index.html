@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0D2137">
+<title>Pilotage Performance — Leroy Merlin</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+<style>
+/* ── myDEV' Design System ────────────────────────────────── */
+:root {
+  /* Brand */
+  --teal:#009688;   /* vert ADEO/myDEV principal */
+  --teal-d:#00796B;
+  --teal-l:#E0F2F1;
+  --teal-m:#80CBC4;
+  --violet:#5C6BC0;  /* accent secondaire myDEV */
+  --violet-l:#E8EAF6;
+  --sidebar:#0D2137; /* sidebar sombre myDEV */
+  --sidebar-hover:rgba(255,255,255,0.07);
+  --sidebar-active:rgba(0,150,136,0.18);
+  --lm-green:#78BE20; /* vert LM pour accents */
+  --yellow:#FFD100;
+  /* Statuts */
+  --ok:#388E3C; --ok-bg:#E8F5E9; --ok-bar:#66BB6A;
+  --warn:#F57C00; --warn-bg:#FFF3E0; --warn-bar:#FFA726;
+  --ko:#D32F2F; --ko-bg:#FFEBEE; --ko-bar:#EF5350;
+  /* Layout */
+  --bg:#F5F6FA;
+  --surf:#FFFFFF;
+  --surf2:#F8F9FC;
+  --brd:#E8EAF0;
+  --brd2:#D1D5E0;
+  --text:#1A2235;
+  --t2:#5A6478;
+  --t3:#9BA5B8;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.1);
+  --r:12px; --rs:8px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;min-height:100vh}
+
+/* ── SCREENS ─────────────────────────────────────────────── */
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+
+/* ── LOGIN ───────────────────────────────────────────────── */
+.login-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;gap:28px;background:var(--sidebar)}
+.login-brand{display:flex;flex-direction:column;align-items:center;gap:16px}
+.login-brand-logo{display:flex;align-items:center;gap:10px}
+.login-brand-name{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.login-brand-name span.my{color:#78BE20;font-style:italic}
+.login-brand-name span.dev{color:var(--teal)}
+.login-tagline{font-size:13px;color:rgba(255,255,255,0.45);letter-spacing:.3px}
+.login-card{background:var(--surf);border-radius:16px;padding:24px 22px;width:100%;max-width:380px;box-shadow:var(--shadow-md)}
+.login-section-title{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px}
+.login-user-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.login-user-btn{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--r);border:1.5px solid var(--brd);background:var(--surf2);cursor:pointer;transition:border-color .15s,background .15s;text-align:left;width:100%;font-family:inherit}
+.login-user-btn:hover{border-color:var(--teal-m);background:var(--teal-l)}
+.login-user-btn.selected{border-color:var(--teal);background:var(--teal-l)}
+.login-user-btn:active{transform:scale(.98)}
+.login-user-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.login-user-name{font-size:14px;font-weight:600;color:var(--text)}
+.login-user-role{font-size:11px;color:var(--t2);margin-top:1px}
+.login-divider{height:1px;background:var(--brd);margin:4px 0 18px}
+.login-pin-label{font-size:12px;font-weight:700;color:var(--t2);margin-bottom:12px;display:block}
+.pin-inputs{display:flex;gap:10px;justify-content:center;margin-bottom:14px}
+.pin-input{width:54px;height:62px;border:2px solid var(--brd);border-radius:var(--r);font-size:26px;font-weight:700;text-align:center;background:var(--surf2);color:var(--text);-webkit-text-security:disc;outline:none;transition:border-color .15s,box-shadow .15s;font-family:inherit}
+.pin-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,150,136,.12)}
+.login-error{font-size:13px;color:var(--ko);text-align:center;min-height:18px;margin-bottom:10px}
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn{display:block;width:100%;padding:12px;border-radius:var(--rs);border:none;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:opacity .15s,transform .1s;font-family:inherit;letter-spacing:.2px}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:hover{background:var(--teal-d)}
+.btn-primary:active{opacity:.9;transform:scale(.99)}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--brd)}
+.btn-danger{background:transparent;color:var(--ko);border:1px solid var(--ko-bg)}
+
+/* ── TOPBAR ──────────────────────────────────────────────── */
+.topbar{background:var(--sidebar);color:#fff;padding:14px 16px 13px;display:flex;align-items:center;gap:10px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.topbar-back{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:20px;line-height:1;border:none;color:#fff;transition:background .15s}
+.topbar-back:active{background:rgba(255,255,255,0.2)}
+.topbar-center{flex:1;min-width:0}
+.topbar-title{font-size:16px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-sub{font-size:11px;opacity:.5;margin-top:1px}
+.topbar-action{background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;letter-spacing:.3px;transition:background .15s}
+.topbar-action:active{background:rgba(255,255,255,0.2)}
+.topbar-teal-pill{background:var(--teal);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0;letter-spacing:.5px}
+
+/* ── CONTENT ─────────────────────────────────────────────── */
+.scroll-content{flex:1;overflow-y:auto;padding:20px 16px;max-width:640px;width:100%;margin:0 auto}
+.page-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;letter-spacing:-.3px}
+.page-sub{font-size:13px;color:var(--t2);margin-bottom:18px}
+
+/* ── CARDS ───────────────────────────────────────────────── */
+.card{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:18px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card-title{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px}
+.section-label{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;margin-top:4px}
+
+/* ── HOME BANNER ─────────────────────────────────────────── */
+.home-banner{background:linear-gradient(135deg,var(--sidebar) 0%,#1a3550 100%);border-radius:var(--r);padding:20px;margin-bottom:16px;position:relative;overflow:hidden}
+.home-banner::after{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(0,150,136,.15)}
+.home-banner-label{font-size:11px;font-weight:700;color:var(--teal-m);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px}
+.home-banner-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:2px;letter-spacing:-.2px}
+.home-banner-sub{font-size:12px;color:rgba(255,255,255,.45)}
+
+/* ── VENDOR GRID ─────────────────────────────────────────── */
+.vendor-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.vendor-card{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:16px;cursor:pointer;transition:border-color .15s,box-shadow .15s;box-shadow:var(--shadow)}
+.vendor-card:hover{border-color:var(--teal-m);box-shadow:var(--shadow-md)}
+.vendor-card:active{transform:scale(.98)}
+.vendor-card-avatar{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;margin-bottom:10px}
+.vendor-card-name{font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px}
+.vendor-card-months{font-size:11px;color:var(--t3);margin-bottom:10px}
+.vendor-card-score{display:flex;align-items:center;justify-content:space-between}
+.vendor-card-pct{font-size:20px;font-weight:800}
+.vprog{height:4px;border-radius:2px;background:var(--surf2);margin-top:8px;overflow:hidden}
+.vprogfill{height:100%;border-radius:2px;transition:width 1s ease}
+
+/* ── QUICK ACTIONS ───────────────────────────────────────── */
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.quick-btn{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:16px;cursor:pointer;text-align:left;transition:border-color .15s,box-shadow .15s;box-shadow:var(--shadow)}
+.quick-btn:hover{border-color:var(--teal-m);box-shadow:var(--shadow-md)}
+.quick-btn:active{transform:scale(.98)}
+.quick-btn-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px}
+.quick-btn-label{font-size:13px;font-weight:700;color:var(--text)}
+.quick-btn-sub{font-size:11px;color:var(--t2);margin-top:2px}
+
+/* ── HERO ADVISOR ────────────────────────────────────────── */
+.advisor-hero{background:var(--sidebar);border-radius:var(--r);padding:20px;margin-bottom:14px;display:flex;align-items:center;gap:16px;box-shadow:var(--shadow-md)}
+.advisor-avatar{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex-shrink:0}
+.advisor-name{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.advisor-meta{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px}
+.advisor-status{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;margin-top:6px}
+
+/* ── MINI SCORES ─────────────────────────────────────────── */
+.hero-scores{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
+.hero-score-item{background:var(--surf);border-radius:10px;border:1px solid var(--brd);padding:9px 4px 7px;text-align:center;box-shadow:var(--shadow)}
+.hero-score-val{font-size:11px;font-weight:700}
+.hero-score-lbl{font-size:9px;color:var(--t3);margin-top:2px;text-transform:uppercase;letter-spacing:.3px}
+.ok-score .hero-score-val{color:var(--ok)}
+.warn-score .hero-score-val{color:var(--warn)}
+.ko-score .hero-score-val{color:var(--ko)}
+
+/* ── KPI CARDS ───────────────────────────────────────────── */
+.kpi-stack{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.kpi-card{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:16px;box-shadow:var(--shadow)}
+.kpi-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px}
+.kpi-name{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.kpi-value{font-size:22px;font-weight:800;color:var(--text);line-height:1;letter-spacing:-.5px}
+.kpi-obj{font-size:11px;color:var(--t3);margin-top:3px}
+.kpi-pill{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.kpi-trend{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:20px;margin-top:5px}
+.trend-up{background:var(--ok-bg);color:var(--ok)}
+.trend-down{background:var(--ko-bg);color:var(--ko)}
+.trend-flat{background:var(--surf2);color:var(--t2)}
+.kpi-bar-wrap{position:relative;margin-bottom:18px}
+.kpi-bar-track{height:7px;border-radius:4px;background:var(--surf2);overflow:visible;position:relative}
+.kpi-bar-fill{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.kpi-bar-target{position:absolute;top:-4px;width:2px;height:15px;background:var(--t3);border-radius:1px;z-index:2}
+.kpi-bar-target-label{position:absolute;top:15px;font-size:9px;color:var(--t3);transform:translateX(-50%);white-space:nowrap;font-weight:600}
+.kpi-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.kpi-remaining{font-size:12px;color:var(--t2)}
+.kpi-chip{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;background:var(--surf2);color:var(--t3);flex-shrink:0;border:1px solid var(--brd)}
+
+/* ── GOAL CARD ───────────────────────────────────────────── */
+.goal-card{background:linear-gradient(135deg,var(--sidebar) 0%,#1a3550 100%);border-radius:var(--r);padding:20px 18px 18px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:var(--shadow-md)}
+.goal-card-bg{position:absolute;right:-10px;bottom:-10px;opacity:.07;pointer-events:none}
+.goal-month{font-size:11px;font-weight:700;color:var(--teal-m);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px}
+.goal-headline{font-size:17px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:4px;letter-spacing:-.2px}
+.goal-sub{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:16px}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.goal-item{background:rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;border:1px solid rgba(255,255,255,.1)}
+.goal-kpi{font-size:10px;font-weight:700;color:var(--teal-m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.goal-val{font-size:18px;font-weight:800;color:#fff;line-height:1.1;letter-spacing:-.3px}
+.goal-delta{font-size:10px;margin-top:3px;font-weight:600}
+.goal-delta.up{color:#A5D6A7}
+.goal-delta.same{color:rgba(255,255,255,.4)}
+.goal-delta.down{color:#FFD54F}
+
+/* ── SAISIE ──────────────────────────────────────────────── */
+.saisie-card{background:var(--teal-l);border-radius:var(--r);border:1px solid var(--teal-m);padding:16px;margin-bottom:14px}
+.saisie-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.saisie-toggle-label{font-size:14px;font-weight:700;color:var(--teal-d)}
+.saisie-toggle-icon{width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:400;transition:transform .2s;flex-shrink:0}
+.saisie-toggle-icon.open{transform:rotate(45deg)}
+.saisie-form{margin-top:14px;display:none}
+.saisie-form.open{display:block}
+
+/* ── FORMS ───────────────────────────────────────────────── */
+.form-group{margin-bottom:12px}
+.form-label{font-size:12px;font-weight:700;color:var(--t2);margin-bottom:7px;display:block;letter-spacing:.1px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+select,input[type=number],input[type=password],input[type=text]{width:100%;padding:11px 13px;border:1.5px solid var(--brd);border-radius:var(--rs);background:var(--surf);color:var(--text);font-size:14px;font-family:inherit;appearance:none;-webkit-appearance:none;transition:border-color .15s,box-shadow .15s}
+select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,150,136,.1)}
+
+/* ── BADGES ──────────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px}
+.ok{background:var(--ok-bg);color:var(--ok)}
+.warn{background:var(--warn-bg);color:var(--warn)}
+.ko{background:var(--ko-bg);color:var(--ko)}
+
+/* ── CHART ───────────────────────────────────────────────── */
+.chart-wrap{position:relative;width:100%}
+.h200{height:200px} .h220{height:220px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--brd);background:transparent;color:var(--t2);cursor:pointer;transition:all .15s}
+.chip.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)}
+.dot{width:10px;height:10px;border-radius:2px}
+
+/* ── TABLES ──────────────────────────────────────────────── */
+.htable{width:100%;border-collapse:collapse;font-size:12px}
+.htable th{text-align:left;padding:7px 8px;color:var(--t3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;border-bottom:2px solid var(--brd)}
+.htable td{padding:9px 8px;border-bottom:1px solid var(--surf2)}
+.htable tr:last-child td{border-bottom:none}
+.htable tr:hover td{background:var(--surf2)}
+.num{text-align:right;font-size:11px;font-variant-numeric:tabular-nums}
+.stable{width:100%;border-collapse:collapse;font-size:12px}
+.stable th{padding:7px 6px;text-align:center;color:var(--t3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;border-bottom:2px solid var(--brd)}
+.stable td{padding:9px 6px;text-align:center;border-bottom:1px solid var(--surf2)}
+.stable tr:last-child td{border-bottom:none}
+
+/* ── MISC ────────────────────────────────────────────────── */
+.divider{height:1px;background:var(--brd);margin:14px 0}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.spin{animation:spin .8s linear infinite;display:inline-block}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--sidebar);color:#fff;padding:11px 22px;border-radius:24px;font-size:13px;font-weight:700;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:var(--shadow-md);letter-spacing:.2px}
+#toast.show{opacity:1}
+.sync-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;display:inline-flex;align-items:center;gap:4px}
+.sync-ok{background:rgba(102,187,106,.2);color:#A5D6A7}
+.sync-err{background:rgba(239,83,80,.2);color:#FFCDD2}
+.sync-load{color:rgba(255,255,255,.4)}
+
+/* ── LOGOUT ROW ──────────────────────────────────────────── */
+.logout-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:var(--r);background:var(--surf);border:1px solid var(--brd);cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s}
+.logout-row:active{transform:scale(.98)}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div class="screen active" id="screen-login">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="login-brand-logo">
+        <svg width="36" height="32" viewBox="0 0 32 28" fill="none"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
+        <div class="login-brand-name" style="color:#fff">
+          <span class="my">my</span><span class="dev">DEV'</span>
+          <span style="color:rgba(255,255,255,.35);font-weight:400;font-size:16px"> · Performance</span>
+        </div>
+      </div>
+      <div class="login-tagline">Leroy Merlin · Groupe ADEO</div>
+    </div>
+
+    <div class="login-card">
+      <div class="login-section-title">Connecte-toi</div>
+      <div class="login-user-list" id="login-user-list"></div>
+
+      <div id="login-pin-section" style="display:none">
+        <div class="login-divider"></div>
+        <label class="login-pin-label" id="login-pin-label">Code PIN</label>
+        <div class="pin-inputs">
+          <input class="pin-input" type="password" maxlength="1" inputmode="numeric" id="pin0">
+          <input class="pin-input" type="password" maxlength="1" inputmode="numeric" id="pin1">
+          <input class="pin-input" type="password" maxlength="1" inputmode="numeric" id="pin2">
+          <input class="pin-input" type="password" maxlength="1" inputmode="numeric" id="pin3">
+        </div>
+        <div class="login-error" id="login-error"></div>
+        <button class="btn btn-primary" onclick="doLogin()">Se connecter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HOME MANAGER ═══ -->
+<div class="screen" id="screen-home">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+      <svg width="26" height="23" viewBox="0 0 32 28" fill="none" style="flex-shrink:0"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
+      <div class="topbar-center">
+        <div class="topbar-title">Pilotage Performance</div>
+        <div class="topbar-sub">Chef de secteur</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+      <span id="sync-icon" class="sync-status sync-load"></span>
+      <div class="topbar-teal-pill" id="current-year">2025</div>
+    </div>
+  </div>
+  <div class="scroll-content">
+    <div class="home-banner">
+      <div class="home-banner-label">Tableau de bord</div>
+      <div class="home-banner-title">Bonjour, Chef de secteur 👋</div>
+      <div class="home-banner-sub">Suivi de performance · <span id="home-date"></span></div>
+    </div>
+
+    <div class="section-label">Mes conseillers</div>
+    <div class="vendor-grid" id="vendor-grid"></div>
+
+    <div class="section-label">Quick actions</div>
+    <div class="quick-actions">
+      <div class="quick-btn" onclick="goScreen('screen-synthese')">
+        <div class="quick-btn-icon" style="background:var(--violet-l);color:var(--violet)">📊</div>
+        <div class="quick-btn-label">Synthèse équipe</div>
+        <div class="quick-btn-sub">Vue comparative</div>
+      </div>
+      <div class="quick-btn" onclick="goScreen('screen-objectifs')">
+        <div class="quick-btn-icon" style="background:var(--teal-l);color:var(--teal)">🎯</div>
+        <div class="quick-btn-label">Objectifs annuels</div>
+        <div class="quick-btn-sub">Modifier les cibles</div>
+      </div>
+    </div>
+
+    <div class="logout-row" onclick="doLogout()">
+      <div style="width:38px;height:38px;border-radius:10px;background:var(--ko-bg);display:flex;align-items:center;justify-content:center;font-size:18px">🔒</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text)">Se déconnecter</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:1px">Verrouiller l'application</div>
+      </div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ═══ FICHE VENDEUR ═══ -->
+<div class="screen" id="screen-vendor">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goHome()">‹</button>
+    <div class="topbar-center">
+      <div class="topbar-title" id="vendor-title">Vendeur</div>
+      <div class="topbar-sub">Suivi de performance</div>
+    </div>
+  </div>
+  <div class="scroll-content" id="vendor-content"></div>
+</div>
+
+<!-- ═══ VUE CONSEILLER ═══ -->
+<div class="screen" id="screen-advisor">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+      <svg width="26" height="23" viewBox="0 0 32 28" fill="none" style="flex-shrink:0"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
+      <div class="topbar-center">
+        <div class="topbar-title" id="advisor-title">Mon suivi</div>
+        <div class="topbar-sub">Leroy Merlin · myDEV'</div>
+      </div>
+    </div>
+    <button class="topbar-action" onclick="doLogout()">🔒 Quitter</button>
+  </div>
+  <div class="scroll-content" id="advisor-content"></div>
+</div>
+
+<!-- ═══ SYNTHESE ═══ -->
+<div class="screen" id="screen-synthese">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goHome()">‹</button>
+    <div class="topbar-center">
+      <div class="topbar-title">Synthèse équipe</div>
+      <div class="topbar-sub">Vue comparative</div>
+    </div>
+  </div>
+  <div class="scroll-content" id="synthese-content"></div>
+</div>
+
+<!-- ═══ OBJECTIFS ═══ -->
+<div class="screen" id="screen-objectifs">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goHome()">‹</button>
+    <div class="topbar-center">
+      <div class="topbar-title">Objectifs annuels</div>
+      <div class="topbar-sub">Modifier les cibles</div>
+    </div>
+    <button class="topbar-action" onclick="saveObjectifs()">Sauvegarder</button>
+  </div>
+  <div class="scroll-content"><div id="objectifs-content"></div></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   ⚙️  CONFIGURATION JSONBIN.IO  (gratuit, sans serveur)
+   ──────────────────────────────────────────────────────
+   1. Va sur https://jsonbin.io et crée un compte gratuit
+   2. Dans le dashboard → "API Keys" → copie ta Master Key
+      (commence par $2a$10$...)  → colle dans JSONBIN_KEY
+   3. Clique "Create Bin" → donne-lui le contenu {}
+      → copie l'ID du bin (ex: 6621a3f3...)  → colle dans JSONBIN_ID
+   4. Partage le même fichier HTML à tous : données toujours à jour
+   ══════════════════════════════════════════════════════════ */
+const JSONBIN_KEY = '$2a$10$/Fc5hqsSaWViVenmuLzwketBwQJtibui6Kdg0RvLF9HIXh72iXU6K';
+const JSONBIN_ID  = '69e49d9736566621a8cbedfd';
+
+/* ══════════════════════════════════════════════════════════
+   🔑  COMPTES & MOTS DE PASSE
+   Modifie les PIN ci-dessous avant de distribuer le fichier.
+   PIN = 4 chiffres.
+   ══════════════════════════════════════════════════════════ */
+const ACCOUNTS = {
+  manager: { label:'Manager',    role:'manager', pin:'1234', color:'#005C2E', bg:'#E6F4ED' },
+  karim:   { label:'Karim',      role:'advisor', pin:'2001', color:'#003087', bg:'#E8EEF8' },
+  evan:    { label:'Evan',       role:'advisor', pin:'2002', color:'#005C2E', bg:'#E6F4ED' },
+  laura:   { label:'Laura',      role:'advisor', pin:'2003', color:'#78BE20', bg:'#F0F8E6' },
+  thomas:  { label:'Thomas',     role:'advisor', pin:'2004', color:'#1A1A1A', bg:'#F2F2F2' },
+};
+
+/* ─── Data constants ─────────────────────────────────────── */
+const VENDEURS = ['karim','evan','laura','thomas'];
+const NOMS = { karim:'Karim', evan:'Evan', laura:'Laura', thomas:'Thomas' };
+const COLORS = { karim:'#003087', evan:'#009688', laura:'#5C6BC0', thomas:'#546E7A' };
+const AVATAR_BG = { karim:'#E8EEF8', evan:'#E0F2F1', laura:'#E8EAF6', thomas:'#ECEFF1' };
+const MOIS_L = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const MOIS_S = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+const KPI_KEYS = ['ca','taux','optin','chantiers','fidelite'];
+const KPI_LABELS = ['Montant','Taux transfo','Opt-in','Chantiers','Fidélité'];
+const KPI_FULL = ['Montant commandé','Taux transformation','Opt-in contactabilité','Chantiers vendus','Adhésions fidélité'];
+const KPI_IS_PCT = { ca:false, taux:true, optin:true, chantiers:false, fidelite:false };
+const KPI_FMT = {
+  ca: v => '€\u202f'+Math.round(v).toLocaleString('fr-FR'),
+  taux: v => parseFloat(v).toFixed(1)+'%',
+  optin: v => parseFloat(v).toFixed(1)+'%',
+  chantiers: v => Math.round(v),
+  fidelite: v => Math.round(v),
+};
+const STATUS_BAR = { ok:'#66BB6A', warn:'#FFA726', ko:'#EF5350' };
+const STATUS_LABEL = { ok:'En ligne', warn:'À surveiller', ko:'Retard' };
+
+/* ─── App state ──────────────────────────────────────────── */
+let currentUser = null;
+let state = defaultState();
+let currentVendeur = null;
+const LOCAL_KEY = 'lm_perf_v10';
+
+function defaultState() {
+  return {
+    objectifs: {
+      karim:  { ca:480000, taux:38, optin:75, chantiers:60, fidelite:140 },
+      evan:   { ca:420000, taux:35, optin:70, chantiers:50, fidelite:120 },
+      laura:  { ca:500000, taux:40, optin:78, chantiers:65, fidelite:150 },
+      thomas: { ca:380000, taux:33, optin:68, chantiers:45, fidelite:110 },
+    },
+    resultats: { karim:{}, evan:{}, laura:{}, thomas:{} },
+  };
+}
+
+/* ════════════════════════════════════════════════════════════
+   JSONBIN — lecture/écriture  (fallback localStorage si non configuré)
+════════════════════════════════════════════════════════════ */
+const JSONBIN_BASE = 'https://api.jsonbin.io/v3/b';
+
+async function remoteRead() {
+  if (!JSONBIN_KEY || !JSONBIN_ID) return null;
+  try {
+    const r = await fetch(`${JSONBIN_BASE}/${JSONBIN_ID}/latest`, {
+      headers: { 'X-Master-Key': JSONBIN_KEY }
+    });
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const json = await r.json();
+    return json.record || null;
+  } catch(e) { console.warn('JSONBin read error', e); return null; }
+}
+
+async function remoteWrite(data) {
+  if (!JSONBIN_KEY || !JSONBIN_ID) return;
+  try {
+    setSyncIcon('loading');
+    const r = await fetch(`${JSONBIN_BASE}/${JSONBIN_ID}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY },
+      body: JSON.stringify(data)
+    });
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    setSyncIcon('ok');
+  } catch(e) { console.warn('JSONBin write error', e); setSyncIcon('error'); }
+}
+
+function localSave() { try{localStorage.setItem(LOCAL_KEY,JSON.stringify(state));}catch(e){} }
+function localLoad() { try{const s=localStorage.getItem(LOCAL_KEY);if(s){const p=JSON.parse(s);if(p&&p.objectifs&&p.resultats)state=p;}}catch(e){} }
+
+async function saveState() { localSave(); await remoteWrite(state); }
+
+async function loadState() {
+  localLoad();                          // cache local affiché immédiatement
+  const remote = await remoteRead();
+  if (remote && remote.objectifs && remote.resultats) { state = remote; localSave(); }
+}
+
+function setSyncIcon(status) {
+  const el=document.getElementById('sync-icon'); if(!el)return;
+  if(status==='loading'){el.textContent='↻';el.className='sync-status sync-load spin';}
+  else if(status==='ok'){el.textContent='✓';el.className='sync-status sync-ok';setTimeout(()=>{el.textContent='';el.className='sync-status sync-load';},3000);}
+  else{el.textContent='⚠';el.className='sync-status sync-err';}
+}
+
+/* ════════════════════════════════════════════════════════════
+   LOGIN
+════════════════════════════════════════════════════════════ */
+let selectedAccountId = null;
+
+function initLogin() {
+  const list=document.getElementById('login-user-list');
+  list.innerHTML='';
+  Object.entries(ACCOUNTS).forEach(([id,acc])=>{
+    const btn=document.createElement('button');
+    btn.className='login-user-btn';
+    btn.innerHTML=`
+      <div class="login-user-avatar" style="background:${acc.bg};color:${acc.color};border-radius:10px">${acc.label[0]}</div>
+      <div>
+        <div class="login-user-name">${acc.label}</div>
+        <div class="login-user-role">${acc.role==='manager'?'Chef de secteur':'Conseiller de vente'}</div>
+      </div>`;
+    btn.onclick=()=>selectAccount(id);
+    list.appendChild(btn);
+  });
+  document.getElementById('login-pin-section').style.display='none';
+  document.getElementById('login-error').textContent='';
+  selectedAccountId=null;
+  [0,1,2,3].forEach(i=>{
+    const inp=document.getElementById('pin'+i);
+    inp.value='';
+    inp.oninput=()=>{
+      inp.value=inp.value.replace(/\D/g,'').slice(-1);
+      if(inp.value&&i<3)document.getElementById('pin'+(i+1)).focus();
+      if(i===3&&getPin().length===4)doLogin();
+    };
+    inp.onkeydown=e=>{if(e.key==='Backspace'&&!inp.value&&i>0)document.getElementById('pin'+(i-1)).focus();};
+  });
+}
+
+function selectAccount(id) {
+  selectedAccountId=id;
+  document.querySelectorAll('.login-user-btn').forEach((btn,i)=>{
+    btn.classList.toggle('selected',Object.keys(ACCOUNTS)[i]===id);
+  });
+  document.getElementById('login-pin-section').style.display='block';
+  document.getElementById('login-pin-label').textContent=`Code PIN — ${ACCOUNTS[id].label}`;
+  document.getElementById('login-error').textContent='';
+  [0,1,2,3].forEach(i=>{document.getElementById('pin'+i).value='';});
+  document.getElementById('pin0').focus();
+}
+
+function getPin(){return [0,1,2,3].map(i=>document.getElementById('pin'+i).value).join('');}
+
+function doLogin() {
+  if(!selectedAccountId)return;
+  const acc=ACCOUNTS[selectedAccountId], pin=getPin();
+  if(pin!==acc.pin){
+    document.getElementById('login-error').textContent='Code incorrect, réessaie.';
+    [0,1,2,3].forEach(i=>{document.getElementById('pin'+i).value='';});
+    document.getElementById('pin0').focus();
+    return;
+  }
+  currentUser={id:selectedAccountId,...acc};
+  sessionStorage.setItem('lm_session',JSON.stringify({id:selectedAccountId}));
+  afterLogin();
+}
+
+function doLogout() {
+  currentUser=null;
+  sessionStorage.removeItem('lm_session');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-login').classList.add('active');
+  initLogin();
+}
+
+async function afterLogin() {
+  await loadState();
+  if(currentUser.role==='manager'){
+    renderHome();
+    goScreen('screen-home');
+  } else {
+    renderAdvisor(currentUser.id);
+    goScreen('screen-advisor');
+  }
+}
+
+function tryRestoreSession() {
+  try {
+    const s=sessionStorage.getItem('lm_session'); if(!s)return false;
+    const{id}=JSON.parse(s); if(!ACCOUNTS[id])return false;
+    currentUser={id,...ACCOUNTS[id]}; return true;
+  } catch(e){return false;}
+}
+
+/* ════════════════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════════════════ */
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='screen-synthese')renderSynthese();
+  if(id==='screen-objectifs')renderObjectifs();
+}
+function goHome(){goScreen('screen-home');renderHome();}
+function openVendeur(v){currentVendeur=v;document.getElementById('vendor-title').textContent=NOMS[v];goScreen('screen-vendor');renderVendeur(v);}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+
+/* ════════════════════════════════════════════════════════════
+   DATA HELPERS
+════════════════════════════════════════════════════════════ */
+function getAv(vendeur) {
+  const obj=state.objectifs[vendeur],res=state.resultats[vendeur];
+  const md=Object.keys(res).map(Number); const av={};
+  KPI_KEYS.forEach(k=>{
+    if(KPI_IS_PCT[k]){
+      const vals=md.map(m=>res[m][k]).filter(v=>v!=null&&!isNaN(v));
+      const moy=vals.length>0?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+      av[k]={realise:moy,pct:vals.length>0?moy/obj[k]*100:0,count:vals.length};
+    }else{
+      const total=md.reduce((s,m)=>s+(res[m][k]||0),0);
+      av[k]={realise:total,pct:obj[k]>0?total/obj[k]*100:0};
+    }
+  });
+  return av;
+}
+function getTrend(vendeur,k){
+  const res=state.resultats[vendeur],md=Object.keys(res).map(Number).sort((a,b)=>a-b);
+  if(md.length<2)return null;
+  const last=res[md[md.length-1]][k],prev=res[md[md.length-2]][k];
+  if(last==null||prev==null||isNaN(last)||isNaN(prev)||prev===0)return null;
+  return((last-prev)/Math.abs(prev))*100;
+}
+function statusCls(pct,moisDone){
+  const traj=moisDone>0?(moisDone/12)*100:0;
+  if(pct>=traj)return'ok'; if(pct>=traj*.85)return'warn'; return'ko';
+}
+function globalScore(vendeur){
+  const av=getAv(vendeur);
+  return Math.round(KPI_KEYS.map(k=>av[k].pct).reduce((a,b)=>a+b,0)/KPI_KEYS.length);
+}
+function getSuggestion(vendeur){
+  const obj=state.objectifs[vendeur],res=state.resultats[vendeur];
+  const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
+  // Si pas de données → on propose objectif du mois courant basé sur l'annuel
+  const currentMonth = new Date().getMonth();
+  const ms = md.length > 0 ? Math.max(...md)+1 : currentMonth;
+  if(ms>11)return null;
+  const mr=12-ms,sugg={};
+  KPI_KEYS.forEach(k=>{
+    if(md.length===0){
+      // Pas de données : objectif mensuel = annuel / 12
+      sugg[k]={val: KPI_IS_PCT[k] ? obj[k] : obj[k]/12};
+    } else if(KPI_IS_PCT[k]){
+      const vals=md.map(m=>res[m][k]).filter(v=>v!=null&&!isNaN(v));
+      const moy=vals.length>0?vals.reduce((a,b)=>a+b,0)/vals.length:obj[k];
+      sugg[k]={val:Math.max(0,obj[k]+(obj[k]-moy)*.3)};
+    }else{
+      const realise=md.reduce((s,m)=>s+(res[m][k]||0),0);
+      const retard=(obj[k]/12*ms)-realise;
+      sugg[k]={val:Math.max(0,obj[k]/12+(retard>0?retard/mr*.5:0))};
+    }
+  });
+  return{sugg,moisSuivant:ms};
+}
+
+/* ════════════════════════════════════════════════════════════
+   KPI CARD
+════════════════════════════════════════════════════════════ */
+function makeKpiCard(vendeur,k,i,av,moisDoneCount){
+  const obj=state.objectifs[vendeur],pct=av[k].pct;
+  const cls=statusCls(pct,moisDoneCount),barPct=Math.min(100,pct);
+  const trajPct=moisDoneCount>0?Math.min(100,(moisDoneCount/12)*100):0;
+  const trend=getTrend(vendeur,k);
+  let trendHtml='';
+  if(trend!==null){
+    const sym=trend>1?'▲':trend<-1?'▼':'→';
+    const tc=trend>1?'trend-up':trend<-1?'trend-down':'trend-flat';
+    trendHtml=`<span class="kpi-trend ${tc}">${sym} ${Math.abs(trend).toFixed(0)}% vs mois préc.</span>`;
+  }
+  let pill='',remain='';
+  if(!moisDoneCount){
+    pill=`<span class="kpi-pill" style="background:var(--surf2);color:var(--t2)">Aucune saisie</span>`;
+  }else if(!KPI_IS_PCT[k]){
+    const attendu=obj[k]/12*moisDoneCount,ecart=av[k].realise-attendu,ef=KPI_FMT[k](Math.abs(ecart));
+    pill=ecart>=0
+      ?`<span class="kpi-pill" style="background:var(--ok-bg);color:var(--ok)">+${ef} d'avance</span>`
+      :`<span class="kpi-pill" style="background:var(--ko-bg);color:var(--ko)">−${ef} de retard</span>`;
+    const restant=obj[k]-av[k].realise,mr=12-moisDoneCount;
+    if(restant<=0)remain=`<span class="kpi-remaining" style="color:var(--ok);font-weight:700">✓ Objectif annuel atteint !</span>`;
+    else if(mr>0)remain=`<span class="kpi-remaining">Reste <b>${KPI_FMT[k](restant)}</b> en ${mr} mois</span>`;
+  }else{
+    const ecart=av[k].realise-obj[k],ea=Math.abs(ecart).toFixed(1);
+    pill=ecart>=0
+      ?`<span class="kpi-pill" style="background:var(--ok-bg);color:var(--ok)">+${ea} pt au-dessus</span>`
+      :`<span class="kpi-pill" style="background:var(--ko-bg);color:var(--ko)">−${ea} pt en dessous</span>`;
+    remain=`<span class="kpi-remaining">Moyenne : <b>${KPI_FMT[k](av[k].realise)}</b> · Objectif : ${KPI_FMT[k](obj[k])}</span>`;
+  }
+  return`<div class="kpi-card">
+    <div class="kpi-card-top">
+      <div style="flex:1;min-width:0">
+        <div class="kpi-name">${KPI_FULL[i]}</div>
+        <div class="kpi-value">${KPI_FMT[k](av[k].realise)}</div>
+        <div class="kpi-obj">Objectif annuel : ${KPI_FMT[k](obj[k])}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;max-width:52%">
+        ${pill}${trendHtml}
+      </div>
+    </div>
+    <div class="kpi-bar-wrap">
+      <div class="kpi-bar-track">
+        <div class="kpi-bar-fill" style="width:${barPct}%;background:${STATUS_BAR[cls]}"></div>
+      </div>
+      ${trajPct>0?`<div class="kpi-bar-target" style="left:calc(${trajPct}% - 1px)"><div class="kpi-bar-target-label">Attendu</div></div>`:''}
+    </div>
+    <div class="kpi-footer">${remain}<span class="kpi-chip">${moisDoneCount} mois saisi${moisDoneCount>1?'s':''}</span></div>
+  </div>`;
+}
+
+/* ════════════════════════════════════════════════════════════
+   HOME
+════════════════════════════════════════════════════════════ */
+function renderHome(){
+  const grid=document.getElementById('vendor-grid');
+  let html='';
+  VENDEURS.forEach(v=>{
+    const score=globalScore(v),md=Object.keys(state.resultats[v]).length;
+    const cls=statusCls(score,md);
+    html+=`<div class="vendor-card" onclick="openVendeur('${v}')">
+      <div class="vendor-card-avatar" style="background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
+      <div class="vendor-card-name">${NOMS[v]}</div>
+      <div class="vendor-card-months">${md>0?md+' mois saisi'+(md>1?'s':''):'Aucune saisie'}</div>
+      <div class="vendor-card-score">
+        <div class="vendor-card-pct" style="color:${STATUS_BAR[cls]}">${score}%</div>
+        <span class="badge ${cls}">${STATUS_LABEL[cls]}</span>
+      </div>
+      <div class="vprog"><div class="vprogfill" style="width:${Math.min(100,score)}%;background:${STATUS_BAR[cls]}"></div></div>
+    </div>`;
+  });
+  grid.innerHTML=html;
+}
+
+/* ════════════════════════════════════════════════════════════
+   VENDOR (manager)
+════════════════════════════════════════════════════════════ */
+function renderVendeur(v){
+  const content=document.getElementById('vendor-content');
+  const av=getAv(v),res=state.resultats[v],obj=state.objectifs[v];
+  const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
+  const suggestion=getSuggestion(v),score=globalScore(v),cls=statusCls(score,md.length);
+
+  let html=`<div class="hero-scores">`;
+  KPI_KEYS.forEach((k,i)=>{
+    const a=av[k],sc=statusCls(a.pct,md.length); let msg='—';
+    if(md.length>0){
+      if(KPI_IS_PCT[k]){const e=a.realise-obj[k];msg=(e>=0?'+':'')+e.toFixed(1)+' pt';}
+      else{const e=a.realise-(obj[k]/12*md.length);msg=(e>=0?'+':'−')+KPI_FMT[k](Math.abs(e));}
+    }
+    html+=`<div class="hero-score-item ${sc}-score"><div class="hero-score-val">${msg}</div><div class="hero-score-lbl">${KPI_LABELS[i]}</div></div>`;
+  });
+  html+=`</div>`;
+
+  html+=`<div class="section-label">Performance annuelle</div><div class="kpi-stack">`;
+  KPI_KEYS.forEach((k,i)=>{html+=makeKpiCard(v,k,i,av,md.length);});
+  html+=`</div>`;
+
+  html+=`<div class="section-label">Saisie du mois</div>
+  <div class="saisie-card" id="saisie-wrap-${v}">
+    <div class="saisie-toggle" onclick="toggleSaisie('${v}')">
+      <span class="saisie-toggle-label">Saisir les résultats</span>
+      <span class="saisie-toggle-icon" id="saisie-icon-${v}">+</span>
+    </div>
+    <div class="saisie-form" id="saisie-form-${v}">
+      <div class="divider"></div>
+      <div class="form-group"><label class="form-label">Mois</label><select id="s-mois-${v}"></select></div>
+      <div class="form-group"><label class="form-label">Montant commandé (€)</label><input type="number" id="s-ca-${v}" placeholder="ex : 42 000" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label">Taux de transformation (%)</label><input type="number" id="s-taux-${v}" placeholder="ex : 35.5" inputmode="decimal" step="0.1"></div>
+      <div class="form-group"><label class="form-label">Opt-in contactabilité (%)</label><input type="number" id="s-optin-${v}" placeholder="ex : 72.0" inputmode="decimal" step="0.1" min="0" max="100"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Chantiers vendus</label><input type="number" id="s-chantiers-${v}" placeholder="ex : 5" inputmode="numeric"></div>
+        <div class="form-group"><label class="form-label">Adhésions fidélité</label><input type="number" id="s-fidelite-${v}" placeholder="ex : 12" inputmode="numeric"></div>
+      </div>
+      <button class="btn btn-primary" onclick="saveVendeurEntry('${v}')">Enregistrer</button>
+    </div>
+  </div>`;
+
+  html+=`<div class="section-label">Évolution mensuelle</div>
+  <div class="card">
+    <div class="chips" id="chips-${v}"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="dot" style="background:${COLORS[v]}"></div>Réalisé</div>
+      <div class="legend-item"><div class="dot" style="background:#80CBC4;border:1px solid #4DB6AC"></div>Objectif</div>
+    </div>
+    <div class="chart-wrap h220"><canvas id="chart-${v}" role="img" aria-label="Évolution ${NOMS[v]}">Évolution mensuelle</canvas></div>
+  </div>`;
+
+  if(md.length>0){
+    html+=`<div class="section-label">Historique</div>
+    <div class="card"><div style="overflow-x:auto"><table class="htable">
+      <thead><tr><th>Mois</th><th class="num">CA</th><th class="num">Transfo</th><th class="num">Opt-in</th><th class="num">Chant.</th><th class="num">Fidél.</th></tr></thead><tbody>`;
+    md.forEach(m=>{const r=res[m];html+=`<tr><td style="font-weight:700">${MOIS_S[m]}</td>
+      <td class="num">${KPI_FMT.ca(r.ca)}</td><td class="num">${KPI_FMT.taux(r.taux)}</td>
+      <td class="num">${KPI_FMT.optin(r.optin)}</td><td class="num">${KPI_FMT.chantiers(r.chantiers)}</td>
+      <td class="num">${KPI_FMT.fidelite(r.fidelite)}</td></tr>`;});
+    html+=`</tbody></table></div></div>`;
+  }
+
+  if(suggestion){
+    const ms=suggestion.moisSuivant,mr=12-ms; let hl,sl;
+    if(score>=90){hl=`C'est en bonne route pour dépasser l'objectif annuel !`;sl=`Cibles pour maintenir l'élan en ${MOIS_S[ms]}.`;}
+    else if(score>=70){hl=`C'est en bonne route pour dépasser l'objectif annuel !`;sl=`Ces objectifs pour ${MOIS_S[ms]} permettront de rester dans la course.`;}
+    else{hl=`${mr} mois pour renverser la vapeur. Courage !`;sl=`Des cibles réalistes pour ${MOIS_S[ms]}.`;}
+    html+=`<div class="section-label">Objectif du mois suivant</div>
+    <div class="goal-card">
+      <svg class="goal-card-bg" width="160" height="130" viewBox="0 0 160 130" fill="none">
+        <polygon points="80,0 160,60 160,130 0,130 0,60" fill="white"/>
+        <rect x="55" y="65" width="50" height="65" fill="white" opacity=".6"/>
+        <rect x="68" y="85" width="24" height="45" fill="white" opacity=".4"/>
+        <rect x="60" y="70" width="16" height="16" fill="white" opacity=".4"/>
+        <rect x="84" y="70" width="16" height="16" fill="white" opacity=".4"/>
+      </svg>
+      <div class="goal-month">Objectif conseillé · ${MOIS_S[ms]} · ${mr} mois restant${mr>1?'s':''}</div>
+      <div class="goal-headline">${hl}</div>
+      <div class="goal-sub">${sl}</div>
+      <div class="goal-grid">`;
+    KPI_KEYS.forEach((k,i)=>{
+      const val=suggestion.sugg[k].val,base=KPI_IS_PCT[k]?obj[k]:obj[k]/12,diff=val-base;
+      let dl,dc;
+      if(diff>.5){dl='↑ rattrapage';dc='down';}else if(diff<-.5){dl='↓ en avance';dc='up';}else{dl='→ rythme de croisière';dc='same';}
+      html+=`<div class="goal-item"><div class="goal-kpi">${KPI_FULL[i]}</div><div class="goal-val">${KPI_FMT[k](val)}</div><div class="goal-delta ${dc}">${dl}</div></div>`;
+    });
+    html+=`</div></div>`;
+  }
+
+  html+=`<div style="height:24px"></div>`;
+  content.innerHTML=html;
+
+  const selMois=document.getElementById(`s-mois-${v}`);
+  MOIS_L.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m;selMois.appendChild(o);});
+  selMois.value=md.length>0?Math.min(11,Math.max(...md)+1):new Date().getMonth();
+
+  let selKpi=0;
+  const chipsDiv=document.getElementById('chips-'+v);
+  KPI_LABELS.forEach((lbl,i)=>{
+    const chip=document.createElement('div');
+    chip.className='chip'+(i===0?' active':'');chip.textContent=lbl;
+    chip.onclick=()=>{selKpi=i;chipsDiv.querySelectorAll('.chip').forEach((c,j)=>c.classList.toggle('active',j===i));drawChart('chart-'+v,v,selKpi);};
+    chipsDiv.appendChild(chip);
+  });
+  setTimeout(()=>drawChart('chart-'+v,v,0),60);
+}
+
+function toggleSaisie(v){
+  const form=document.getElementById(`saisie-form-${v}`),icon=document.getElementById(`saisie-icon-${v}`);
+  form.classList.toggle('open');icon.classList.toggle('open',form.classList.contains('open'));
+}
+
+async function saveVendeurEntry(v){
+  const m=parseInt(document.getElementById(`s-mois-${v}`).value);
+  const vals={
+    ca:parseFloat(document.getElementById(`s-ca-${v}`).value),
+    taux:parseFloat(document.getElementById(`s-taux-${v}`).value),
+    optin:parseFloat(document.getElementById(`s-optin-${v}`).value),
+    chantiers:parseFloat(document.getElementById(`s-chantiers-${v}`).value),
+    fidelite:parseFloat(document.getElementById(`s-fidelite-${v}`).value),
+  };
+  if(Object.values(vals).some(isNaN)){toast('Remplis tous les champs');return;}
+  state.resultats[v][m]=vals;
+  await saveState();
+  toast(`${NOMS[v]} · ${MOIS_L[m]} enregistré ✓`);
+  renderVendeur(v);
+}
+
+/* ════════════════════════════════════════════════════════════
+   ADVISOR VIEW
+════════════════════════════════════════════════════════════ */
+function renderAdvisor(v){
+  const content=document.getElementById('advisor-content');
+  const av=getAv(v),res=state.resultats[v],obj=state.objectifs[v];
+  const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
+  const suggestion=getSuggestion(v),score=globalScore(v),cls=statusCls(score,md.length);
+
+  let html=`<div class="advisor-hero">
+    <div class="advisor-avatar" style="background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
+    <div>
+      <div class="advisor-name">${NOMS[v]}</div>
+      <div class="advisor-meta">${md.length} mois saisi${md.length>1?'s':''}</div>
+      <span class="advisor-status ${cls}" style="background:${cls==='ok'?'rgba(102,187,106,.2)':cls==='warn'?'rgba(255,167,38,.2)':'rgba(239,83,80,.2)'};color:${STATUS_BAR[cls]}">
+        ${score}% · ${STATUS_LABEL[cls]}
+      </span>
+    </div>
+  </div>`;
+
+  html+=`<div class="section-label">Mes performances</div><div class="kpi-stack">`;
+  KPI_KEYS.forEach((k,i)=>{html+=makeKpiCard(v,k,i,av,md.length);});
+  html+=`</div>`;
+
+  html+=`<div class="section-label">Mon évolution</div>
+  <div class="card">
+    <div class="chips" id="chips-adv-${v}"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="dot" style="background:${COLORS[v]}"></div>Réalisé</div>
+      <div class="legend-item"><div class="dot" style="background:#80CBC4;border:1px solid #4DB6AC"></div>Objectif</div>
+    </div>
+    <div class="chart-wrap h220"><canvas id="chart-adv-${v}" role="img" aria-label="Évolution ${NOMS[v]}">Évolution</canvas></div>
+  </div>`;
+
+  if(md.length>0){
+    html+=`<div class="section-label">Mon historique</div>
+    <div class="card"><div style="overflow-x:auto"><table class="htable">
+      <thead><tr><th>Mois</th><th class="num">CA</th><th class="num">Transfo</th><th class="num">Opt-in</th><th class="num">Chant.</th><th class="num">Fidél.</th></tr></thead><tbody>`;
+    md.forEach(m=>{const r=res[m];html+=`<tr><td style="font-weight:700">${MOIS_S[m]}</td>
+      <td class="num">${KPI_FMT.ca(r.ca)}</td><td class="num">${KPI_FMT.taux(r.taux)}</td>
+      <td class="num">${KPI_FMT.optin(r.optin)}</td><td class="num">${KPI_FMT.chantiers(r.chantiers)}</td>
+      <td class="num">${KPI_FMT.fidelite(r.fidelite)}</td></tr>`;});
+    html+=`</tbody></table></div></div>`;
+  }
+
+  if(suggestion){
+    const ms=suggestion.moisSuivant,mr=12-ms; let hl,sl;
+    if(score>=90){hl=`C'est en bonne route pour dépasser ton objectif annuel !`;sl=`Voici tes cibles pour ${MOIS_S[ms]}.`;}
+    else if(score>=70){hl=`C'est en bonne route pour dépasser ton objectif annuel !`;sl=`Garde le cap pour ${MOIS_S[ms]}.`;}
+    else{hl=`${mr} mois pour renverser la vapeur. Courage !`;sl=`Des objectifs atteignables pour ${MOIS_S[ms]}.`;}
+    html+=`<div class="section-label">Mon objectif pour le mois prochain</div>
+    <div class="goal-card">
+      <svg class="goal-card-bg" width="160" height="130" viewBox="0 0 160 130" fill="none">
+        <polygon points="80,0 160,60 160,130 0,130 0,60" fill="white"/>
+        <rect x="55" y="65" width="50" height="65" fill="white" opacity=".6"/>
+        <rect x="68" y="85" width="24" height="45" fill="white" opacity=".4"/>
+        <rect x="60" y="70" width="16" height="16" fill="white" opacity=".4"/>
+        <rect x="84" y="70" width="16" height="16" fill="white" opacity=".4"/>
+      </svg>
+      <div class="goal-month">Objectif conseillé · ${MOIS_S[ms]} · ${mr} mois restant${mr>1?'s':''}</div>
+      <div class="goal-headline">${hl}</div>
+      <div class="goal-sub">${sl}</div>
+      <div class="goal-grid">`;
+    KPI_KEYS.forEach((k,i)=>{
+      const val=suggestion.sugg[k].val,base=KPI_IS_PCT[k]?obj[k]:obj[k]/12,diff=val-base;
+      let dl,dc;
+      if(diff>.5){dl='↑ rattrapage';dc='down';}else if(diff<-.5){dl='↓ en avance';dc='up';}else{dl='→ rythme de croisière';dc='same';}
+      html+=`<div class="goal-item"><div class="goal-kpi">${KPI_FULL[i]}</div><div class="goal-val">${KPI_FMT[k](val)}</div><div class="goal-delta ${dc}">${dl}</div></div>`;
+    });
+    html+=`</div></div>`;
+  }
+
+  html+=`<div style="height:24px"></div>`;
+  content.innerHTML=html;
+
+  let selKpi=0;
+  const chipsDiv=document.getElementById(`chips-adv-${v}`);
+  KPI_LABELS.forEach((lbl,i)=>{
+    const chip=document.createElement('div');
+    chip.className='chip'+(i===0?' active':'');chip.textContent=lbl;
+    chip.onclick=()=>{selKpi=i;chipsDiv.querySelectorAll('.chip').forEach((c,j)=>c.classList.toggle('active',j===i));drawChart('chart-adv-'+v,v,selKpi);};
+    chipsDiv.appendChild(chip);
+  });
+  setTimeout(()=>drawChart('chart-adv-'+v,v,0),60);
+}
+
+/* ════════════════════════════════════════════════════════════
+   CHARTS
+════════════════════════════════════════════════════════════ */
+const chartInstances={};
+function drawChart(canvasId,v,ki){
+  const canvas=document.getElementById(canvasId);if(!canvas)return;
+  if(chartInstances[canvasId])chartInstances[canvasId].destroy();
+  const res=state.resultats[v],obj=state.objectifs[v];
+  const k=KPI_KEYS[ki],col=COLORS[v],isPct=KPI_IS_PCT[k];
+  const realData=MOIS_S.map((_,m)=>(res[m]&&res[m][k]!=null)?res[m][k]:null);
+  const objM=isPct?obj[k]:obj[k]/12,tc='#9BA5B8';
+  chartInstances[canvasId]=new Chart(canvas,{
+    type:'bar',
+    data:{labels:MOIS_S,datasets:[
+      {label:'Réalisé',data:realData,backgroundColor:col+'28',borderColor:col,borderWidth:1.5,borderRadius:6,order:1},
+      {label:'Objectif',data:MOIS_S.map(()=>objM),type:'line',borderColor:'#80CBC4',borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false,order:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.y==null?null:`${ctx.dataset.label}: ${KPI_FMT[k](ctx.parsed.y)}`}}},
+      scales:{
+        x:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},autoSkip:false,maxRotation:0}},
+        y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},callback:v=>{
+          if(ki===0)return'€'+Math.round(v/1000)+'k';if(isPct)return v+'%';return Math.round(v);
+        }}}
+      }
+    }
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   SYNTHESE
+════════════════════════════════════════════════════════════ */
+function renderSynthese(){
+  const div=document.getElementById('synthese-content');
+  let html=`<div class="card"><div class="card-title">% Réalisation annuelle</div>
+    <div class="chart-wrap h220"><canvas id="chart-syn" role="img" aria-label="Synthèse">Synthèse</canvas></div>
+  </div>
+  <div class="card"><div class="card-title">Détail par KPI</div>
+    <div style="overflow-x:auto"><table class="stable"><thead><tr><th style="text-align:left">Vendeur</th>`;
+  KPI_LABELS.forEach(l=>{html+=`<th>${l}</th>`;});
+  html+=`</tr></thead><tbody>`;
+  VENDEURS.forEach(v=>{
+    const av=getAv(v),md=Object.keys(state.resultats[v]).length;
+    html+=`<tr><td style="text-align:left;white-space:nowrap">
+      <div style="display:flex;align-items:center;gap:7px">
+        <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
+        <span style="font-weight:700">${NOMS[v]}</span>
+      </div></td>`;
+    KPI_KEYS.forEach(k=>{
+      const pct=Math.round(av[k].pct),cls=statusCls(av[k].pct,md);
+      html+=`<td><span class="badge ${cls}">${pct}%</span></td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</tbody></table></div></div><div style="height:24px"></div>`;
+  div.innerHTML=html;
+  setTimeout(()=>{
+    const canvas=document.getElementById('chart-syn');if(!canvas)return;
+    if(chartInstances['chart-syn'])chartInstances['chart-syn'].destroy();
+    const tc='#9BA5B8',kC=['#009688','#003087','#F57C00','#5C6BC0','#546E7A'];
+    chartInstances['chart-syn']=new Chart(canvas,{
+      type:'bar',
+      data:{labels:VENDEURS.map(v=>NOMS[v]),datasets:KPI_KEYS.map((k,i)=>({
+        label:KPI_LABELS[i],data:VENDEURS.map(v=>Math.round(getAv(v)[k].pct)),
+        backgroundColor:kC[i]+'50',borderColor:kC[i],borderWidth:1.5,borderRadius:5,
+      }))},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}%`}}},
+        scales:{x:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:13,weight:'600'}}},
+          y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},callback:v=>v+'%'},min:0}}
+      }
+    });
+    const legDiv=document.createElement('div');legDiv.className='legend';legDiv.style.marginTop='10px';
+    kC.forEach((c,i)=>{const it=document.createElement('div');it.className='legend-item';it.innerHTML=`<div class="dot" style="background:${c}"></div>${KPI_LABELS[i]}`;legDiv.appendChild(it);});
+    canvas.parentElement.parentElement.appendChild(legDiv);
+  },60);
+}
+
+/* ════════════════════════════════════════════════════════════
+   OBJECTIFS
+════════════════════════════════════════════════════════════ */
+function renderObjectifs(){
+  const div=document.getElementById('objectifs-content');
+  let html='';
+  VENDEURS.forEach(v=>{
+    const obj=state.objectifs[v];
+    html+=`<div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
+        <div class="card-title" style="margin:0">${NOMS[v]}</div>
+      </div><div class="form-row">`;
+    KPI_KEYS.forEach((k,i)=>{
+      const unit=k==='ca'?' (€)':KPI_IS_PCT[k]?' (%)':'';
+      html+=`<div class="form-group">
+        <label class="form-label">${KPI_LABELS[i]}${unit}</label>
+        <input type="number" id="obj-${v}-${k}" value="${obj[k]}" inputmode="decimal" step="${KPI_IS_PCT[k]?'0.1':'1'}">
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+  html+=`<div style="height:24px"></div>`;
+  div.innerHTML=html;
+}
+
+async function saveObjectifs(){
+  VENDEURS.forEach(v=>{KPI_KEYS.forEach(k=>{
+    const el=document.getElementById(`obj-${v}-${k}`);
+    if(el){const val=parseFloat(el.value);if(!isNaN(val))state.objectifs[v][k]=val;}
+  });});
+  await saveState();toast('Objectifs sauvegardés ✓');
+}
+
+/* ════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════ */
+const now=new Date();
+document.getElementById('current-year').textContent=now.getFullYear();
+const homeDate=document.getElementById('home-date');
+if(homeDate)homeDate.textContent=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+
+(async function init(){
+  if(tryRestoreSession()){
+    await afterLogin();
+  }else{
+    initLogin();
+  }
+})();
+</script>
+</body>
+</html>
