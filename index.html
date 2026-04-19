@@ -82,14 +82,19 @@ html,body{background:var(--bg);color:var(--text);font-family:-apple-system,Blink
 
 /* ── TOPBAR ──────────────────────────────────────────────── */
 .topbar{background:var(--sidebar);color:#fff;padding:14px 16px 13px;display:flex;align-items:center;gap:10px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.topbar-back{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:20px;line-height:1;border:none;color:#fff;transition:background .15s}
-.topbar-back:active{background:rgba(255,255,255,0.2)}
+.topbar-back{display:none}
 .topbar-center{flex:1;min-width:0}
 .topbar-title{font-size:16px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .topbar-sub{font-size:11px;opacity:.5;margin-top:1px}
-.topbar-action{background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;letter-spacing:.3px;transition:background .15s}
-.topbar-action:active{background:rgba(255,255,255,0.2)}
+.topbar-action{display:none}
 .topbar-teal-pill{background:var(--teal);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0;letter-spacing:.5px}
+
+/* ── BOTTOM ACTION BAR ───────────────────────────────────── */
+.bottom-bar{position:sticky;bottom:0;left:0;right:0;padding:12px 16px;background:var(--surf);border-top:1px solid var(--brd);display:flex;gap:10px;z-index:50;box-shadow:0 -4px 16px rgba(0,0,0,0.1)}
+.bottom-bar-back{flex:1;padding:15px;border-radius:12px;border:2px solid var(--brd2);background:var(--surf2);color:var(--text);font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+.bottom-bar-back:active{background:var(--brd)}
+.bottom-bar-save{flex:2;padding:15px;border-radius:12px;border:none;background:#FFD100;color:#1a1200;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(255,209,0,0.4);transition:opacity .15s}
+.bottom-bar-save:active{opacity:.85}
 
 /* ── CONTENT ─────────────────────────────────────────────── */
 .scroll-content{flex:1;overflow-y:auto;padding:20px 16px;max-width:640px;width:100%;margin:0 auto}
@@ -332,13 +337,16 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 <!-- ═══ FICHE VENDEUR ═══ -->
 <div class="screen" id="screen-vendor">
   <div class="topbar">
-    <button class="topbar-back" onclick="goHome()">‹</button>
+    <button class="topbar-back" onclick="goHome()">‹ Retour</button>
     <div class="topbar-center">
       <div class="topbar-title" id="vendor-title">Vendeur</div>
       <div class="topbar-sub">Suivi de performance</div>
     </div>
   </div>
   <div class="scroll-content" id="vendor-content"></div>
+  <div class="bottom-bar">
+    <button class="bottom-bar-back" onclick="goHome()">‹ Retour</button>
+  </div>
 </div>
 
 <!-- ═══ VUE CONSEILLER ═══ -->
@@ -354,24 +362,30 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
     <button class="topbar-action" onclick="doLogout()">🔒 Quitter</button>
   </div>
   <div class="scroll-content" id="advisor-content"></div>
+  <div class="bottom-bar">
+    <button class="bottom-bar-back" onclick="doLogout()">🔒 Quitter</button>
+  </div>
 </div>
 
 <!-- ═══ SYNTHESE ═══ -->
 <div class="screen" id="screen-synthese">
   <div class="topbar">
-    <button class="topbar-back" onclick="goHome()">‹</button>
+    <button class="topbar-back" onclick="goHome()">‹ Retour</button>
     <div class="topbar-center">
       <div class="topbar-title">Synthèse équipe</div>
       <div class="topbar-sub">Vue comparative</div>
     </div>
   </div>
   <div class="scroll-content" id="synthese-content"></div>
+  <div class="bottom-bar">
+    <button class="bottom-bar-back" onclick="goHome()">‹ Retour</button>
+  </div>
 </div>
 
 <!-- ═══ OBJECTIFS ═══ -->
 <div class="screen" id="screen-objectifs">
   <div class="topbar">
-    <button class="topbar-back" onclick="goHome()">‹</button>
+    <button class="topbar-back" onclick="goHome()">‹ Retour</button>
     <div class="topbar-center">
       <div class="topbar-title">Objectifs annuels</div>
       <div class="topbar-sub">Modifier les cibles</div>
@@ -379,6 +393,10 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
     <button class="topbar-action" onclick="saveObjectifs()">Sauvegarder</button>
   </div>
   <div class="scroll-content"><div id="objectifs-content"></div></div>
+  <div class="bottom-bar">
+    <button class="bottom-bar-back" onclick="goHome()">‹ Retour</button>
+    <button class="bottom-bar-save" onclick="saveObjectifs()">💾 Sauvegarder</button>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -440,10 +458,10 @@ const LOCAL_KEY = 'lm_perf_v10';
 function defaultState() {
   return {
     objectifs: {
-      karim:  { ca:480000, taux:38, optin:75, chantiers:60, fidelite:140 },
-      evan:   { ca:420000, taux:35, optin:70, chantiers:50, fidelite:120 },
-      laura:  { ca:500000, taux:40, optin:78, chantiers:65, fidelite:150 },
-      thomas: { ca:380000, taux:33, optin:68, chantiers:45, fidelite:110 },
+      karim:  { ca:480000, taux:30, optin:80, chantiers:60, fidelite:120 },
+      evan:   { ca:420000, taux:30, optin:80, chantiers:50, fidelite:120 },
+      laura:  { ca:500000, taux:30, optin:80, chantiers:65, fidelite:120 },
+      thomas: { ca:380000, taux:30, optin:80, chantiers:45, fidelite:120 },
     },
     resultats: { karim:{}, evan:{}, laura:{}, thomas:{} },
   };
