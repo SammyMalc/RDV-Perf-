@@ -41,7 +41,7 @@
 }
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;min-height:100vh}
+html,body{background:var(--sidebar);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;min-height:100vh}
 
 /* ── SCREENS ─────────────────────────────────────────────── */
 .screen{display:none;min-height:100vh;flex-direction:column}
@@ -243,6 +243,29 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 .sync-err{background:rgba(239,83,80,.2);color:#FFCDD2}
 .sync-load{color:rgba(255,255,255,.4)}
 
+/* ── SPLASH SCREEN ───────────────────────────────────────── */
+#screen-splash{position:fixed;inset:0;background:var(--sidebar);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:28px;transition:opacity .7s ease;overflow:hidden}
+#screen-splash.fade-out{opacity:0;pointer-events:none}
+.splash-bars{display:flex;align-items:flex-end;gap:14px;height:180px}
+.splash-bar{border-radius:10px 10px 0 0;height:0;transition:height .6s cubic-bezier(.4,0,.2,1),opacity .4s ease}
+.splash-bar-glow{box-shadow:0 0 18px rgba(120,190,32,.5)}
+.splash-brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.splash-brand.show{opacity:1;transform:translateY(0)}
+.splash-title{font-size:56px;font-weight:800;letter-spacing:-2px;color:#fff;line-height:1;text-align:center}
+.splash-subtitle{font-size:15px;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;font-weight:500;text-align:center}
+.splash-score-row{display:flex;gap:20px;margin-top:14px;justify-content:center}
+.splash-score-item{display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .4s ease}
+.splash-score-item.show{opacity:1;transform:translateY(0)}
+.splash-score-val{font-size:22px;font-weight:800;color:#fff}
+.splash-score-lbl{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px}
+.splash-ring{position:relative;width:100px;height:100px;opacity:0;transition:opacity .5s ease}
+.splash-ring.show{opacity:1}
+.splash-ring svg{transform:rotate(-90deg)}
+.splash-ring-track{fill:none;stroke:rgba(255,255,255,.12);stroke-width:8}
+.splash-ring-fill{fill:none;stroke:#78BE20;stroke-width:8;stroke-linecap:round;stroke-dasharray:263;stroke-dashoffset:263;transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1)}
+.splash-ring-fill.animate{stroke-dashoffset:24}
+.splash-ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;text-align:center}
+
 /* ── LOGOUT ROW ──────────────────────────────────────────── */
 .logout-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:var(--r);background:var(--surf);border:1px solid var(--brd);cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s}
 .logout-row:active{transform:scale(.98)}
@@ -250,8 +273,90 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 </head>
 <body>
 
+
+<!-- ═══ SPLASH ═══ -->
+<div id="screen-splash">
+  <!-- Barres de performance -->
+  <div class="splash-bars">
+    <div class="splash-bar" id="sb1" style="background:#78BE20;width:26px" ></div>
+    <div class="splash-bar" id="sb2" style="background:#009688;width:34px" ></div>
+    <div class="splash-bar" id="sb3" style="background:#5C6BC0;width:26px" ></div>
+    <div class="splash-bar" id="sb4" style="background:#78BE20;width:42px" ></div>
+    <div class="splash-bar" id="sb5" style="background:#009688;width:28px" ></div>
+    <div class="splash-bar" id="sb6" style="background:#78BE20;width:32px" ></div>
+    <div class="splash-bar" id="sb7" style="background:#5C6BC0;width:26px" ></div>
+  </div>
+
+  <!-- Logo + titre -->
+  <div class="splash-brand" id="splash-brand">
+    <div style="display:flex;align-items:center;gap:14px;justify-content:center">
+      <svg width="52" height="46" viewBox="0 0 32 28" fill="none"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
+      <div>
+        <div class="splash-title">RDV Perf</div>
+        <div class="splash-subtitle">Être acteur de sa performance</div>
+      </div>
+    </div>
+
+  <!-- KPI animés -->
+    <div class="splash-score-row">
+      <div class="splash-score-item" id="ss1">
+        <div class="splash-ring" id="ring1">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle class="splash-ring-track" cx="50" cy="50" r="42"/>
+            <circle class="splash-ring-fill" id="ring1-fill" cx="50" cy="50" r="42" style="stroke:#78BE20;stroke-dashoffset:263"/>
+          </svg>
+          <div class="splash-ring-label">CA</div>
+        </div>
+        <div class="splash-score-lbl">Montant</div>
+      </div>
+      <div class="splash-score-item" id="ss2">
+        <div class="splash-ring" id="ring2">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle class="splash-ring-track" cx="50" cy="50" r="42"/>
+            <circle class="splash-ring-fill" id="ring2-fill" cx="50" cy="50" r="42" style="stroke:#009688;stroke-dashoffset:263"/>
+          </svg>
+          <div class="splash-ring-label">%</div>
+        </div>
+        <div class="splash-score-lbl">Transfo</div>
+      </div>
+      <div class="splash-score-item" id="ss3">
+        <div class="splash-ring" id="ring3">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle class="splash-ring-track" cx="50" cy="50" r="42"/>
+            <circle class="splash-ring-fill" id="ring3-fill" cx="50" cy="50" r="42" style="stroke:#5C6BC0;stroke-dashoffset:263"/>
+          </svg>
+          <div class="splash-ring-label">%</div>
+        </div>
+        <div class="splash-score-lbl">Opt-in</div>
+      </div>
+      <div class="splash-score-item" id="ss4">
+        <div class="splash-ring" id="ring4">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle class="splash-ring-track" cx="50" cy="50" r="42"/>
+            <circle class="splash-ring-fill" id="ring4-fill" cx="50" cy="50" r="42" style="stroke:#78BE20;stroke-dashoffset:263"/>
+          </svg>
+          <div class="splash-ring-label">🏠</div>
+        </div>
+        <div class="splash-score-lbl">Chantiers</div>
+      </div>
+      <div class="splash-score-item" id="ss5">
+        <div class="splash-ring" id="ring5">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle class="splash-ring-track" cx="50" cy="50" r="42"/>
+            <circle class="splash-ring-fill" id="ring5-fill" cx="50" cy="50" r="42" style="stroke:#009688;stroke-dashoffset:263"/>
+          </svg>
+          <div class="splash-ring-label">★</div>
+        </div>
+        <div class="splash-score-lbl">Fidélité</div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:rgba(255,255,255,.25);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">Leroy Merlin · Groupe ADEO</div>
+  </div>
+</div>
+
 <!-- ═══ LOGIN ═══ -->
-<div class="screen active" id="screen-login">
+<div class="screen" id="screen-login" style="visibility:hidden">
   <div class="login-wrap">
     <div class="login-brand">
       <div class="login-brand-logo">
@@ -265,8 +370,7 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
     </div>
 
     <div class="login-card">
-      <div class="login-section-title">Connecte-toi</div>
-      <div class="login-user-list" id="login-user-list"></div>
+            <div class="login-user-list" id="login-user-list"></div>
 
       <div id="login-pin-section" style="display:none">
         <div class="login-divider"></div>
@@ -1084,6 +1188,65 @@ async function saveObjectifs(){
 }
 
 /* ════════════════════════════════════════════════════════════
+   SPLASH ANIMATION — 5 secondes
+════════════════════════════════════════════════════════════ */
+function runSplash(callback) {
+  const bars = [
+    { id:"sb1", h: 80,  delay: 0   },
+    { id:"sb2", h: 145,  delay: 100 },
+    { id:"sb3", h: 65,  delay: 200 },
+    { id:"sb4", h: 180, delay: 60  },
+    { id:"sb5", h: 105,  delay: 160 },
+    { id:"sb6", h: 125,  delay: 120 },
+    { id:"sb7", h: 60,  delay: 240 },
+  ];
+
+  // Phase 1 — barres montent (0 → 800ms)
+  bars.forEach(b => {
+    setTimeout(() => {
+      const el = document.getElementById(b.id);
+      if (el) el.style.height = b.h + 'px';
+    }, b.delay);
+  });
+
+  // Phase 2 — logo + titre apparaît (900ms)
+  setTimeout(() => {
+    const brand = document.getElementById('splash-brand');
+    if (brand) brand.classList.add('show');
+    ['ring1','ring2','ring3','ring4','ring5'].forEach(id => {
+      const r = document.getElementById(id);
+      if (r) r.classList.add('show');
+    });
+  }, 900);
+
+  // Phase 3 — KPI scores apparaissent en séquence (1100ms)
+  ['ss1','ss2','ss3','ss4','ss5'].forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('show');
+    }, 1100 + i * 180);
+  });
+
+  // Phase 4 — anneaux se remplissent à 100% en cascade (1200ms)
+  ['ring1-fill','ring2-fill','ring3-fill','ring4-fill','ring5-fill'].forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.style.strokeDashoffset = '0';
+    }, 1200 + i * 220);
+  });
+
+  // Phase 5 — fade out (5000ms)
+  setTimeout(() => {
+    const splash = document.getElementById('screen-splash');
+    if (splash) splash.classList.add('fade-out');
+    setTimeout(() => {
+      if (splash) splash.style.display = 'none';
+      callback();
+    }, 700);
+  }, 5000);
+}
+
+/* ════════════════════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════════════════════ */
 const now=new Date();
@@ -1091,13 +1254,17 @@ document.getElementById('current-year').textContent=now.getFullYear();
 const homeDate=document.getElementById('home-date');
 if(homeDate)homeDate.textContent=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
 
-(async function init(){
+runSplash(async function() {
+  document.body.style.background = 'var(--bg)';
+  const loginEl = document.getElementById('screen-login');
+  loginEl.style.visibility = 'visible';
+  loginEl.classList.add('active');
   if(tryRestoreSession()){
     await afterLogin();
   }else{
     initLogin();
   }
-})();
+});
 </script>
 </body>
 </html>
