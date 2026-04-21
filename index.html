@@ -1128,20 +1128,72 @@ function drawChart(canvasId,v,ki){
   if(chartInstances[canvasId])chartInstances[canvasId].destroy();
   const res=state.resultats[v],obj=state.objectifs[v];
   const k=KPI_KEYS[ki],col=COLORS[v],isPct=KPI_IS_PCT[k];
+  const tc='#9BA5B8';
+
+  // Mois saisis
+  const moisDone=Object.keys(res).map(Number).sort((a,b)=>a-b);
+  const dernierMois=moisDone.length>0?Math.max(...moisDone):-1;
+  const prochainMois=dernierMois<11?dernierMois+1:-1;
+
+  // Données réalisées (barres) — null pour mois non saisis
   const realData=MOIS_S.map((_,m)=>(res[m]&&res[m][k]!=null)?res[m][k]:null);
-  const objM=isPct?obj[k]:obj[k]/12,tc='#9BA5B8';
+
+  // Trajectoire attendue mois par mois
+  // Pour KPI cumulatif : cumul proraté = (objectifAnnuel / 12) * (m+1)
+  // Pour KPI % : objectif fixe (cible à atteindre chaque mois)
+  const trajData=MOIS_S.map((_,m)=>{
+    if(isPct) return obj[k];
+    return Math.round(obj[k]/12*(m+1));
+  });
+
+  // Suggestion mois suivant (objectif conseillé)
+  const suggData=MOIS_S.map((_,m)=>null);
+  if(prochainMois>=0){
+    const sugg=getSuggestion(v);
+    if(sugg&&sugg.moisSuivant===prochainMois){
+      suggData[prochainMois]=sugg.sugg[k].val;
+    }
+  }
+
+  // Légende
+  const hasNextMonth=suggData.some(v=>v!==null);
+
   chartInstances[canvasId]=new Chart(canvas,{
     type:'bar',
     data:{labels:MOIS_S,datasets:[
-      {label:'Réalisé',data:realData,backgroundColor:col+'28',borderColor:col,borderWidth:1.5,borderRadius:6,order:1},
-      {label:'Objectif',data:MOIS_S.map(()=>objM),type:'line',borderColor:'#80CBC4',borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false,order:0}
+      // Barres réalisées
+      {label:'Réalisé',data:realData,
+        backgroundColor:col+'30',borderColor:col,borderWidth:1.5,borderRadius:6,order:2},
+      // Ligne trajectoire attendue
+      {label:'Trajectoire',data:trajData,
+        type:'line',borderColor:'#80CBC4',borderDash:[6,3],borderWidth:2,
+        pointRadius:0,pointHoverRadius:4,fill:false,order:0,tension:0},
+      // Barre objectif mois suivant (si disponible)
+      ...(hasNextMonth?[{
+        label:'Objectif mois suivant',data:suggData,
+        backgroundColor:'rgba(255,209,0,0.25)',borderColor:'#FFD100',
+        borderWidth:2,borderRadius:6,borderDash:[4,2],order:3
+      }]:[]),
     ]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.y==null?null:`${ctx.dataset.label}: ${KPI_FMT[k](ctx.parsed.y)}`}}},
+      plugins:{
+        legend:{
+          display:true,
+          position:'bottom',
+          labels:{
+            color:tc,font:{size:10},
+            boxWidth:12,padding:10,
+            filter:item=>item.datasetIndex<2||(item.datasetIndex===2&&hasNextMonth)
+          }
+        },
+        tooltip:{callbacks:{
+          label:ctx=>ctx.parsed.y==null?null:`${ctx.dataset.label}: ${KPI_FMT[k](ctx.parsed.y)}`
+        }}
+      },
       scales:{
         x:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},autoSkip:false,maxRotation:0}},
-        y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},callback:v=>{
-          if(ki===0)return'€'+Math.round(v/1000)+'k';if(isPct)return v+'%';return Math.round(v);
+        y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},callback:val=>{
+          if(ki===0)return'€'+Math.round(val/1000)+'k';if(isPct)return val+'%';return Math.round(val);
         }}}
       }
     }
