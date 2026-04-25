@@ -9,6 +9,8 @@
 <meta name="color-scheme" content="dark light">
 <title>Pilotage Performance — Leroy Merlin</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
 /* ── myDEV' Design System ────────────────────────────────── */
 :root {
@@ -221,9 +223,9 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 /* ── CHART ───────────────────────────────────────────────── */
 .chart-wrap{position:relative;width:100%}
 .h200{height:200px} .h220{height:220px}
-.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--brd);background:transparent;color:var(--t2);cursor:pointer;transition:all .15s}
+.chip{flex:none;padding:8px 4px;border-radius:10px;font-size:11px;font-weight:600;border:1.5px solid var(--brd);background:transparent;color:var(--t2);cursor:pointer;transition:all .15s;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chip.active{background:var(--teal);color:#fff;border-color:var(--teal)}
 .legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
 .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)}
@@ -252,6 +254,40 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 .sync-err{background:rgba(239,83,80,.2);color:#FFCDD2}
 .sync-load{color:rgba(255,255,255,.4)}
 
+.login-setup-banner{background:var(--teal-l);border:1px solid var(--teal-m);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--teal-d);font-weight:600;line-height:1.4}
+.login-setup-step{font-size:11px;color:var(--t3);text-align:center;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+
+/* ── ENGAGEMENTS ─────────────────────────────────────────── */
+.eng-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.eng-item{background:var(--surf);border-radius:10px;border:1px solid var(--brd);padding:12px 14px;box-shadow:var(--shadow)}
+.eng-item-top{display:flex;align-items:flex-start;gap:10px}
+.eng-item-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.eng-item-body{flex:1;min-width:0}
+.eng-item-texte{font-size:13px;font-weight:600;color:var(--text);line-height:1.4}
+.eng-item-meta{font-size:11px;color:var(--t3);margin-top:3px}
+.eng-item-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.eng-btn{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.eng-btn-tenu{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-bar)}
+.eng-btn-non{background:var(--ko-bg);color:var(--ko);border-color:var(--ko-bar)}
+.eng-btn-del{background:var(--surf2);color:var(--t3);border-color:var(--brd)}
+.eng-add{display:flex;gap:8px;margin-top:4px}
+.eng-add input{flex:1;padding:10px 12px;border:1.5px solid var(--brd);border-radius:var(--rs);font-size:14px;font-family:inherit;background:var(--surf2);color:var(--text)}
+.eng-add input:focus{outline:none;border-color:var(--teal)}
+.eng-add-btn{padding:10px 16px;border-radius:var(--rs);background:var(--teal);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.eng-who{display:flex;gap:6px;margin-bottom:8px}
+.eng-who-btn{flex:1;padding:7px;border-radius:var(--rs);border:1.5px solid var(--brd);background:transparent;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--t2);transition:all .15s}
+.eng-who-btn.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+
+/* ── BIEN-ÊTRE ───────────────────────────────────────────── */
+.bienetre-gauge{display:flex;gap:8px;justify-content:center;margin:14px 0 4px}
+.bienetre-btn{width:52px;height:52px;border-radius:50%;border:2.5px solid var(--brd);background:var(--surf2);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.bienetre-btn.selected{border-color:var(--teal);background:var(--teal-l);transform:scale(1.15)}
+.bienetre-label{text-align:center;font-size:11px;color:var(--t3);margin-bottom:12px}
+
+/* ── PDF EXPORT ──────────────────────────────────────────── */
+.pdf-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:var(--r);border:none;background:var(--sidebar);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow-md);transition:opacity .15s;margin-bottom:12px}
+.pdf-btn:active{opacity:.85}
+
 /* ── SPLASH SCREEN ───────────────────────────────────────── */
 #screen-splash{position:fixed;inset:0;background:var(--sidebar);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:28px;transition:opacity .7s ease;overflow:hidden}
 #screen-splash.fade-out{opacity:0;pointer-events:none}
@@ -274,6 +310,33 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 .splash-ring-fill{fill:none;stroke:#78BE20;stroke-width:8;stroke-linecap:round;stroke-dasharray:263;stroke-dashoffset:263;transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1)}
 .splash-ring-fill.animate{stroke-dashoffset:24}
 .splash-ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:clamp(9px,2.5vw,13px);font-weight:800;color:#fff;text-align:center}
+
+/* ── ALERT BANNERS (accueil manager) ─────────────────────── */
+.alert-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.alert-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:var(--r);border:1px solid;font-size:13px;font-weight:600;cursor:pointer}
+.alert-item.warn{background:var(--warn-bg);border-color:#FFCC80;color:var(--warn)}
+.alert-item.ko{background:var(--ko-bg);border-color:#FFCDD2;color:var(--ko)}
+.alert-icon{font-size:18px;flex-shrink:0}
+.alert-text{flex:1}
+.alert-sub{font-size:11px;font-weight:400;opacity:.7;margin-top:1px}
+
+/* ── RDV CARD ────────────────────────────────────────────── */
+.rdv-card{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:14px 16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.rdv-row{display:flex;gap:10px}
+.rdv-col{flex:1;min-width:0}
+.rdv-label{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.rdv-val{font-size:14px;font-weight:700;color:var(--text)}
+.rdv-empty{font-size:13px;color:var(--t3);font-style:italic}
+.rdv-input{width:100%;padding:9px 12px;border:1.5px solid var(--brd);border-radius:var(--rs);font-size:15px;font-family:inherit;background:var(--surf2);color:var(--text)}
+.rdv-input:focus{outline:none;border-color:var(--teal)}
+
+/* ── TENDANCE PHRASE ─────────────────────────────────────── */
+.trend-phrase{background:var(--teal-l);border-radius:var(--r);border:1px solid var(--teal-m);padding:12px 14px;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--teal-d);line-height:1.4}
+
+/* ── COMMENTAIRE MOIS ────────────────────────────────────── */
+.comment-area{width:100%;padding:10px 12px;border:1.5px solid var(--brd);border-radius:var(--rs);font-size:14px;font-family:inherit;background:var(--surf2);color:var(--text);resize:none;min-height:70px;margin-top:6px}
+.comment-area:focus{outline:none;border-color:var(--teal)}
+.comment-display{font-size:12px;color:var(--t2);font-style:italic;padding:6px 8px;background:var(--surf2);border-radius:var(--rs);margin-top:2px}
 
 /* ── LOGOUT ROW ──────────────────────────────────────────── */
 .logout-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:var(--r);background:var(--surf);border:1px solid var(--brd);cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s}
@@ -420,7 +483,7 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
           <input class="pin-input" type="password" maxlength="1" inputmode="numeric" id="pin3">
         </div>
         <div class="login-error" id="login-error"></div>
-        <button class="btn btn-primary" onclick="doLogin()">Se connecter</button>
+        <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Se connecter</button>
       </div>
     </div>
   </div>
@@ -433,21 +496,22 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
       <svg width="26" height="23" viewBox="0 0 32 28" fill="none" style="flex-shrink:0"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
       <div class="topbar-center">
         <div class="topbar-title">Pilotage Performance</div>
-        <div class="topbar-sub">Chef de secteur</div>
+        <div class="topbar-sub">Responsable Rayon</div>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
       <span id="sync-icon" class="sync-status sync-load"></span>
-      <div class="topbar-teal-pill" id="current-year">2025</div>
+      <select id="year-selector" onchange="switchYear(this.value)" style="background:var(--teal);color:#fff;border:none;font-size:12px;font-weight:700;padding:3px 8px;border-radius:20px;cursor:pointer;font-family:inherit;-webkit-appearance:none;appearance:none"></select>
     </div>
   </div>
   <div class="scroll-content">
     <div class="home-banner">
       <div class="home-banner-label">Tableau de bord</div>
-      <div class="home-banner-title">Bonjour, Chef de secteur 👋</div>
+      <div class="home-banner-title">Bonjour, Sammy 👋</div>
       <div class="home-banner-sub">Suivi de performance · <span id="home-date"></span></div>
     </div>
 
+    <div id="home-alerts"></div>
     <div class="section-label">Mes conseillers</div>
     <div class="vendor-grid" id="vendor-grid"></div>
 
@@ -595,6 +659,7 @@ const STATUS_LABEL = { ok:'En ligne', warn:'À surveiller', ko:'Retard' };
 let currentUser = null;
 let state = defaultState();
 let currentVendeur = null;
+let currentYear = new Date().getFullYear();
 const LOCAL_KEY = 'lm_perf_v10';
 
 function defaultState() {
@@ -605,8 +670,44 @@ function defaultState() {
       laura:  { ca:500000, taux:30, optin:80, chantiers:65, fidelite:120 },
       thomas: { ca:380000, taux:30, optin:80, chantiers:45, fidelite:120 },
     },
-    resultats: { karim:{}, evan:{}, laura:{}, thomas:{} },
+    annees: {}, // { 2026: { resultats:{...}, commentaires:{...} }, 2027: {...} }
+    resultats: { karim:{}, evan:{}, laura:{}, thomas:{} }, // année courante (compatibilité)
+    commentaires: { karim:{}, evan:{}, laura:{}, thomas:{} },
+    rdv: { karim:{}, evan:{}, laura:{}, thomas:{} },
+    pins: {},
+    engagements: { karim:[], evan:[], laura:[], thomas:[] }, // [{id, date, auteur:'manager'|'conseiller', texte, statut:'ouvert'|'tenu'|'non_tenu'}]
+    bienetre: { karim:{}, evan:{}, laura:{}, thomas:{} },    // { '2026-04': 4, '2026-05': 2, ... }
   };
+}
+
+// Retourne les données de l'année sélectionnée
+function getYearData(year) {
+  const y = year || currentYear;
+  if (!state.annees) state.annees = {};
+  if (!state.annees[y]) {
+    state.annees[y] = {
+      resultats: { karim:{}, evan:{}, laura:{}, thomas:{} },
+      commentaires: { karim:{}, evan:{}, laura:{}, thomas:{} },
+    };
+  }
+  return state.annees[y];
+}
+
+// Retourne les résultats pour l'année active
+function getRes(v, year) { return getYearData(year).resultats[v] || {}; }
+function getComm(v, year) { return getYearData(year).commentaires[v] || {}; }
+
+function getAvailableYears() {
+  const years = new Set([new Date().getFullYear()]);
+  if (state.annees) Object.keys(state.annees).forEach(y => years.add(parseInt(y)));
+  return Array.from(years).sort((a,b)=>b-a);
+}
+
+function switchYear(y) {
+  currentYear = parseInt(y);
+  document.getElementById('year-selector').value = y;
+  if (currentVendeur) renderVendeur(currentVendeur);
+  else renderHome();
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -673,14 +774,20 @@ function initLogin() {
       <div class="login-user-avatar" style="background:${acc.bg};color:${acc.color};border-radius:10px">${acc.label[0]}</div>
       <div>
         <div class="login-user-name">${acc.label}</div>
-        <div class="login-user-role">${acc.role==='manager'?'Chef de secteur':'Conseiller de vente'}</div>
+        <div class="login-user-role">${acc.role==='manager'?'Responsable Rayon':'Conseiller de vente'}</div>
       </div>`;
     btn.onclick=()=>selectAccount(id);
     list.appendChild(btn);
   });
   document.getElementById('login-pin-section').style.display='none';
   document.getElementById('login-error').textContent='';
+  document.getElementById('login-btn').textContent='Se connecter';
+  document.getElementById('login-btn').onclick=doLogin;
+  const banner=document.getElementById('setup-banner'); if(banner)banner.remove();
+  const stepLabel=document.getElementById('setup-step-label'); if(stepLabel)stepLabel.remove();
   selectedAccountId=null;
+  window._pinSetupStep=1;
+  window._pinSetupFirst='';
   [0,1,2,3].forEach(i=>{
     const inp=document.getElementById('pin'+i);
     inp.value='';
@@ -698,11 +805,101 @@ function selectAccount(id) {
   document.querySelectorAll('.login-user-btn').forEach((btn,i)=>{
     btn.classList.toggle('selected',Object.keys(ACCOUNTS)[i]===id);
   });
-  document.getElementById('login-pin-section').style.display='block';
-  document.getElementById('login-pin-label').textContent=`Code PIN — ${ACCOUNTS[id].label}`;
+  const acc=ACCOUNTS[id];
+  const pinSection=document.getElementById('login-pin-section');
+  pinSection.style.display='block';
   document.getElementById('login-error').textContent='';
   [0,1,2,3].forEach(i=>{document.getElementById('pin'+i).value='';});
+
+  // Vérifier si c'est un conseiller sans PIN défini
+  const isFirstTime = acc.role==='advisor' && !(state.pins&&state.pins[id]);
+
+  if(isFirstTime){
+    document.getElementById('login-pin-label').textContent='Choisis ton code PIN — 4 chiffres';
+    // Ajouter banner et indicateur de step si pas déjà présent
+    let banner=document.getElementById('setup-banner');
+    if(!banner){
+      banner=document.createElement('div');
+      banner.id='setup-banner';
+      banner.className='login-setup-banner';
+      banner.textContent='🔐 Première connexion — choisis un code PIN personnel à 4 chiffres. Tu l\'utiliseras à chaque ouverture.';
+      pinSection.insertBefore(banner,pinSection.firstChild);
+    }
+    let stepLabel=document.getElementById('setup-step-label');
+    if(!stepLabel){
+      stepLabel=document.createElement('div');
+      stepLabel.id='setup-step-label';
+      stepLabel.className='login-setup-step';
+      pinSection.insertBefore(stepLabel,document.querySelector('.pin-inputs'));
+    }
+    stepLabel.textContent='Étape 1 sur 2 — Choisis ton PIN';
+    // Désactiver l'auto-login sur 4 chiffres — attendre confirmation
+    [0,1,2,3].forEach(i=>{
+      const inp=document.getElementById('pin'+i);
+      inp.oninput=()=>{
+        inp.value=inp.value.replace(/\D/g,'').slice(-1);
+        if(inp.value&&i<3)document.getElementById('pin'+(i+1)).focus();
+        // Pas d'auto-submit en mode setup
+      };
+    });
+    document.getElementById('login-btn').textContent='Confirmer mon PIN';
+    document.getElementById('login-btn').onclick=handlePinSetup;
+    window._pinSetupStep=1;
+    window._pinSetupFirst='';
+  } else {
+    // Connexion normale
+    let banner=document.getElementById('setup-banner');
+    if(banner)banner.remove();
+    let stepLabel=document.getElementById('setup-step-label');
+    if(stepLabel)stepLabel.remove();
+    document.getElementById('login-pin-label').textContent=`Code PIN — ${acc.label}`;
+    document.getElementById('login-btn').textContent='Se connecter';
+    document.getElementById('login-btn').onclick=doLogin;
+    [0,1,2,3].forEach(i=>{
+      const inp=document.getElementById('pin'+i);
+      inp.oninput=()=>{
+        inp.value=inp.value.replace(/\D/g,'').slice(-1);
+        if(inp.value&&i<3)document.getElementById('pin'+(i+1)).focus();
+        if(i===3&&getPin().length===4)doLogin();
+      };
+    });
+  }
   document.getElementById('pin0').focus();
+}
+
+function handlePinSetup(){
+  const pin=getPin();
+  if(pin.length<4){document.getElementById('login-error').textContent='Saisis 4 chiffres.';return;}
+  if(window._pinSetupStep===1){
+    // Étape 1 : mémoriser et demander confirmation
+    window._pinSetupFirst=pin;
+    window._pinSetupStep=2;
+    document.getElementById('login-pin-label').textContent='Confirme ton code PIN';
+    document.getElementById('setup-step-label').textContent='Étape 2 sur 2 — Confirme ton PIN';
+    document.getElementById('login-error').textContent='';
+    [0,1,2,3].forEach(i=>{document.getElementById('pin'+i).value='';});
+    document.getElementById('pin0').focus();
+  } else {
+    // Étape 2 : vérifier correspondance
+    if(pin!==window._pinSetupFirst){
+      document.getElementById('login-error').textContent='Les codes ne correspondent pas. Recommence.';
+      window._pinSetupStep=1;
+      window._pinSetupFirst='';
+      document.getElementById('login-pin-label').textContent='Choisis ton code PIN — 4 chiffres';
+      document.getElementById('setup-step-label').textContent='Étape 1 sur 2 — Choisis ton PIN';
+      [0,1,2,3].forEach(i=>{document.getElementById('pin'+i).value='';});
+      document.getElementById('pin0').focus();
+      return;
+    }
+    // PIN validé — sauvegarder
+    if(!state.pins)state.pins={};
+    state.pins[selectedAccountId]=pin;
+    saveState();
+    toast('Code PIN enregistré ✓');
+    currentUser={id:selectedAccountId,...ACCOUNTS[selectedAccountId]};
+    sessionStorage.setItem('lm_session',JSON.stringify({id:selectedAccountId}));
+    afterLogin();
+  }
 }
 
 function getPin(){return [0,1,2,3].map(i=>document.getElementById('pin'+i).value).join('');}
@@ -710,7 +907,9 @@ function getPin(){return [0,1,2,3].map(i=>document.getElementById('pin'+i).value
 function doLogin() {
   if(!selectedAccountId)return;
   const acc=ACCOUNTS[selectedAccountId], pin=getPin();
-  if(pin!==acc.pin){
+  // PIN effectif : pour manager → code fixe dans ACCOUNTS ; pour conseiller → state.pins
+  const expectedPin = acc.role==='manager' ? acc.pin : (state.pins&&state.pins[selectedAccountId])||acc.pin;
+  if(pin!==expectedPin){
     document.getElementById('login-error').textContent='Code incorrect, réessaie.';
     [0,1,2,3].forEach(i=>{document.getElementById('pin'+i).value='';});
     document.getElementById('pin0').focus();
@@ -778,8 +977,8 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 /* ════════════════════════════════════════════════════════════
    DATA HELPERS
 ════════════════════════════════════════════════════════════ */
-function getAv(vendeur) {
-  const obj=state.objectifs[vendeur],res=state.resultats[vendeur];
+function getAv(vendeur,year){
+  const obj=state.objectifs[vendeur],res=getRes(vendeur,year);
   const md=Object.keys(res).map(Number); const av={};
   KPI_KEYS.forEach(k=>{
     if(KPI_IS_PCT[k]){
@@ -793,8 +992,8 @@ function getAv(vendeur) {
   });
   return av;
 }
-function getTrend(vendeur,k){
-  const res=state.resultats[vendeur],md=Object.keys(res).map(Number).sort((a,b)=>a-b);
+function getTrend(vendeur,k,year){
+  const res=getRes(vendeur,year),md=Object.keys(res).map(Number).sort((a,b)=>a-b);
   if(md.length<2)return null;
   const last=res[md[md.length-1]][k],prev=res[md[md.length-2]][k];
   if(last==null||prev==null||isNaN(last)||isNaN(prev)||prev===0)return null;
@@ -804,23 +1003,21 @@ function statusCls(pct,moisDone){
   const traj=moisDone>0?(moisDone/12)*100:0;
   if(pct>=traj)return'ok'; if(pct>=traj*.85)return'warn'; return'ko';
 }
-function globalScore(vendeur){
-  const av=getAv(vendeur);
+function globalScore(vendeur,year){
+  const av=getAv(vendeur,year);
   return Math.round(KPI_KEYS.map(k=>av[k].pct).reduce((a,b)=>a+b,0)/KPI_KEYS.length);
 }
-function getSuggestion(vendeur){
-  const obj=state.objectifs[vendeur],res=state.resultats[vendeur];
+function getSuggestion(vendeur,year){
+  const obj=state.objectifs[vendeur],res=getRes(vendeur,year);
   const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
-  // Si pas de données → on propose objectif du mois courant basé sur l'annuel
-  const currentMonth = new Date().getMonth();
-  const ms = md.length > 0 ? Math.max(...md)+1 : currentMonth;
+  const currentMonth=new Date().getMonth();
+  const ms=md.length>0?Math.max(...md)+1:currentMonth;
   if(ms>11)return null;
   const mr=12-ms,sugg={};
   KPI_KEYS.forEach(k=>{
     if(md.length===0){
-      // Pas de données : objectif mensuel = annuel / 12
-      sugg[k]={val: KPI_IS_PCT[k] ? obj[k] : obj[k]/12};
-    } else if(KPI_IS_PCT[k]){
+      sugg[k]={val:KPI_IS_PCT[k]?obj[k]:obj[k]/12};
+    }else if(KPI_IS_PCT[k]){
       const vals=md.map(m=>res[m][k]).filter(v=>v!=null&&!isNaN(v));
       const moy=vals.length>0?vals.reduce((a,b)=>a+b,0)/vals.length:obj[k];
       sugg[k]={val:Math.max(0,obj[k]+(obj[k]-moy)*.3)};
@@ -840,7 +1037,7 @@ function makeKpiCard(vendeur,k,i,av,moisDoneCount){
   const obj=state.objectifs[vendeur],pct=av[k].pct;
   const cls=statusCls(pct,moisDoneCount),barPct=Math.min(100,pct);
   const trajPct=moisDoneCount>0?Math.min(100,(moisDoneCount/12)*100):0;
-  const trend=getTrend(vendeur,k);
+  const trend=getTrend(vendeur,k,currentYear);
   let trendHtml='';
   if(trend!==null){
     const sym=trend>1?'▲':trend<-1?'▼':'→';
@@ -853,8 +1050,8 @@ function makeKpiCard(vendeur,k,i,av,moisDoneCount){
   }else if(!KPI_IS_PCT[k]){
     const attendu=obj[k]/12*moisDoneCount,ecart=av[k].realise-attendu,ef=KPI_FMT[k](Math.abs(ecart));
     pill=ecart>=0
-      ?`<span class="kpi-pill" style="background:var(--ok-bg);color:var(--ok)">+${ef} d'avance</span>`
-      :`<span class="kpi-pill" style="background:var(--ko-bg);color:var(--ko)">−${ef} de retard</span>`;
+      ?`<span class="kpi-pill" style="background:var(--ok-bg);color:var(--ok)">+${ef} d'avance ↑</span>`
+      :`<span class="kpi-pill" style="background:var(--warn-bg);color:var(--warn)">↗ ${ef} à combler</span>`;
     const restant=obj[k]-av[k].realise,mr=12-moisDoneCount;
     if(restant<=0)remain=`<span class="kpi-remaining" style="color:var(--ok);font-weight:700">✓ Objectif annuel atteint !</span>`;
     else if(mr>0)remain=`<span class="kpi-remaining">Reste <b>${KPI_FMT[k](restant)}</b> en ${mr} mois</span>`;
@@ -891,15 +1088,54 @@ function makeKpiCard(vendeur,k,i,av,moisDoneCount){
 ════════════════════════════════════════════════════════════ */
 function renderHome(){
   const grid=document.getElementById('vendor-grid');
+  populateYearSelector();
+  const nowH=new Date();
+  const homeDate=document.getElementById('home-date');
+  if(homeDate)homeDate.textContent=nowH.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})+' · '+currentYear;
+  const moisCourant=nowH.getMonth();
+
+  // Alertes proactives
+  const alerts=[];
+  VENDEURS.forEach(v=>{
+    const md=Object.keys(getRes(v,currentYear)).map(Number);
+    const score=globalScore(v,currentYear), cls=statusCls(score,md.length);
+    if(md.length===0){
+      alerts.push({v,type:'warn',msg:`${NOMS[v]} — Aucune donnée saisie`,sub:'Commencer la saisie pour suivre la performance'});
+    } else {
+      const dernierMois=Math.max(...md);
+      if(moisCourant-dernierMois>=2)
+        alerts.push({v,type:'warn',msg:`${NOMS[v]} — Saisie en retard`,sub:`Dernière saisie : ${MOIS_S[dernierMois]} · ${moisCourant-dernierMois} mois de retard`});
+    }
+    if(md.length>0&&cls==='ko')
+      alerts.push({v,type:'ko',msg:`${NOMS[v]} — Rythme à accélérer`,sub:'Moins de 70% de la trajectoire — sujet à aborder en RDV'});
+  });
+  const alertEl=document.getElementById('home-alerts');
+  if(alertEl){
+    if(alerts.length>0){
+      let ah=`<div class="section-label">⚠ Points d'attention</div><div class="alert-list">`;
+      alerts.forEach(a=>{ah+=`<div class="alert-item ${a.type}" onclick="openVendeur('${a.v}')">
+        <div class="alert-icon">${a.type==='ko'?'🔴':'🟡'}</div>
+        <div class="alert-text">${a.msg}<div class="alert-sub">${a.sub}</div></div>
+        <div style="font-size:18px;opacity:.4">›</div></div>`;});
+      ah+=`</div>`;
+      alertEl.innerHTML=ah;
+    } else { alertEl.innerHTML=''; }
+  }
+
+  // Cartes vendeurs avec prochain RDV
   let html='';
   VENDEURS.forEach(v=>{
     const score=globalScore(v),md=Object.keys(state.resultats[v]).length;
     const cls=statusCls(score,md);
+    const score2=globalScore(v,currentYear),md2=Object.keys(getRes(v,currentYear)).length;
+    const cls2=statusCls(score2,md2);
+    const rdv=(state.rdv&&state.rdv[v])||{};
     html+=`<div class="vendor-card" onclick="openVendeur('${v}')">
       <div class="vendor-card-avatar" style="background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
       <div class="vendor-card-name">${NOMS[v]}</div>
-      <div class="vendor-card-months">${md>0?md+' mois saisi'+(md>1?'s':''):'Aucune saisie'}</div>
-      <div class="vprog"><div class="vprogfill" style="width:${Math.min(100,score)}%;background:${STATUS_BAR[cls]}"></div></div>
+      <div class="vendor-card-months">${md2>0?md2+' mois saisi'+(md2>1?'s':''):'Aucune saisie'}</div>
+      ${rdv.prochain?`<div style="font-size:10px;color:var(--teal);font-weight:700;margin-bottom:4px">📅 RDV ${rdv.prochain}</div>`:''}
+      <div class="vprog"><div class="vprogfill" style="width:${Math.min(100,score2)}%;background:${STATUS_BAR[cls2]}"></div></div>
     </div>`;
   });
   grid.innerHTML=html;
@@ -910,11 +1146,41 @@ function renderHome(){
 ════════════════════════════════════════════════════════════ */
 function renderVendeur(v){
   const content=document.getElementById('vendor-content');
-  const av=getAv(v),res=state.resultats[v],obj=state.objectifs[v];
+  const av=getAv(v,currentYear),res=getRes(v,currentYear),obj=state.objectifs[v];
   const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
-  const suggestion=getSuggestion(v),score=globalScore(v),cls=statusCls(score,md.length);
+  const suggestion=getSuggestion(v,currentYear),score=globalScore(v,currentYear),cls=statusCls(score,md.length);
 
-  let html=`<div class="hero-scores">`;
+  // ── BIEN-ÊTRE EN PREMIER ──
+  const beMoisTop=new Date().toISOString().slice(0,7);
+  const beValTop=(state.bienetre&&state.bienetre[v]&&state.bienetre[v][beMoisTop])||0;
+  const beEmojisTop=['😞','😕','😐','🙂','😄'];
+  const beLabelsTop=['Difficile','Compliqué','Neutre','Bien','Excellent'];
+  const beBgTop=['#FEE2E2','#FEF3C7','#F2F6EE','#E0F2F1','#EAF5CC'];
+  const beColorTop=['#B91C1C','#B45309','#4A6A35','#00796B','#3A7D00'];
+  let html=`<div class="section-label">Climat du moment</div>
+  <div class="card" style="padding:14px 16px;margin-bottom:14px">
+    <div style="font-size:13px;color:var(--t2);margin-bottom:4px">Comment ${NOMS[v]} se sent-il/elle en ce moment ?</div>
+    <div style="font-size:11px;color:var(--t3);margin-bottom:10px;font-style:italic">Indicateur de dialogue — non évaluatif, confidentiel, à l'initiative du conseiller.</div>
+    <div class="bienetre-gauge">`;
+  beEmojisTop.forEach((em,i)=>{
+    html+=`<button class="bienetre-btn${beValTop===i+1?' selected':''}" onclick="saveBienetre('${v}',${i+1})" title="${beLabelsTop[i]}">${em}</button>`;
+  });
+  html+=`</div>`;
+  if(beValTop>0){
+    html+=`<div style="display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px 14px;border-radius:10px;background:${beBgTop[beValTop-1]}">
+      <span style="font-size:28px">${beEmojisTop[beValTop-1]}</span>
+      <div>
+        <div style="font-size:15px;font-weight:800;color:${beColorTop[beValTop-1]}">${beLabelsTop[beValTop-1]}</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:1px">${NOMS[v]} · ${beMoisTop}</div>
+      </div>
+    </div>`;
+  } else {
+    html+=`<div class="bienetre-label">Pas encore renseigné par ${NOMS[v]} ce mois-ci</div>`;
+  }
+  html+=`</div>`;
+
+  // ── MINI-SCORES ──
+  html+=`<div class="hero-scores">`;
   KPI_KEYS.forEach((k,i)=>{
     const a=av[k],sc=statusCls(a.pct,md.length); let msg='—';
     if(md.length>0){
@@ -925,8 +1191,23 @@ function renderVendeur(v){
   });
   html+=`</div>`;
 
+  // Phrase de tendance
+  if(md.length>0){
+    const kpiEnHausse=KPI_KEYS.filter(k=>{const t=getTrend(v,k,currentYear);return t!==null&&t>1;}).length;
+    const kpiEnBaisse=KPI_KEYS.filter(k=>{const t=getTrend(v,k,currentYear);return t!==null&&t<-1;}).length;
+    const kpiOk=KPI_KEYS.filter(k=>statusCls(av[k].pct,md.length)==='ok').length;
+    let phrase='', phraseColor='var(--teal-d)';
+    if(kpiEnHausse>=3) phrase=`📈 ${kpiEnHausse} KPI progressent ce mois-ci — belle dynamique !`;
+    else if(kpiEnBaisse>=3) phrase=`📉 ${kpiEnBaisse} KPI en baisse vs mois précédent — point à aborder.`;
+    else if(kpiOk===5) phrase=`✅ Tous les KPI sont en trajectoire — objectif annuel bien engagé.`;
+    else if(kpiOk>=3) phrase=`🟡 ${kpiOk}/5 KPI en trajectoire — quelques points à renforcer.`;
+    else phrase=`🔴 ${kpiOk}/5 KPI en trajectoire — bilan à approfondir en RDV.`;
+    html+=`<div class="trend-phrase">${phrase}</div>`;
+  }
+
+  // Bloc RDV
+  const rdv=(state.rdv&&state.rdv[v])||{};
   html+=`<div class="section-label">Performance annuelle</div><div class="kpi-stack">`;
-  KPI_KEYS.forEach((k,i)=>{html+=makeKpiCard(v,k,i,av,md.length);});
   html+=`</div>`;
 
   html+=`<div class="section-label">Saisie du mois</div>
@@ -945,6 +1226,10 @@ function renderVendeur(v){
         <div class="form-group"><label class="form-label">Chantiers vendus</label><input type="number" id="s-chantiers-${v}" placeholder="ex : 5" inputmode="numeric"></div>
         <div class="form-group"><label class="form-label">Adhésions fidélité</label><input type="number" id="s-fidelite-${v}" placeholder="ex : 12" inputmode="numeric"></div>
       </div>
+      <div class="form-group">
+        <label class="form-label">Contexte du mois (optionnel)</label>
+        <textarea class="comment-area" id="s-comment-${v}" placeholder="Ex : absence 1 semaine, opération promo, travaux R05..."></textarea>
+      </div>
       <button class="btn btn-primary" onclick="saveVendeurEntry('${v}')">Enregistrer</button>
     </div>
   </div>`;
@@ -960,13 +1245,20 @@ function renderVendeur(v){
   </div>`;
 
   if(md.length>0){
+  const commentaires=(state.commentaires&&state.commentaires[v])||{};
     html+=`<div class="section-label">Historique</div>
     <div class="card"><div style="overflow-x:auto"><table class="htable">
       <thead><tr><th>Mois</th><th class="num">CA</th><th class="num">Transfo</th><th class="num">Opt-in</th><th class="num">Chant.</th><th class="num">Fidél.</th></tr></thead><tbody>`;
-    md.forEach(m=>{const r=res[m];html+=`<tr><td style="font-weight:700">${MOIS_S[m]}</td>
-      <td class="num">${KPI_FMT.ca(r.ca)}</td><td class="num">${KPI_FMT.taux(r.taux)}</td>
-      <td class="num">${KPI_FMT.optin(r.optin)}</td><td class="num">${KPI_FMT.chantiers(r.chantiers)}</td>
-      <td class="num">${KPI_FMT.fidelite(r.fidelite)}</td></tr>`;});
+    md.forEach(m=>{
+      const r=res[m];
+      const comm=commentaires[m]||'';
+      html+=`<tr><td style="font-weight:700">${MOIS_S[m]}
+        ${comm?`<div class="comment-display">💬 ${comm}</div>`:''}
+      </td>
+        <td class="num">${KPI_FMT.ca(r.ca)}</td><td class="num">${KPI_FMT.taux(r.taux)}</td>
+        <td class="num">${KPI_FMT.optin(r.optin)}</td><td class="num">${KPI_FMT.chantiers(r.chantiers)}</td>
+        <td class="num">${KPI_FMT.fidelite(r.fidelite)}</td></tr>`;
+    });
     html+=`</tbody></table></div></div>`;
   }
 
@@ -997,6 +1289,81 @@ function renderVendeur(v){
     html+=`</div></div>`;
   }
 
+  // ── ENGAGEMENTS ──
+  const engs=(state.engagements&&state.engagements[v])||[];
+  const engsOuverts=engs.filter(e=>e.statut==='ouvert');
+  const engsClos=engs.filter(e=>e.statut!=='ouvert');
+  html+=`<div class="section-label">Engagements</div>
+  <div class="card" style="padding:14px 16px">`;
+  if(engsOuverts.length>0){
+    html+=`<div class="eng-list">`;
+    engsOuverts.forEach(e=>{
+      const dotColor=e.auteur==='manager'?'var(--teal)':'var(--violet)';
+      html+=`<div class="eng-item">
+        <div class="eng-item-top">
+          <div class="eng-item-dot" style="background:${dotColor}"></div>
+          <div class="eng-item-body">
+            <div class="eng-item-texte">${e.texte}</div>
+            <div class="eng-item-meta">${e.auteur==='manager'?'👤 Manager':'🙋 Conseiller'} · ${e.date}</div>
+          </div>
+        </div>
+        <div class="eng-item-actions">
+          <button class="eng-btn eng-btn-tenu" onclick="updateEngagement('${v}','${e.id}','tenu')">✓ Tenu</button>
+          <button class="eng-btn eng-btn-non" onclick="updateEngagement('${v}','${e.id}','non_tenu')">✗ Non tenu</button>
+          <button class="eng-btn eng-btn-del" onclick="updateEngagement('${v}','${e.id}','suppr')">Suppr.</button>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+  if(engsClos.length>0){
+    html+=`<details style="margin-bottom:10px"><summary style="font-size:12px;font-weight:600;color:var(--t3);cursor:pointer;margin-bottom:6px">${engsClos.length} engagement${engsClos.length>1?'s':''} clôturé${engsClos.length>1?'s':''}</summary><div class="eng-list" style="margin-top:8px">`;
+    engsClos.forEach(e=>{
+      const icon=e.statut==='tenu'?'✓':'✗';
+      const col=e.statut==='tenu'?'var(--ok)':'var(--ko)';
+      html+=`<div class="eng-item" style="opacity:.6">
+        <div class="eng-item-top">
+          <div class="eng-item-dot" style="background:${col}"></div>
+          <div class="eng-item-body">
+            <div class="eng-item-texte" style="text-decoration:line-through">${e.texte}</div>
+            <div class="eng-item-meta">${icon} ${e.statut==='tenu'?'Tenu':'Non tenu'} · ${e.auteur==='manager'?'Manager':'Conseiller'} · ${e.date}</div>
+          </div>
+        </div>
+      </div>`;
+    });
+    html+=`</div></details>`;
+  }
+  html+=`<div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px">Ajouter un engagement :</div>
+    <div class="eng-who" id="eng-who-${v}">
+      <button class="eng-who-btn active" id="eng-who-mgr-${v}" onclick="setEngWho('${v}','manager')">👤 Manager</button>
+      <button class="eng-who-btn" id="eng-who-adv-${v}" onclick="setEngWho('${v}','conseiller')">🙋 Conseiller</button>
+    </div>
+    <div class="eng-add">
+      <input type="text" id="eng-input-${v}" placeholder="Ex : Relancer les devis pro chaque semaine…" maxlength="120">
+      <button class="eng-add-btn" onclick="addEngagement('${v}')">+ Ajouter</button>
+    </div>
+  </div>`;
+
+  // ── PROCHAIN RDV ──
+  html+=`<div class="section-label">Planifier le prochain RDV</div>
+  <div class="rdv-card">
+    <div class="rdv-label">Date du prochain RDV</div>
+    <input class="rdv-input" type="date" id="rdv-next-${v}" value="${rdv.prochain||''}" onchange="saveRdv('${v}')" style="margin-top:8px">
+  </div>`;
+
+  // ── PDF EXPORT ──
+  html+=`<button class="pdf-btn" onclick="exportPDF('${v}')">📄 Exporter le compte-rendu PDF</button>`;
+
+  // ── OBJECTIFS ANNUELS ──
+  html+=`<div class="section-label">Objectifs annuels</div><div class="card" style="padding:14px 16px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">`;
+  KPI_KEYS.forEach((k,i)=>{
+    html+=`<div style="background:var(--surf2);border-radius:10px;padding:10px 12px;border:1px solid var(--brd)">
+      <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">${KPI_FULL[i]}</div>
+      <div style="font-size:18px;font-weight:800;color:var(--text)">${KPI_FMT[k](obj[k])}</div>
+    </div>`;
+  });
+  html+=`</div></div>`;
+
   html+=`<div style="height:24px"></div>`;
   content.innerHTML=html;
 
@@ -1012,12 +1379,245 @@ function renderVendeur(v){
     chip.onclick=()=>{selKpi=i;chipsDiv.querySelectorAll('.chip').forEach((c,j)=>c.classList.toggle('active',j===i));drawChart('chart-'+v,v,selKpi);};
     chipsDiv.appendChild(chip);
   });
-  setTimeout(()=>drawChart('chart-'+v,v,0),60);
+  setTimeout(()=>{
+    drawChart('chart-'+v,v,0);
+  },60);
 }
 
 function toggleSaisie(v){
   const form=document.getElementById(`saisie-form-${v}`),icon=document.getElementById(`saisie-icon-${v}`);
   form.classList.toggle('open');icon.classList.toggle('open',form.classList.contains('open'));
+}
+
+async function saveRdv(v){
+  if(!state.rdv)state.rdv={karim:{},evan:{},laura:{},thomas:{}};
+  const prev=state.rdv[v]||{};
+  state.rdv[v]={
+    dernier:prev.dernier||'',
+    prochain:document.getElementById(`rdv-next-${v}`).value||'',
+  };
+  await saveState();
+  toast('Prochain RDV enregistré ✓');
+}
+
+/* ── ENGAGEMENTS ─────────────────────────────────────────── */
+let _engWho = {};
+
+function setEngWho(v, who) {
+  _engWho[v] = who;
+  document.getElementById(`eng-who-mgr-${v}`).classList.toggle('active', who==='manager');
+  document.getElementById(`eng-who-adv-${v}`).classList.toggle('active', who==='conseiller');
+}
+
+async function addEngagement(v) {
+  const input = document.getElementById(`eng-input-${v}`);
+  const texte = input.value.trim();
+  if(!texte) return;
+  if(!state.engagements) state.engagements={karim:[],evan:[],laura:[],thomas:[]};
+  if(!state.engagements[v]) state.engagements[v]=[];
+  const now = new Date();
+  const date = now.toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'});
+  state.engagements[v].push({
+    id: Date.now().toString(),
+    date,
+    auteur: _engWho[v]||'manager',
+    texte,
+    statut: 'ouvert'
+  });
+  input.value='';
+  await saveState();
+  renderVendeur(v);
+}
+
+async function updateEngagement(v, id, action) {
+  if(!state.engagements||!state.engagements[v]) return;
+  if(action==='suppr'){
+    state.engagements[v]=state.engagements[v].filter(e=>e.id!==id);
+  } else {
+    const eng=state.engagements[v].find(e=>e.id===id);
+    if(eng) eng.statut=action;
+  }
+  await saveState();
+  renderVendeur(v);
+}
+
+/* ── BIEN-ÊTRE ───────────────────────────────────────────── */
+async function saveBienetre(v, val) {
+  if(!state.bienetre) state.bienetre={karim:{},evan:{},laura:{},thomas:{}};
+  if(!state.bienetre[v]) state.bienetre[v]={};
+  const mois = new Date().toISOString().slice(0,7);
+  state.bienetre[v][mois] = val;
+  await saveState();
+  toast('Bien-être enregistré ✓');
+  renderVendeur(v);
+}
+
+/* ── EXPORT PDF ──────────────────────────────────────────── */
+async function exportPDF(v) {
+  if(typeof window.jspdf === 'undefined') { toast('PDF en cours de chargement…'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const obj = state.objectifs[v];
+  const av = getAv(v, currentYear);
+  const res = getRes(v, currentYear);
+  const md = Object.keys(res).map(Number).sort((a,b)=>a-b);
+  const rdv = (state.rdv&&state.rdv[v])||{};
+  const engs = (state.engagements&&state.engagements[v])||[];
+  const beData = (state.bienetre&&state.bienetre[v])||{};
+  const now = new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+
+  // ── En-tête ──
+  doc.setFillColor(13,33,55); // sidebar color
+  doc.rect(0,0,210,28,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(18); doc.setFont('helvetica','bold');
+  doc.text('RDV Perf — Suivi de performance', 14, 12);
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text(`${NOMS[v]} · Leroy Merlin · ${currentYear}`, 14, 20);
+  doc.text(`Généré le ${now}`, 210-14, 20, {align:'right'});
+
+  let y = 36;
+
+  // ── Infos RDV ──
+  doc.setTextColor(30,30,30);
+  doc.setFontSize(12); doc.setFont('helvetica','bold');
+  doc.text('Informations RDV', 14, y); y+=6;
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  if(rdv.dernier) { doc.text(`Dernier RDV : ${rdv.dernier}`, 14, y); y+=5; }
+  if(rdv.prochain) { doc.text(`Prochain RDV : ${rdv.prochain}`, 14, y); y+=5; }
+  y+=4;
+
+  // ── KPI ──
+  const moisCumul=md.length>0?md.length:new Date().getMonth()+1;
+  const moisNom=MOIS_L[moisCumul-1]||'';
+  doc.setFontSize(12); doc.setFont('helvetica','bold');
+  doc.setTextColor(0,96,88);
+  doc.text(`Performance — Cumul ${moisCumul} mois (${MOIS_L[0]} → ${MOIS_L[moisCumul-1]}) · ${currentYear}`, 14, y); y+=6;
+  doc.setTextColor(30,30,30);
+  KPI_KEYS.forEach((k,i)=>{
+    const a=av[k];
+    const pct=Math.round(a.pct);
+    const realise=KPI_FMT[k](a.realise);
+    const cible=KPI_FMT[k](obj[k]);
+    const cls=statusCls(a.pct,md.length);
+    const statusTxt=cls==='ok'?'✓ Objectif en vue':cls==='warn'?`↗ ${Math.round(av[k].pct)}% de l'obj. annuel`:`${Math.round(av[k].pct)}% de l'objectif annuel`;
+    doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text(`${KPI_FULL[i]}`, 14, y);
+    doc.setFont('helvetica','normal');
+    doc.text(`${realise} / ${cible} (${pct}%) — ${statusTxt}`, 80, y);
+    y+=5;
+  });
+  y+=4;
+
+  // ── Historique mensuel ──
+  if(md.length>0){
+    doc.setFontSize(12); doc.setFont('helvetica','bold');
+    doc.setTextColor(0,96,88);
+    doc.text('Historique mensuel', 14, y); y+=6;
+    doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(80,80,80);
+    doc.text('Mois', 14, y); doc.text('CA (€)', 40, y); doc.text('Transfo', 70, y);
+    doc.text('Opt-in', 90, y); doc.text('Chantiers', 112, y); doc.text('Fidélité', 138, y);
+    y+=4;
+    doc.setDrawColor(200,200,200); doc.line(14,y,196,y); y+=3;
+    doc.setFont('helvetica','normal'); doc.setTextColor(30,30,30);
+    const comm=(state.commentaires&&state.commentaires[v])||{};
+    md.forEach(m=>{
+      const r=res[m];
+      doc.text(MOIS_S[m], 14, y);
+      doc.text(KPI_FMT.ca(r.ca).toString(), 40, y);
+      doc.text(KPI_FMT.taux(r.taux).toString(), 70, y);
+      doc.text(KPI_FMT.optin(r.optin).toString(), 90, y);
+      doc.text(KPI_FMT.chantiers(r.chantiers).toString(), 112, y);
+      doc.text(KPI_FMT.fidelite(r.fidelite).toString(), 138, y);
+      y+=5;
+      if(comm[m]){ doc.setTextColor(120,120,120); doc.setFontSize(7.5);
+        doc.text(`↳ ${comm[m]}`, 18, y); doc.setTextColor(30,30,30); doc.setFontSize(8); y+=4; }
+      if(y>270){ doc.addPage(); y=20; }
+    });
+    y+=4;
+  }
+
+  // ── Engagements ──
+  if(engs.length>0){
+    if(y>250){ doc.addPage(); y=20; }
+    doc.setFontSize(12); doc.setFont('helvetica','bold');
+    doc.setTextColor(0,96,88);
+    doc.text('Engagements', 14, y); y+=6;
+    doc.setFontSize(9); doc.setTextColor(30,30,30);
+    engs.forEach(e=>{
+      const icon = e.statut==='tenu'?'✓':e.statut==='non_tenu'?'✗':'•';
+      const who = e.auteur==='manager'?'Manager':'Conseiller';
+      doc.setFont('helvetica','bold');
+      doc.text(`${icon} [${who}] ${e.date}`, 14, y); y+=4;
+      doc.setFont('helvetica','normal');
+      const lines=doc.splitTextToSize(e.texte, 176);
+      doc.text(lines, 18, y); y+=lines.length*4+3;
+      if(y>270){ doc.addPage(); y=20; }
+    });
+    y+=4;
+  }
+
+  // ── Climat du moment (courbe emoji) ──
+  const beMoisList=Object.keys(beData).sort().slice(-6);
+  if(beMoisList.length>0){
+    if(y>240){ doc.addPage(); y=20; }
+    doc.setFontSize(12); doc.setFont('helvetica','bold');
+    doc.setTextColor(0,96,88);
+    doc.text('Climat du moment', 14, y); y+=5;
+    doc.setFontSize(7.5); doc.setFont('helvetica','italic'); doc.setTextColor(150,150,150);
+    doc.text('Ressenti partagé par le conseiller — à titre indicatif uniquement.', 14, y); y+=8;
+
+    // Courbe
+    const beLabels3=['😞','😕','😐','🙂','😄'];
+    const beTexts3=['Difficile','Compliqué','Neutre','Bien','Excellent'];
+    const n=beMoisList.length;
+    const chartX=20, chartW=170, chartH=28;
+    const padL=10, padR=10;
+    const drawW=chartW-padL-padR;
+
+    // Grille légère
+    doc.setDrawColor(232,234,240); doc.setLineWidth(0.2);
+    for(let lv=1;lv<=5;lv++){
+      const gy=y+chartH-(lv-1)/4*chartH;
+      doc.line(chartX+padL,gy,chartX+chartW-padR,gy);
+    }
+
+    // Calcul coordonnées
+    const pts=beMoisList.map((m,i)=>{
+      const val=beData[m];
+      const px=chartX+padL+(n>1?i/(n-1)*drawW:drawW/2);
+      const py=y+chartH-(val-1)/4*chartH;
+      return{px,py,val,mois:MOIS_S[parseInt(m.slice(5))-1]||m};
+    });
+
+    // Ligne de courbe
+    doc.setDrawColor(0,150,136); doc.setLineWidth(1.5);
+    for(let i=1;i<pts.length;i++){
+      doc.line(pts[i-1].px,pts[i-1].py,pts[i].px,pts[i].py);
+    }
+
+    // Points + emojis
+    pts.forEach(({px,py,val,mois})=>{
+      doc.setFillColor(255,255,255); doc.setDrawColor(0,150,136); doc.setLineWidth(1);
+      doc.circle(px,py,2,'FD');
+      doc.setFontSize(13); doc.setTextColor(30,30,30);
+      doc.text(beLabels3[val-1],px,py-5,{align:'center'});
+      doc.setFontSize(7); doc.setTextColor(155,165,184);
+      doc.text(mois,px,py+8,{align:'center'});
+      doc.setFontSize(6.5); doc.setTextColor(74,106,53);
+      doc.text(beTexts3[val-1],px,py-10,{align:'center'});
+    });
+    y+=chartH+14;
+  }
+
+  // ── Pied de page ──
+  doc.setFontSize(8); doc.setTextColor(150,150,150); doc.setFont('helvetica','italic');
+  doc.text('RDV Perf · Leroy Merlin · Document de suivi — challenger et accompagner', 105, 290, {align:'center'});
+
+  // Téléchargement
+  const filename=`RDV-Perf_${NOMS[v]}_${currentYear}_${now.replace(/ /g,'-')}.pdf`;
+  doc.save(filename);
+  toast(`PDF généré — ${filename}`);
 }
 
 async function saveVendeurEntry(v){
@@ -1030,7 +1630,11 @@ async function saveVendeurEntry(v){
     fidelite:parseFloat(document.getElementById(`s-fidelite-${v}`).value),
   };
   if(Object.values(vals).some(isNaN)){toast('Remplis tous les champs');return;}
-  state.resultats[v][m]=vals;
+  const yd=getYearData(currentYear);
+  yd.resultats[v][m]=vals;
+  const comm=document.getElementById(`s-comment-${v}`).value.trim();
+  if(comm) yd.commentaires[v][m]=comm;
+  else delete yd.commentaires[v][m];
   await saveState();
   toast(`${NOMS[v]} · ${MOIS_L[m]} enregistré ✓`);
   renderVendeur(v);
@@ -1041,9 +1645,9 @@ async function saveVendeurEntry(v){
 ════════════════════════════════════════════════════════════ */
 function renderAdvisor(v){
   const content=document.getElementById('advisor-content');
-  const av=getAv(v),res=state.resultats[v],obj=state.objectifs[v];
+  const av=getAv(v,currentYear),res=getRes(v,currentYear),obj=state.objectifs[v];
   const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
-  const suggestion=getSuggestion(v),score=globalScore(v),cls=statusCls(score,md.length);
+  const suggestion=getSuggestion(v,currentYear),score=globalScore(v,currentYear),cls=statusCls(score,md.length);
 
   let html=`<div class="advisor-hero">
     <div class="advisor-avatar" style="background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
@@ -1105,6 +1709,30 @@ function renderAdvisor(v){
     html+=`</div></div>`;
   }
 
+  html+=`<div class="section-label">Mes objectifs annuels</div><div class="card" style="padding:14px 16px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">`;
+  KPI_KEYS.forEach((k,i)=>{
+    html+=`<div style="background:var(--surf2);border-radius:10px;padding:10px 12px;border:1px solid var(--brd)">
+      <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">${KPI_FULL[i]}</div>
+      <div style="font-size:18px;font-weight:800;color:var(--text)">${KPI_FMT[k](obj[k])}</div>
+    </div>`;
+  });
+  html+=`</div></div>`;
+
+  // ── BIEN-ÊTRE auto-évaluation conseiller ──
+  const beMoisAdv=new Date().toISOString().slice(0,7);
+  const beValAdv=(state.bienetre&&state.bienetre[v]&&state.bienetre[v][beMoisAdv])||0;
+  const beEmojisAdv=['😞','😕','😐','🙂','😄'];
+  const beLabelsAdv=['Difficile','Compliqué','Neutre','Bien','Excellent'];
+  html+=`<div class="section-label">Comment je me sens en ce moment ?</div>
+  <div class="card" style="padding:14px 16px">
+    <div style="font-size:13px;color:var(--t2);margin-bottom:4px">Un espace d'expression libre — sans jugement, sans impact sur ton évaluation.</div>
+    <div style="font-size:11px;color:var(--t3);margin-bottom:10px;font-style:italic">Totalement facultatif. Tu choisis si et quoi partager.</div>
+    <div class="bienetre-gauge">`;
+  beEmojisAdv.forEach((em,i)=>{
+    html+=`<button class="bienetre-btn${beValAdv===i+1?' selected':''}" onclick="saveBienetre('${v}',${i+1})" title="${beLabelsAdv[i]}">${em}</button>`;
+  });
+  html+=`</div><div class="bienetre-label">${beValAdv>0?`Tu as indiqué : ${beEmojisAdv[beValAdv-1]} ${beLabelsAdv[beValAdv-1]}`:'Non renseigné ce mois-ci — tout à fait facultatif'}</div></div>`;
+
   html+=`<div style="height:24px"></div>`;
   content.innerHTML=html;
 
@@ -1126,7 +1754,7 @@ const chartInstances={};
 function drawChart(canvasId,v,ki){
   const canvas=document.getElementById(canvasId);if(!canvas)return;
   if(chartInstances[canvasId])chartInstances[canvasId].destroy();
-  const res=state.resultats[v],obj=state.objectifs[v];
+  const res=getRes(v,currentYear),obj=state.objectifs[v];
   const k=KPI_KEYS[ki],col=COLORS[v],isPct=KPI_IS_PCT[k];
   const tc='#9BA5B8';
 
@@ -1188,7 +1816,30 @@ function drawChart(canvasId,v,ki){
         },
         tooltip:{callbacks:{
           label:ctx=>ctx.parsed.y==null?null:`${ctx.dataset.label}: ${KPI_FMT[k](ctx.parsed.y)}`
-        }}
+        }},
+        annotation:{
+          annotations:{
+            travaux:{
+              type:'box',
+              xMin:3.5,  // entre Avr et Mai
+              xMax:5.5,  // entre Jun et Jul
+              backgroundColor:'rgba(180,83,9,0.08)',
+              borderColor:'rgba(180,83,9,0.25)',
+              borderWidth:1,
+              borderDash:[4,3],
+              label:{
+                display:true,
+                content:'🔧 Travaux R05',
+                position:{x:'center',y:'start'},
+                color:'rgba(180,83,9,0.7)',
+                font:{size:10,weight:'700'},
+                padding:{top:4,bottom:4,left:6,right:6},
+                backgroundColor:'rgba(254,243,199,0.85)',
+                borderRadius:4,
+              }
+            }
+          }
+        }
       },
       scales:{
         x:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},autoSkip:false,maxRotation:0}},
@@ -1345,10 +1996,20 @@ function runSplash(callback) {
 /* ════════════════════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════════════════════ */
-const now=new Date();
-document.getElementById('current-year').textContent=now.getFullYear();
-const homeDate=document.getElementById('home-date');
-if(homeDate)homeDate.textContent=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+function populateYearSelector(){
+  const sel=document.getElementById('year-selector'); if(!sel)return;
+  const years=getAvailableYears();
+  sel.innerHTML='';
+  years.forEach(y=>{
+    const o=document.createElement('option');
+    o.value=y; o.textContent=y;
+    if(y===currentYear)o.selected=true;
+    sel.appendChild(o);
+  });
+}
+
+const nowInit=new Date();
+currentYear=nowInit.getFullYear();
 
 runSplash(async function() {
   document.body.style.background = 'var(--bg)';
