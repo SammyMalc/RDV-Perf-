@@ -1210,13 +1210,22 @@ function statusCls(pct,moisDone){
 }
 function globalScore(vendeur,year){
   const av=getAv(vendeur,year);
-  const md=Object.keys(getRes(vendeur,year)).length;
-  return KPI_KEYS.filter(k=>statusCls(av[k].pct,md)==='ok').length;
+  const res=getRes(vendeur,year);
+  const md=Object.keys(res).map(Number);
+  // Ne compter que les KPI qui ont des données réelles
+  return KPI_KEYS.filter(k=>{
+    const hasData=md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]));
+    return hasData && statusCls(av[k].pct,md.length)==='ok';
+  }).length;
 }
+// Retourne X/Y où Y = nombre de KPI réellement renseignés
 function globalScoreLabel(vendeur,year){
-  return globalScore(vendeur,year)+'/5';
+  const res=getRes(vendeur,year);
+  const md=Object.keys(res).map(Number);
+  const filled=KPI_KEYS.filter(k=>md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]))).length;
+  if(filled===0) return null; // aucune donnée
+  return globalScore(vendeur,year)+'/'+filled;
 }
-// Couleur basée sur X/5
 function scoreColor(score){
   if(score>=4) return STATUS_BAR.ok;
   if(score>=2) return STATUS_BAR.warn;
@@ -1251,9 +1260,16 @@ function getSuggestion(vendeur,year){
 ════════════════════════════════════════════════════════════ */
 function makeKpiCard(vendeur,k,i,av,moisDoneCount){
   const obj=state.objectifs[vendeur],pct=av[k].pct;
-  const cls=statusCls(pct,moisDoneCount),barPct=Math.min(100,pct);
-  const trajPct=moisDoneCount>0?Math.min(100,(moisDoneCount/12)*100):0;
-  const trend=getTrend(vendeur,k,currentYear);
+  // Vérifier si ce KPI spécifique a des données (pas juste des mois saisis)
+  const res=getRes(vendeur,currentYear);
+  const md=Object.keys(res).map(Number);
+  const hasKpiData = KPI_IS_PCT[k]
+    ? md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]))
+    : md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]));
+  const cls=hasKpiData?statusCls(pct,moisDoneCount):'neutral';
+  const barPct=hasKpiData?Math.min(100,pct):0;
+  const trajPct=hasKpiData&&moisDoneCount>0?Math.min(100,(moisDoneCount/12)*100):0;
+  const trend=hasKpiData?getTrend(vendeur,k,currentYear):null;
   let trendHtml='';
   if(trend!==null){
     const sym=trend>1?'▲':trend<-1?'▼':'→';
@@ -1261,8 +1277,8 @@ function makeKpiCard(vendeur,k,i,av,moisDoneCount){
     trendHtml=`<span class="kpi-trend ${tc}">${sym} ${Math.abs(trend).toFixed(0)}% vs mois préc.</span>`;
   }
   let pill='',remain='';
-  if(!moisDoneCount){
-    pill=`<span class="kpi-pill" style="background:var(--surf2);color:var(--t2)">Aucune saisie</span>`;
+  if(!hasKpiData){
+    pill=`<span class="kpi-pill" style="background:var(--surf2);color:var(--t3);font-style:italic">Non renseigné</span>`;
   }else if(!KPI_IS_PCT[k]){
     const attendu=obj[k]/12*moisDoneCount,ecart=av[k].realise-attendu,ef=KPI_FMT[k](Math.abs(ecart));
     pill=ecart>=0
@@ -1278,11 +1294,13 @@ function makeKpiCard(vendeur,k,i,av,moisDoneCount){
       :`<span class="kpi-pill" style="background:var(--ko-bg);color:var(--ko)">−${ea} pt en dessous</span>`;
     remain=`<span class="kpi-remaining">Moyenne : <b>${KPI_FMT[k](av[k].realise)}</b> · Objectif : ${KPI_FMT[k](obj[k])}</span>`;
   }
+  const barColor=cls==='ok'?STATUS_BAR.ok:cls==='warn'?STATUS_BAR.warn:cls==='ko'?STATUS_BAR.ko:'var(--brd)';
+  const displayVal=hasKpiData?KPI_FMT[k](av[k].realise):'—';
   return`<div class="kpi-card">
     <div class="kpi-card-top">
       <div style="flex:1;min-width:0">
         <div class="kpi-name">${KPI_FULL[i]}</div>
-        <div class="kpi-value">${KPI_FMT[k](av[k].realise)}</div>
+        <div class="kpi-value" style="${!hasKpiData?'color:var(--t3);font-size:16px':''}">${displayVal}</div>
         <div class="kpi-obj">Objectif annuel : ${KPI_FMT[k](obj[k])}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;max-width:52%">
@@ -1291,7 +1309,7 @@ function makeKpiCard(vendeur,k,i,av,moisDoneCount){
     </div>
     <div class="kpi-bar-wrap">
       <div class="kpi-bar-track">
-        <div class="kpi-bar-fill" style="width:${barPct}%;background:${STATUS_BAR[cls]}"></div>
+        <div class="kpi-bar-fill" style="width:${barPct}%;background:${barColor}"></div>
       </div>
       ${trajPct>0?`<div class="kpi-bar-target" style="left:calc(${trajPct}% - 1px)"><div class="kpi-bar-target-label">Attendu</div></div>`:''}
     </div>
@@ -1571,16 +1589,17 @@ function renderHome(){
     let html='';
     VENDEURS.forEach(v=>{
       const score=globalScore(v,currentYear),md=Object.keys(getRes(v,currentYear)).length;
-      const col=scoreColor(score);
+      const scoreLabel=globalScoreLabel(v,currentYear);
+      const col=score>0?scoreColor(score):'var(--t3)';
       const rdv=(state.rdv&&state.rdv[v])||{};
       const click=isDesktop()?`showDesktopVendeur('${v}')`:`openVendeur('${v}')`;
       html+=`<div class="vendor-card" onclick="${click}" style="cursor:pointer">
         <div class="vendor-card-avatar" style="background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
         <div class="vendor-card-name">${NOMS[v]}</div>
         <div class="vendor-card-months">${md>0?md+' mois saisi'+(md>1?'s':''):'Aucune saisie'}</div>
-        ${md>0?`<div style="font-size:13px;font-weight:800;color:${col};margin-bottom:4px">${score}/5 KPI en trajectoire</div>`:''}
+        ${scoreLabel?`<div style="font-size:13px;font-weight:800;color:${col};margin-bottom:4px">${scoreLabel} KPI en trajectoire</div>`:''}
         ${rdv.prochain?`<div style="font-size:10px;color:var(--teal);font-weight:700;margin-bottom:4px">📅 RDV ${rdv.prochain}</div>`:''}
-        <div class="vprog"><div class="vprogfill" style="width:${scoreBarPct(score)}%;background:${col}"></div></div>
+        <div class="vprog"><div class="vprogfill" style="width:${scoreLabel?scoreBarPct(score):0}%;background:${col}"></div></div>
       </div>`;
     });
     grid.innerHTML=html;
@@ -2257,8 +2276,21 @@ function drawChart(canvasId,v,ki){
   const dernierMois=moisDone.length>0?Math.max(...moisDone):-1;
   const prochainMois=dernierMois<11?dernierMois+1:-1;
 
-  // Données réalisées (barres) — null pour mois non saisis
-  const realData=MOIS_S.map((_,m)=>(res[m]&&res[m][k]!=null)?res[m][k]:null);
+  // Données réalisées — null pour mois non saisis ou KPI manquant
+  const realData=MOIS_S.map((_,m)=>(res[m]&&res[m][k]!=null&&!isNaN(res[m][k]))?res[m][k]:null);
+  const hasAnyData=realData.some(v=>v!==null);
+
+  // Si aucune donnée pour ce KPI — afficher message
+  if(!hasAnyData){
+    const ctx=canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='#9BA5B8';
+    ctx.font='500 13px -apple-system, sans-serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText('Pas d\'historique', canvas.clientWidth/2||100, canvas.clientHeight/2||60);
+    return;
+  }
 
   // Trajectoire attendue mois par mois
   // Pour KPI cumulatif : cumul proraté = (objectifAnnuel / 12) * (m+1)
@@ -2339,7 +2371,9 @@ function drawChart(canvasId,v,ki){
         x:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},autoSkip:false,maxRotation:0}},
         y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},callback:val=>{
           if(ki===0)return'€'+Math.round(val/1000)+'k';if(isPct)return val+'%';return Math.round(val);
-        }}}
+        }},
+        suggestedMax: [100000, 100, 100, 20, 30][ki],
+        min:0}
       }
     }
   });
