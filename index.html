@@ -877,16 +877,25 @@ function getYearData(year) {
   if (!state.annees) state.annees = {};
   if (!state.annees[y]) {
     state.annees[y] = {
-      resultats: { karim:{}, evan:{}, laura:{}, thomas:{} },
+      resultats:    { karim:{}, evan:{}, laura:{}, thomas:{} },
       commentaires: { karim:{}, evan:{}, laura:{}, thomas:{} },
     };
   }
+  // S'assurer que chaque vendeur a son propre objet (sécurité)
+  VENDEURS.forEach(v=>{
+    if(!state.annees[y].resultats[v])    state.annees[y].resultats[v]={};
+    if(!state.annees[y].commentaires[v]) state.annees[y].commentaires[v]={};
+  });
   return state.annees[y];
 }
 
 // Retourne les résultats pour l'année active
-function getRes(v, year) { return getYearData(year).resultats[v] || {}; }
-function getComm(v, year) { return getYearData(year).commentaires[v] || {}; }
+function getRes(v, year) {
+  return getYearData(year).resultats[v] || {};
+}
+function getComm(v, year) {
+  return getYearData(year).commentaires[v] || {};
+}
 
 function getAvailableYears() {
   const years = new Set([new Date().getFullYear()]);
@@ -2096,14 +2105,17 @@ async function exportPDF(v) {
 async function saveVendeurEntry(v){
   const m=parseInt(document.getElementById(`s-mois-${v}`).value);
   const yd=getYearData(currentYear);
+  // S'assurer que le conteneur du vendeur existe
+  if(!yd.resultats[v]) yd.resultats[v]={};
+  if(!yd.commentaires[v]) yd.commentaires[v]={};
   // Partir des données existantes (saisie partielle possible)
-  const existing=(yd.resultats[v]&&yd.resultats[v][m])||{};
+  const existing=yd.resultats[v][m]||{};
   const keys=['ca','taux','optin','chantiers','fidelite'];
   const vals={...existing};
   let atLeastOne=false;
   keys.forEach(k=>{
     const raw=document.getElementById(`s-${k}-${v}`).value;
-    if(raw===''||raw===null) return; // vide → on garde l'existant
+    if(raw===''||raw===null||raw===undefined) return;
     const num=parseFloat(raw);
     if(!isNaN(num)){vals[k]=num;atLeastOne=true;}
   });
@@ -2111,9 +2123,7 @@ async function saveVendeurEntry(v){
   yd.resultats[v][m]=vals;
   const comm=document.getElementById(`s-comment-${v}`).value.trim();
   if(comm) yd.commentaires[v][m]=comm;
-  else if(!comm&&!existing) delete yd.commentaires[v][m];
   await saveState();
-  // Indiquer quels KPI sont encore manquants
   const manquants=keys.filter(k=>vals[k]==null||isNaN(vals[k]));
   if(manquants.length>0){
     const labels={ca:'Montant',taux:'Transfo',optin:'Opt-in',chantiers:'Chantiers',fidelite:'Fidélité'};
