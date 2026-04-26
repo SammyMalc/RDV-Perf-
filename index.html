@@ -2308,13 +2308,11 @@ function drawChart(canvasId,v,ki){
     return;
   }
 
-  // Trajectoire attendue mois par mois
-  // Pour KPI cumulatif : cumul proraté = (objectifAnnuel / 12) * (m+1)
-  // Pour KPI % : objectif fixe (cible à atteindre chaque mois)
-  const trajData=MOIS_S.map((_,m)=>{
-    if(isPct) return obj[k];
-    return Math.round(obj[k]/12*(m+1));
-  });
+  // Objectif mensuel — ligne horizontale fixe pour tous les KPI
+  // Pour les % : la cible mensuelle = objectif annuel (c'est une moyenne)
+  // Pour les cumulatifs : la cible mensuelle = objectif annuel / 12
+  const objMensuel = isPct ? obj[k] : Math.round(obj[k] / 12);
+  const trajData = MOIS_S.map(() => objMensuel);
 
   // Suggestion mois suivant (objectif conseillé)
   const suggData=MOIS_S.map((_,m)=>null);
@@ -2388,7 +2386,7 @@ function drawChart(canvasId,v,ki){
         y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},callback:val=>{
           if(ki===0)return'€'+Math.round(val/1000)+'k';if(isPct)return val+'%';return Math.round(val);
         }},
-        suggestedMax: [100000, 100, 100, 20, 30][ki],
+        suggestedMax: isPct ? 100 : Math.ceil((obj[k]/12)*1.5),
         min:0}
       }
     }
