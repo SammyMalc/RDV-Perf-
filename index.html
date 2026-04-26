@@ -1181,7 +1181,8 @@ function getAv(vendeur,year){
       const moy=vals.length>0?vals.reduce((a,b)=>a+b,0)/vals.length:0;
       av[k]={realise:moy,pct:vals.length>0?moy/obj[k]*100:0,count:vals.length};
     }else{
-      const total=md.reduce((s,m)=>s+(res[m][k]||0),0);
+      // Pour les cumulatifs, ignorer les mois où ce KPI n'est pas encore saisi
+      const total=md.reduce((s,m)=>s+(res[m][k]!=null&&!isNaN(res[m][k])?res[m][k]:0),0);
       av[k]={realise:total,pct:obj[k]>0?total/obj[k]*100:0};
     }
   });
@@ -1653,12 +1654,12 @@ function renderVendeur(v){
   html+=`<div class="section-label">Saisie du mois</div>
   <div class="saisie-card" id="saisie-wrap-${v}">
     <div class="saisie-toggle" onclick="toggleSaisie('${v}')">
-      <span class="saisie-toggle-label">Saisir les résultats</span>
+      <span class="saisie-toggle-label" id="saisie-label-${v}">Saisir les résultats</span>
       <span class="saisie-toggle-icon" id="saisie-icon-${v}">+</span>
     </div>
     <div class="saisie-form" id="saisie-form-${v}">
       <div class="divider"></div>
-      <div class="form-group"><label class="form-label">Mois</label><select id="s-mois-${v}"></select></div>
+      <div class="form-group"><label class="form-label">Mois</label><select id="s-mois-${v}" onchange="prefillSaisie('${v}')"></select></div>
       <div class="form-group"><label class="form-label">Montant commandé (€)</label><input type="number" id="s-ca-${v}" placeholder="ex : 42 000" inputmode="decimal"></div>
       <div class="form-group"><label class="form-label">Taux de transformation (%)</label><input type="number" id="s-taux-${v}" placeholder="ex : 35.5" inputmode="decimal" step="0.1"></div>
       <div class="form-group"><label class="form-label">Opt-in contactabilité (%)</label><input type="number" id="s-optin-${v}" placeholder="ex : 72.0" inputmode="decimal" step="0.1" min="0" max="100"></div>
@@ -1808,8 +1809,17 @@ function renderVendeur(v){
   content.innerHTML=html;
 
   const selMois=document.getElementById(`s-mois-${v}`);
-  MOIS_L.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m;selMois.appendChild(o);});
-  selMois.value=md.length>0?Math.min(11,Math.max(...md)+1):new Date().getMonth();
+  const yd=getYearData(currentYear);
+  MOIS_L.forEach((m,i)=>{
+    const o=document.createElement('option');
+    o.value=i;
+    const already=yd.resultats[v]&&yd.resultats[v][i];
+    o.textContent=m+(already?' ✎':'');
+    selMois.appendChild(o);
+  });
+  const defaultMois=md.length>0?Math.min(11,Math.max(...md)+1):new Date().getMonth();
+  selMois.value=defaultMois;
+  prefillSaisie(v);
 
   let selKpi=0;
   const chipsDiv=document.getElementById('chips-'+v);
@@ -1827,6 +1837,29 @@ function renderVendeur(v){
 function toggleSaisie(v){
   const form=document.getElementById(`saisie-form-${v}`),icon=document.getElementById(`saisie-icon-${v}`);
   form.classList.toggle('open');icon.classList.toggle('open',form.classList.contains('open'));
+}
+
+function prefillSaisie(v){
+  const m=parseInt(document.getElementById(`s-mois-${v}`).value);
+  const yd=getYearData(currentYear);
+  const existing=yd.resultats[v]&&yd.resultats[v][m];
+  const label=document.querySelector(`#saisie-form-${v}`);
+  if(!label) return;
+  // Mettre à jour le libellé du toggle selon si c'est une modif ou une saisie
+  const toggleLabel=document.getElementById(`saisie-label-${v}`);
+  if(toggleLabel) toggleLabel.textContent=existing?`✎ Modifier — ${MOIS_L[m]}`:'Saisir les résultats';
+  // Pré-remplir si données existantes
+  const fields=['ca','taux','optin','chantiers','fidelite'];
+  fields.forEach(k=>{
+    const el=document.getElementById(`s-${k}-${v}`);
+    if(!el) return;
+    el.value=existing&&existing[k]!=null?existing[k]:'';
+  });
+  const comm=document.getElementById(`s-comment-${v}`);
+  if(comm){
+    const commData=yd.commentaires[v]&&yd.commentaires[v][m];
+    comm.value=commData||'';
+  }
 }
 
 async function saveRdv(v){
@@ -2062,21 +2095,32 @@ async function exportPDF(v) {
 
 async function saveVendeurEntry(v){
   const m=parseInt(document.getElementById(`s-mois-${v}`).value);
-  const vals={
-    ca:parseFloat(document.getElementById(`s-ca-${v}`).value),
-    taux:parseFloat(document.getElementById(`s-taux-${v}`).value),
-    optin:parseFloat(document.getElementById(`s-optin-${v}`).value),
-    chantiers:parseFloat(document.getElementById(`s-chantiers-${v}`).value),
-    fidelite:parseFloat(document.getElementById(`s-fidelite-${v}`).value),
-  };
-  if(Object.values(vals).some(isNaN)){toast('Remplis tous les champs');return;}
   const yd=getYearData(currentYear);
+  // Partir des données existantes (saisie partielle possible)
+  const existing=(yd.resultats[v]&&yd.resultats[v][m])||{};
+  const keys=['ca','taux','optin','chantiers','fidelite'];
+  const vals={...existing};
+  let atLeastOne=false;
+  keys.forEach(k=>{
+    const raw=document.getElementById(`s-${k}-${v}`).value;
+    if(raw===''||raw===null) return; // vide → on garde l'existant
+    const num=parseFloat(raw);
+    if(!isNaN(num)){vals[k]=num;atLeastOne=true;}
+  });
+  if(!atLeastOne&&Object.keys(existing).length===0){toast('Remplis au moins un champ');return;}
   yd.resultats[v][m]=vals;
   const comm=document.getElementById(`s-comment-${v}`).value.trim();
   if(comm) yd.commentaires[v][m]=comm;
-  else delete yd.commentaires[v][m];
+  else if(!comm&&!existing) delete yd.commentaires[v][m];
   await saveState();
-  toast(`${NOMS[v]} · ${MOIS_L[m]} enregistré ✓`);
+  // Indiquer quels KPI sont encore manquants
+  const manquants=keys.filter(k=>vals[k]==null||isNaN(vals[k]));
+  if(manquants.length>0){
+    const labels={ca:'Montant',taux:'Transfo',optin:'Opt-in',chantiers:'Chantiers',fidelite:'Fidélité'};
+    toast(`${MOIS_L[m]} enregistré — manque : ${manquants.map(k=>labels[k]).join(', ')}`);
+  } else {
+    toast(`${NOMS[v]} · ${MOIS_L[m]} complet ✓`);
+  }
   renderVendeur(v);
 }
 
