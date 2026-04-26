@@ -138,7 +138,7 @@ select,input{font-size:16px !important}
 .vprogfill{height:100%;border-radius:2px;transition:width 1s ease}
 
 /* ── QUICK ACTIONS ───────────────────────────────────────── */
-.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
 .quick-btn{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:16px;cursor:pointer;text-align:left;transition:border-color .15s,box-shadow .15s;box-shadow:var(--shadow)}
 .quick-btn:hover{border-color:var(--teal-m);box-shadow:var(--shadow-md)}
 .quick-btn:active{transform:scale(.98)}
@@ -346,6 +346,112 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 /* Adapte la barre du bas aux encoches/barres de navigation Android */
 .bottom-bar{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
 
+/* ════════════════════════════════════════════════════════════
+   DESKTOP LAYOUT — Chrome / Windows (≥900px)
+   Sidebar fixe à gauche + zone principale à droite
+════════════════════════════════════════════════════════════ */
+@media (min-width:900px){
+  /* Reset mobile constraints */
+  html,body{overflow:hidden;height:100vh}
+  .screen.active{flex-direction:row;height:100vh;overflow:hidden}
+
+  /* ── Sidebar ── */
+  .desktop-sidebar{
+    width:240px;flex-shrink:0;
+    background:var(--sidebar);
+    display:flex;flex-direction:column;
+    height:100vh;overflow-y:auto;
+    border-right:1px solid rgba(255,255,255,.06);
+  }
+  .sidebar-logo{padding:24px 20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.07)}
+  .sidebar-logo-text{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.3px}
+  .sidebar-logo-text .my{color:var(--lm-green);font-style:italic}
+  .sidebar-logo-text .dev{color:var(--teal)}
+  .sidebar-year{margin:12px 16px 0;display:flex;align-items:center;gap:8px}
+  .sidebar-year-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.8px}
+  .sidebar-year select{background:rgba(255,255,255,.1);color:#fff;border:none;font-size:12px;font-weight:700;padding:4px 8px;border-radius:20px;cursor:pointer;font-family:inherit;-webkit-appearance:none;appearance:none;flex:1}
+  .sidebar-nav{padding:12px 0;flex:1}
+  .sidebar-nav-section{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1.2px;padding:10px 20px 4px}
+  .sidebar-nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;transition:background .15s;color:rgba(255,255,255,.6);font-size:13px;font-weight:600;border-radius:0;position:relative}
+  .sidebar-nav-item:hover{background:var(--sidebar-hover);color:#fff}
+  .sidebar-nav-item.active{background:var(--sidebar-active);color:var(--teal)}
+  .sidebar-nav-item.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:3px;background:var(--teal);border-radius:0 2px 2px 0}
+  .sidebar-nav-icon{font-size:16px;flex-shrink:0;width:20px;text-align:center}
+  .sidebar-vendor-item{display:flex;align-items:center;gap:10px;padding:8px 20px;cursor:pointer;transition:background .15s;color:rgba(255,255,255,.6);font-size:13px;font-weight:500;position:relative}
+  .sidebar-vendor-item:hover{background:var(--sidebar-hover);color:#fff}
+  .sidebar-vendor-item.active{background:var(--sidebar-active);color:#fff}
+  .sidebar-vendor-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .sidebar-bottom{padding:16px;border-top:1px solid rgba(255,255,255,.07)}
+  .sidebar-sync{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.35);margin-bottom:10px}
+  .sidebar-logout{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.5);font-size:12px;font-weight:600;transition:background .15s}
+  .sidebar-logout:hover{background:var(--sidebar-hover);color:#fff}
+
+  /* ── Main content ── */
+  .desktop-main{flex:1;overflow-y:auto;background:var(--bg);display:flex;flex-direction:column;height:100vh}
+  .desktop-topbar{background:var(--surf);border-bottom:1px solid var(--brd);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--shadow)}
+  .desktop-topbar-title{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.4px}
+  .desktop-topbar-sub{font-size:12px;color:var(--t2);margin-top:2px}
+  .desktop-main-content{flex:1;padding:28px;max-width:1200px;width:100%}
+
+  /* ── Grid layouts ── */
+  .desktop-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .desktop-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .desktop-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .desktop-vendor-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+
+  /* ── Dashboard cards ── */
+  .dash-stat-card{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:20px;box-shadow:var(--shadow)}
+  .dash-stat-val{font-size:28px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1}
+  .dash-stat-label{font-size:12px;color:var(--t2);margin-top:4px;font-weight:600}
+  .dash-stat-trend{font-size:11px;margin-top:8px;font-weight:600}
+
+  /* ── Vendor panel desktop ── */
+  .desktop-vendor-panel{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .desktop-kpi-col{display:flex;flex-direction:column;gap:10px}
+
+  /* ── Override mobile-only elements ── */
+  .topbar{display:none!important}
+  .bottom-bar{display:none!important}
+  .home-banner{display:none!important}
+  .scroll-content{max-width:none;padding:0}
+  #mobile-topbar{display:none!important}
+  #mobile-home-scroll{display:none!important}
+
+  /* Action buttons desktop style */
+  .desktop-action-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+  .desktop-action-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:8px;border:1.5px solid var(--brd);background:var(--surf);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:var(--shadow)}
+  .desktop-action-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-l)}
+  .desktop-action-btn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .desktop-action-btn.primary:hover{background:var(--teal-d)}
+  .desktop-action-btn.yellow{background:var(--yellow);color:#1a1200;border-color:var(--yellow);box-shadow:0 2px 8px rgba(255,209,0,.3)}
+
+  /* Vendor card desktop */
+  .vendor-card{padding:20px}
+  .vendor-card-name{font-size:18px}
+
+  /* KPI cards desktop */
+  .kpi-card{padding:18px 20px}
+  .kpi-value{font-size:24px}
+
+  /* Charts taller on desktop */
+  .h220{height:280px}
+  .h200{height:240px}
+
+  /* Hide mobile quick actions, show desktop nav */
+  .quick-actions{display:none}
+  .logout-row{display:none}
+}
+
+@media (max-width:899px){
+  .desktop-sidebar{display:none!important}
+  .desktop-main{display:none!important}
+  .desktop-topbar{display:none!important}
+  .desktop-main-content{display:none!important}
+  .desktop-action-bar{display:none!important}
+  #mobile-topbar{display:flex!important}
+  #mobile-home-scroll{display:flex!important;flex-direction:column}
+}
+
 /* Pixel 10 Pro — écran dense 497ppi, interface légèrement agrandie */
 @media screen and (min-resolution:400dpi){
   .kpi-value{font-size:20px}
@@ -491,7 +597,96 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 
 <!-- ═══ HOME MANAGER ═══ -->
 <div class="screen" id="screen-home">
-  <div class="topbar">
+  <!-- DESKTOP SIDEBAR (hidden on mobile via CSS) -->
+  <div class="desktop-sidebar" id="desktop-sidebar">
+    <div class="sidebar-logo">
+      <svg width="28" height="24" viewBox="0 0 32 28" fill="none"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
+      <div class="sidebar-logo-text"><span class="my">my</span><span class="dev">DEV'</span> <span style="color:rgba(255,255,255,.3);font-weight:400;font-size:12px">Perf</span></div>
+    </div>
+    <div class="sidebar-year">
+      <span class="sidebar-year-label">Année</span>
+      <select id="year-selector-desktop" onchange="switchYear(this.value)"></select>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-section">Navigation</div>
+      <div class="sidebar-nav-item active" id="nav-home" onclick="showDesktopView('home')">
+        <span class="sidebar-nav-icon">🏠</span> Accueil
+      </div>
+      <div class="sidebar-nav-item" id="nav-dashboard" onclick="showDesktopView('dashboard')">
+        <span class="sidebar-nav-icon">📊</span> Tableau de bord
+      </div>
+      <div class="sidebar-nav-item" id="nav-objectifs" onclick="showDesktopView('objectifs')">
+        <span class="sidebar-nav-icon">🎯</span> Objectifs annuels
+      </div>
+      <div class="sidebar-nav-section" style="margin-top:8px">Conseillers</div>
+      <div class="sidebar-vendor-item" id="nav-karim" onclick="showDesktopVendeur('karim')">
+        <div class="sidebar-vendor-dot" style="background:#003087"></div> Karim
+      </div>
+      <div class="sidebar-vendor-item" id="nav-evan" onclick="showDesktopVendeur('evan')">
+        <div class="sidebar-vendor-dot" style="background:#009688"></div> Evan
+      </div>
+      <div class="sidebar-vendor-item" id="nav-laura" onclick="showDesktopVendeur('laura')">
+        <div class="sidebar-vendor-dot" style="background:#5C6BC0"></div> Laura
+      </div>
+      <div class="sidebar-vendor-item" id="nav-thomas" onclick="showDesktopVendeur('thomas')">
+        <div class="sidebar-vendor-dot" style="background:#546E7A"></div> Thomas
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="sidebar-sync">
+        <span id="sync-icon-desktop" class="sync-status sync-load"></span>
+        <span>Synchronisé</span>
+      </div>
+      <div class="sidebar-logout" onclick="doLogout()">🔒 Se déconnecter</div>
+    </div>
+  </div>
+
+  <!-- DESKTOP MAIN (hidden on mobile via CSS) -->
+  <div class="desktop-main">
+    <div class="desktop-topbar">
+      <div>
+        <div class="desktop-topbar-title" id="desktop-view-title">Pilotage Performance</div>
+        <div class="desktop-topbar-sub" id="desktop-view-sub">Sammy M. — Responsable Rayon</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <select id="year-selector" onchange="switchYear(this.value)" style="background:var(--teal);color:#fff;border:none;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:inherit;-webkit-appearance:none;appearance:none"></select>
+        <span id="sync-icon" class="sync-status" style="color:var(--teal)"></span>
+        <div style="background:var(--adeo);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:.5px">ADEO</div>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto">
+      <div class="desktop-main-content">
+        <div id="desktop-home-view">
+          <div id="home-alerts-desktop" style="margin-bottom:16px"></div>
+          <div class="section-label" style="margin-top:0">Mes conseillers</div>
+          <div class="vendor-grid desktop-vendor-grid" id="vendor-grid-desktop"></div>
+          <div class="section-label">Actions rapides</div>
+          <div class="desktop-action-bar">
+            <button class="desktop-action-btn" onclick="showDesktopView('dashboard')">📊 Tableau de bord</button>
+            <button class="desktop-action-btn" onclick="showDesktopView('objectifs')">🎯 Objectifs annuels</button>
+          </div>
+        </div>
+        <div id="desktop-dashboard-view" style="display:none"><div id="dashboard-content"></div></div>
+        <div id="desktop-vendor-view" style="display:none">
+          <div class="desktop-action-bar">
+            <button class="desktop-action-btn" onclick="showDesktopView('home')">‹ Retour</button>
+            <button class="desktop-action-btn primary" onclick="if(currentVendeur)exportPDF(currentVendeur)">📄 Exporter PDF</button>
+          </div>
+          <div id="vendor-content-desktop"></div>
+        </div>
+        <div id="desktop-objectifs-view" style="display:none">
+          <div class="desktop-action-bar">
+            <button class="desktop-action-btn" onclick="showDesktopView('home')">‹ Retour</button>
+            <button class="desktop-action-btn yellow" onclick="saveObjectifs()">💾 Sauvegarder</button>
+          </div>
+          <div id="objectifs-content-desktop"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE TOPBAR (hidden on desktop via CSS) -->
+  <div class="topbar" id="mobile-topbar">
     <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
       <svg width="26" height="23" viewBox="0 0 32 28" fill="none" style="flex-shrink:0"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
       <div class="topbar-center">
@@ -500,41 +695,37 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-      <span id="sync-icon" class="sync-status sync-load"></span>
-      <select id="year-selector" onchange="switchYear(this.value)" style="background:var(--teal);color:#fff;border:none;font-size:12px;font-weight:700;padding:3px 8px;border-radius:20px;cursor:pointer;font-family:inherit;-webkit-appearance:none;appearance:none"></select>
+      <span id="sync-icon-mobile" class="sync-status sync-load"></span>
+      <select id="year-selector-mobile" onchange="switchYear(this.value)" style="background:var(--teal);color:#fff;border:none;font-size:12px;font-weight:700;padding:3px 8px;border-radius:20px;cursor:pointer;font-family:inherit;-webkit-appearance:none;appearance:none"></select>
     </div>
   </div>
-  <div class="scroll-content">
+
+  <!-- MOBILE CONTENT (hidden on desktop via CSS) -->
+  <div class="scroll-content" id="mobile-home-scroll">
     <div class="home-banner">
       <div class="home-banner-label">Tableau de bord</div>
       <div class="home-banner-title">Bonjour, Sammy 👋</div>
       <div class="home-banner-sub">Suivi de performance · <span id="home-date"></span></div>
     </div>
-
     <div id="home-alerts"></div>
     <div class="section-label">Mes conseillers</div>
     <div class="vendor-grid" id="vendor-grid"></div>
-
     <div class="section-label">Quick actions</div>
-    <div class="quick-actions">
-      <div class="quick-btn" onclick="goScreen('screen-synthese')">
-        <div class="quick-btn-icon" style="background:var(--violet-l);color:var(--violet)">📊</div>
-        <div class="quick-btn-label">Synthèse équipe</div>
-        <div class="quick-btn-sub">Vue comparative</div>
+    <div class="quick-actions" style="grid-template-columns:1fr 1fr">
+      <div class="quick-btn" onclick="goScreen('screen-dashboard')">
+        <div class="quick-btn-icon" style="background:var(--teal-l);color:var(--teal)">📊</div>
+        <div class="quick-btn-label">Tableau de bord</div>
+        <div class="quick-btn-sub">Synthèse équipe</div>
       </div>
       <div class="quick-btn" onclick="goScreen('screen-objectifs')">
-        <div class="quick-btn-icon" style="background:var(--teal-l);color:var(--teal)">🎯</div>
+        <div class="quick-btn-icon" style="background:#FEF3C7;color:var(--warn)">🎯</div>
         <div class="quick-btn-label">Objectifs annuels</div>
         <div class="quick-btn-sub">Modifier les cibles</div>
       </div>
     </div>
-
     <div class="logout-row" onclick="doLogout()">
       <div style="width:38px;height:38px;border-radius:10px;background:var(--ko-bg);display:flex;align-items:center;justify-content:center;font-size:18px">🔒</div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--text)">Se déconnecter</div>
-        <div style="font-size:11px;color:var(--t2);margin-top:1px">Verrouiller l'application</div>
-      </div>
+      <div><div style="font-size:13px;font-weight:700;color:var(--text)">Se déconnecter</div><div style="font-size:11px;color:var(--t2);margin-top:1px">Verrouiller l'application</div></div>
     </div>
     <div style="height:20px"></div>
   </div>
@@ -573,16 +764,16 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
   </div>
 </div>
 
-<!-- ═══ SYNTHESE ═══ -->
-<div class="screen" id="screen-synthese">
+<!-- ═══ DASHBOARD MOBILE ═══ -->
+<div class="screen" id="screen-dashboard">
   <div class="topbar">
     <button class="topbar-back" onclick="goHome()">‹ Retour</button>
     <div class="topbar-center">
-      <div class="topbar-title">Synthèse équipe</div>
-      <div class="topbar-sub">Vue comparative</div>
+      <div class="topbar-title">Tableau de bord</div>
+      <div class="topbar-sub">Synthèse équipe</div>
     </div>
   </div>
-  <div class="scroll-content" id="synthese-content"></div>
+  <div class="scroll-content"><div id="dashboard-content-mobile"></div></div>
   <div class="bottom-bar">
     <button class="bottom-bar-back" onclick="goHome()">‹ Retour</button>
   </div>
@@ -753,10 +944,12 @@ async function loadState() {
 }
 
 function setSyncIcon(status) {
-  const el=document.getElementById('sync-icon'); if(!el)return;
-  if(status==='loading'){el.textContent='↻';el.className='sync-status sync-load spin';}
-  else if(status==='ok'){el.textContent='✓';el.className='sync-status sync-ok';setTimeout(()=>{el.textContent='';el.className='sync-status sync-load';},3000);}
-  else{el.textContent='⚠';el.className='sync-status sync-err';}
+  ['sync-icon','sync-icon-mobile','sync-icon-desktop'].forEach(id=>{
+    const el=document.getElementById(id); if(!el)return;
+    if(status==='loading'){el.textContent='↻';el.className='sync-status sync-load spin';}
+    else if(status==='ok'){el.textContent='✓';el.className='sync-status sync-ok';setTimeout(()=>{el.textContent='';el.className='sync-status sync-load';},3000);}
+    else{el.textContent='⚠';el.className='sync-status sync-err';}
+  });
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -929,26 +1122,19 @@ function doLogout() {
 }
 
 async function afterLogin() {
-  // 1. Affiche immédiatement avec les données locales (instantané)
   localLoad();
   if(currentUser.role==='manager'){
     renderHome();
     goScreen('screen-home');
+    if(isDesktop()) showDesktopView('home');
   } else {
     renderAdvisor(currentUser.id);
     goScreen('screen-advisor');
   }
-  // 2. Rafraîchit en arrière-plan depuis JSONBin (sans bloquer l'affichage)
   const remote = await remoteRead();
-  if(remote && remote.objectifs && remote.resultats){
-    state = remote;
-    localSave();
-    // Re-render silencieux si les données ont changé
-    if(currentUser.role==='manager'){
-      renderHome();
-    } else {
-      renderAdvisor(currentUser.id);
-    }
+  if(remote && remote.objectifs && remote.resultats){ state=remote; localSave();
+    if(currentUser.role==='manager') renderHome();
+    else renderAdvisor(currentUser.id);
   }
 }
 
@@ -967,11 +1153,20 @@ function goScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
-  if(id==='screen-synthese')renderSynthese();
-  if(id==='screen-objectifs')renderObjectifs();
+  if(id==='screen-objectifs') renderObjectifs();
+  if(id==='screen-dashboard') renderDashboardMobile();
 }
-function goHome(){goScreen('screen-home');renderHome();}
-function openVendeur(v){currentVendeur=v;document.getElementById('vendor-title').textContent=NOMS[v];goScreen('screen-vendor');renderVendeur(v);}
+function goHome(){
+  if(isDesktop()){ showDesktopView('home'); renderHome(); return; }
+  goScreen('screen-home'); renderHome();
+}
+function openVendeur(v){
+  currentVendeur=v;
+  if(isDesktop()){ showDesktopVendeur(v); return; }
+  document.getElementById('vendor-title').textContent=NOMS[v];
+  goScreen('screen-vendor');
+  renderVendeur(v);
+}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
 
 /* ════════════════════════════════════════════════════════════
@@ -1005,8 +1200,19 @@ function statusCls(pct,moisDone){
 }
 function globalScore(vendeur,year){
   const av=getAv(vendeur,year);
-  return Math.round(KPI_KEYS.map(k=>av[k].pct).reduce((a,b)=>a+b,0)/KPI_KEYS.length);
+  const md=Object.keys(getRes(vendeur,year)).length;
+  return KPI_KEYS.filter(k=>statusCls(av[k].pct,md)==='ok').length;
 }
+function globalScoreLabel(vendeur,year){
+  return globalScore(vendeur,year)+'/5';
+}
+// Couleur basée sur X/5
+function scoreColor(score){
+  if(score>=4) return STATUS_BAR.ok;
+  if(score>=2) return STATUS_BAR.warn;
+  return STATUS_BAR.ko;
+}
+function scoreBarPct(score){ return Math.round(score/5*100); }
 function getSuggestion(vendeur,year){
   const obj=state.objectifs[vendeur],res=getRes(vendeur,year);
   const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
@@ -1084,21 +1290,243 @@ function makeKpiCard(vendeur,k,i,av,moisDoneCount){
 }
 
 /* ════════════════════════════════════════════════════════════
-   HOME
+   DESKTOP NAVIGATION
 ════════════════════════════════════════════════════════════ */
+const isDesktop = () => window.innerWidth >= 900;
+
+function showDesktopView(view) {
+  if (!isDesktop()) return;
+  // Hide all views
+  ['home','dashboard','vendor','objectifs'].forEach(v => {
+    const el = document.getElementById(`desktop-${v}-view`);
+    if (el) el.style.display = 'none';
+  });
+  // Show target
+  const target = document.getElementById(`desktop-${view}-view`);
+  if (target) target.style.display = 'block';
+
+  // Update sidebar active state
+  document.querySelectorAll('.sidebar-nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sidebar-vendor-item').forEach(el => el.classList.remove('active'));
+  const navEl = document.getElementById(`nav-${view}`);
+  if (navEl) navEl.classList.add('active');
+
+  // Update topbar title
+  const titles = {
+    home: ['Pilotage Performance', 'Vue d\'ensemble de l\'équipe'],
+    dashboard: ['Tableau de bord', 'Synthèse comparative · ' + currentYear],
+    vendor: [currentVendeur ? NOMS[currentVendeur] : 'Vendeur', 'Suivi de performance'],
+    objectifs: ['Objectifs annuels', 'Modifier les cibles · ' + currentYear],
+  };
+  const [title, sub] = titles[view] || ['', ''];
+  const tEl = document.getElementById('desktop-view-title');
+  const sEl = document.getElementById('desktop-view-sub');
+  if (tEl) tEl.textContent = title;
+  if (sEl) sEl.textContent = sub + (view === 'home' ? ' · ' + (document.getElementById('home-date')?.textContent||'') : '');
+
+  // Render content
+  if (view === 'dashboard') renderDashboard();
+  if (view === 'objectifs') renderObjectifs();
+}
+
+function showDesktopVendeur(v) {
+  if (!isDesktop()) { openVendeur(v); return; }
+  currentVendeur = v;
+  document.querySelectorAll('.sidebar-vendor-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav-item').forEach(el => el.classList.remove('active'));
+  const navEl = document.getElementById(`nav-${v}`);
+  if (navEl) navEl.classList.add('active');
+  ['home','dashboard','vendor','objectifs'].forEach(view => {
+    const el = document.getElementById(`desktop-${view}-view`);
+    if (el) el.style.display = 'none';
+  });
+  const vv = document.getElementById('desktop-vendor-view');
+  if (vv) vv.style.display = 'block';
+  const tEl = document.getElementById('desktop-view-title');
+  const sEl = document.getElementById('desktop-view-sub');
+  if (tEl) tEl.textContent = NOMS[v];
+  if (sEl) sEl.textContent = 'Suivi de performance · ' + currentYear;
+  renderVendeur(v);
+}
+
+/* ════════════════════════════════════════════════════════════
+   TABLEAU DE BORD SYNTHÈSE (manager desktop uniquement)
+════════════════════════════════════════════════════════════ */
+function renderDashboard() {
+  const div = document.getElementById('dashboard-content');
+  if (!div) return;
+
+  // ── KPI globaux équipe ──
+  const totalNonTenus = VENDEURS.reduce((s,v)=>s+((state.engagements&&state.engagements[v]||[]).filter(e=>e.statut==='non_tenu').length),0);
+  const avgMois = Math.round(VENDEURS.map(v=>Object.keys(getRes(v,currentYear)).length).reduce((a,b)=>a+b,0)/VENDEURS.length);
+  const teamOk = VENDEURS.reduce((s,v)=>s+globalScore(v,currentYear),0);
+  const teamMax = VENDEURS.length*5;
+  let html = `<div class="desktop-grid-4" style="margin-bottom:20px">`;
+  const statCards = [
+    { label:'Conseillers suivis', val:VENDEURS.length, icon:'👥', color:'var(--teal)' },
+    { label:'Mois saisis (moy.)', val:avgMois, icon:'📅', color:'var(--violet)' },
+    { label:'KPI équipe en trajectoire', val:`${teamOk}/${teamMax}`, icon:'✓', color:'var(--ok)' },
+    { label:'Engagements non tenus', val:totalNonTenus||'—', icon:'⚠', color:totalNonTenus>0?'var(--ko)':'var(--ok)' },
+  ];
+  statCards.forEach(s => {
+    html += `<div class="dash-stat-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span style="font-size:24px">${s.icon}</span>
+        <span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px">${s.label}</span>
+      </div>
+      <div class="dash-stat-val" style="color:${s.color}">${s.val}</div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  // ── Tableau comparatif ──
+  html += `<div class="desktop-grid-2" style="margin-bottom:20px">`;
+
+  // Tableau KPI par vendeur
+  html += `<div class="card" style="padding:0;overflow:hidden">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between">
+      <div class="card-title" style="margin:0">Performance par conseiller · ${currentYear}</div>
+    </div>
+    <table class="stable" style="margin:0">
+      <thead><tr>
+        <th style="text-align:left;padding-left:20px">Conseiller</th>`;
+  KPI_LABELS.forEach(l => { html += `<th>${l}</th>`; });
+  html += `<th>Climat</th></tr></thead><tbody>`;
+  VENDEURS.forEach(v => {
+    const av = getAv(v, currentYear);
+    const md = Object.keys(getRes(v, currentYear)).length;
+    const beMois = new Date().toISOString().slice(0,7);
+    const beVal = (state.bienetre&&state.bienetre[v]&&state.bienetre[v][beMois])||0;
+    const beEmojis = ['','😞','😕','😐','🙂','😄'];
+    html += `<tr><td style="text-align:left;padding-left:20px;white-space:nowrap">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
+        <div>
+          <div style="font-weight:700;font-size:13px">${NOMS[v]}</div>
+          <div style="font-size:10px;color:var(--t3)">${md} mois · <b style="color:${scoreColor(globalScore(v,currentYear))}">${globalScore(v,currentYear)}/5 KPI ✓</b></div>
+        </div>
+      </div></td>`;
+    KPI_KEYS.forEach(k => {
+      const pct = Math.round(av[k].pct);
+      const cls = statusCls(av[k].pct, md);
+      html += `<td><div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+        <span style="font-size:13px;font-weight:700;color:${cls==='ok'?'var(--ok)':cls==='warn'?'var(--warn)':'var(--ko)'}">${pct}%</span>
+        <div style="width:36px;height:4px;border-radius:2px;background:var(--surf2);overflow:hidden">
+          <div style="height:100%;border-radius:2px;width:${Math.min(100,pct)}%;background:${cls==='ok'?'var(--ok-bar)':cls==='warn'?'var(--warn-bar)':'var(--ko-bar)'}"></div>
+        </div>
+      </div></td>`;
+    });
+    html += `<td style="font-size:18px;text-align:center">${beVal>0?beEmojis[beVal]:'—'}</td></tr>`;
+  });
+  html += `</tbody></table></div>`;
+
+  // Graphique barres comparatif
+  html += `<div class="card">
+    <div class="card-title">% Réalisation par KPI</div>
+    <div class="legend" style="margin-bottom:12px">`;
+  const kColors = ['#009688','#003087','#F57C00','#5C6BC0','#546E7A'];
+  VENDEURS.forEach((v,i) => {
+    html += `<div class="legend-item"><div class="dot" style="background:${COLORS[v]}"></div>${NOMS[v]}</div>`;
+  });
+  html += `</div>
+    <div class="chart-wrap" style="height:260px"><canvas id="chart-dashboard-bar" role="img" aria-label="Tableau de bord">Synthèse</canvas></div>
+  </div></div>`;
+
+  // ── Engagements ouverts ──
+  const allEngs = [];
+  VENDEURS.forEach(v => {
+    ((state.engagements&&state.engagements[v])||[]).filter(e=>e.statut==='ouvert').forEach(e => {
+      allEngs.push({...e, vendeur:v});
+    });
+  });
+  if (allEngs.length > 0) {
+    html += `<div class="card" style="margin-bottom:20px">
+      <div class="card-title">Engagements ouverts</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">`;
+    allEngs.forEach(e => {
+      const dotColor = e.auteur==='manager'?'var(--teal)':'var(--violet)';
+      html += `<div style="background:var(--surf2);border-radius:10px;padding:12px 14px;border:1px solid var(--brd)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <div style="width:8px;height:8px;border-radius:50%;background:${COLORS[e.vendeur]};flex-shrink:0"></div>
+          <span style="font-size:12px;font-weight:700;color:${COLORS[e.vendeur]}">${NOMS[e.vendeur]}</span>
+          <span style="font-size:10px;color:var(--t3);margin-left:auto">${e.auteur==='manager'?'👤':'🙋'} ${e.date}</span>
+        </div>
+        <div style="font-size:13px;color:var(--text);line-height:1.4">${e.texte}</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // ── Prochains RDV ──
+  const rdvList = VENDEURS.map(v => ({v, rdv:(state.rdv&&state.rdv[v])||{}}))
+    .filter(x => x.rdv.prochain)
+    .sort((a,b) => a.rdv.prochain.localeCompare(b.rdv.prochain));
+  if (rdvList.length > 0) {
+    html += `<div class="card">
+      <div class="card-title">Prochains RDV planifiés</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">`;
+    rdvList.forEach(({v, rdv}) => {
+      const d = new Date(rdv.prochain);
+      const fmt = d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long'});
+      html += `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surf2);border-radius:10px;border:1px solid var(--brd);cursor:pointer" onclick="showDesktopVendeur('${v}')">
+        <div style="width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)">${NOMS[v]}</div>
+          <div style="font-size:11px;color:var(--teal);font-weight:600">📅 ${fmt}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  div.innerHTML = html;
+
+  setTimeout(() => {
+    const canvas = document.getElementById('chart-dashboard-bar');
+    if (!canvas) return;
+    if (chartInstances['chart-dashboard-bar']) chartInstances['chart-dashboard-bar'].destroy();
+    const tc = '#9BA5B8';
+    chartInstances['chart-dashboard-bar'] = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: KPI_LABELS,
+        datasets: VENDEURS.map(v => ({
+          label: NOMS[v],
+          data: KPI_KEYS.map(k => Math.round(getAv(v, currentYear)[k].pct)),
+          backgroundColor: COLORS[v] + '40',
+          borderColor: COLORS[v],
+          borderWidth: 2,
+          borderRadius: 4,
+        }))
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true, position: 'bottom', labels: { color: tc, font: { size: 11 }, padding: 16 } },
+          tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y}%` } }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { color: tc, font: { size: 11 } } },
+          y: { grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { color: tc, font: { size: 10 }, callback: v => v+'%' }, min: 0 }
+        }
+      }
+    });
+  }, 60);
+}
 function renderHome(){
-  const grid=document.getElementById('vendor-grid');
   populateYearSelector();
   const nowH=new Date();
-  const homeDate=document.getElementById('home-date');
-  if(homeDate)homeDate.textContent=nowH.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})+' · '+currentYear;
+  const dateStr=nowH.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})+' · '+currentYear;
+  ['home-date'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=dateStr;});
+  const dsub=document.getElementById('desktop-view-sub');
+  if(dsub)dsub.textContent='Sammy M. — Responsable Rayon · '+dateStr;
   const moisCourant=nowH.getMonth();
 
-  // Alertes proactives
+  // Alertes
   const alerts=[];
   VENDEURS.forEach(v=>{
     const md=Object.keys(getRes(v,currentYear)).map(Number);
-    const score=globalScore(v,currentYear), cls=statusCls(score,md.length);
+    const score=globalScore(v,currentYear);
     if(md.length===0){
       alerts.push({v,type:'warn',msg:`${NOMS[v]} — Aucune donnée saisie`,sub:'Commencer la saisie pour suivre la performance'});
     } else {
@@ -1106,49 +1534,61 @@ function renderHome(){
       if(moisCourant-dernierMois>=2)
         alerts.push({v,type:'warn',msg:`${NOMS[v]} — Saisie en retard`,sub:`Dernière saisie : ${MOIS_S[dernierMois]} · ${moisCourant-dernierMois} mois de retard`});
     }
-    if(md.length>0&&cls==='ko')
-      alerts.push({v,type:'ko',msg:`${NOMS[v]} — Rythme à accélérer`,sub:'Moins de 70% de la trajectoire — sujet à aborder en RDV'});
+    if(md.length>0&&score<=1)
+      alerts.push({v,type:'ko',msg:`${NOMS[v]} — Rythme à accélérer`,sub:`${score}/5 KPI en trajectoire — sujet à aborder en RDV`});
   });
-  const alertEl=document.getElementById('home-alerts');
-  if(alertEl){
-    if(alerts.length>0){
-      let ah=`<div class="section-label">⚠ Points d'attention</div><div class="alert-list">`;
-      alerts.forEach(a=>{ah+=`<div class="alert-item ${a.type}" onclick="openVendeur('${a.v}')">
+
+  const buildAlerts=()=>{
+    if(!alerts.length) return '';
+    let ah=`<div class="section-label" style="margin-top:0">⚠ Points d'attention</div><div class="alert-list">`;
+    alerts.forEach(a=>{
+      const click=isDesktop()?`showDesktopVendeur('${a.v}')`:`openVendeur('${a.v}')`;
+      ah+=`<div class="alert-item ${a.type}" onclick="${click}">
         <div class="alert-icon">${a.type==='ko'?'🔴':'🟡'}</div>
         <div class="alert-text">${a.msg}<div class="alert-sub">${a.sub}</div></div>
-        <div style="font-size:18px;opacity:.4">›</div></div>`;});
-      ah+=`</div>`;
-      alertEl.innerHTML=ah;
-    } else { alertEl.innerHTML=''; }
-  }
+        <div style="font-size:18px;opacity:.4">›</div></div>`;
+    });
+    return ah+'</div>';
+  };
 
-  // Cartes vendeurs avec prochain RDV
-  let html='';
-  VENDEURS.forEach(v=>{
-    const score=globalScore(v),md=Object.keys(state.resultats[v]).length;
-    const cls=statusCls(score,md);
-    const score2=globalScore(v,currentYear),md2=Object.keys(getRes(v,currentYear)).length;
-    const cls2=statusCls(score2,md2);
-    const rdv=(state.rdv&&state.rdv[v])||{};
-    html+=`<div class="vendor-card" onclick="openVendeur('${v}')">
-      <div class="vendor-card-avatar" style="background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
-      <div class="vendor-card-name">${NOMS[v]}</div>
-      <div class="vendor-card-months">${md2>0?md2+' mois saisi'+(md2>1?'s':''):'Aucune saisie'}</div>
-      ${rdv.prochain?`<div style="font-size:10px;color:var(--teal);font-weight:700;margin-bottom:4px">📅 RDV ${rdv.prochain}</div>`:''}
-      <div class="vprog"><div class="vprogfill" style="width:${Math.min(100,score2)}%;background:${STATUS_BAR[cls2]}"></div></div>
-    </div>`;
+  const alertsHtml=buildAlerts();
+  ['home-alerts','home-alerts-desktop'].forEach(id=>{
+    const el=document.getElementById(id); if(el)el.innerHTML=alertsHtml;
   });
-  grid.innerHTML=html;
+
+  const buildCards=(gridId)=>{
+    const grid=document.getElementById(gridId); if(!grid)return;
+    let html='';
+    VENDEURS.forEach(v=>{
+      const score=globalScore(v,currentYear),md=Object.keys(getRes(v,currentYear)).length;
+      const col=scoreColor(score);
+      const rdv=(state.rdv&&state.rdv[v])||{};
+      const click=isDesktop()?`showDesktopVendeur('${v}')`:`openVendeur('${v}')`;
+      html+=`<div class="vendor-card" onclick="${click}" style="cursor:pointer">
+        <div class="vendor-card-avatar" style="background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
+        <div class="vendor-card-name">${NOMS[v]}</div>
+        <div class="vendor-card-months">${md>0?md+' mois saisi'+(md>1?'s':''):'Aucune saisie'}</div>
+        ${md>0?`<div style="font-size:13px;font-weight:800;color:${col};margin-bottom:4px">${score}/5 KPI en trajectoire</div>`:''}
+        ${rdv.prochain?`<div style="font-size:10px;color:var(--teal);font-weight:700;margin-bottom:4px">📅 RDV ${rdv.prochain}</div>`:''}
+        <div class="vprog"><div class="vprogfill" style="width:${scoreBarPct(score)}%;background:${col}"></div></div>
+      </div>`;
+    });
+    grid.innerHTML=html;
+  };
+
+  buildCards('vendor-grid');
+  buildCards('vendor-grid-desktop');
 }
 
 /* ════════════════════════════════════════════════════════════
    VENDOR (manager)
 ════════════════════════════════════════════════════════════ */
 function renderVendeur(v){
-  const content=document.getElementById('vendor-content');
+  const contentId = isDesktop() ? 'vendor-content-desktop' : 'vendor-content';
+  const content=document.getElementById(contentId)||document.getElementById('vendor-content');
   const av=getAv(v,currentYear),res=getRes(v,currentYear),obj=state.objectifs[v];
   const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
-  const suggestion=getSuggestion(v,currentYear),score=globalScore(v,currentYear),cls=statusCls(score,md.length);
+  const suggestion=getSuggestion(v,currentYear),score=globalScore(v,currentYear),cls=score>=4?"ok":score>=2?"warn":"ko";
 
   // ── BIEN-ÊTRE EN PREMIER ──
   const beMoisTop=new Date().toISOString().slice(0,7);
@@ -1647,7 +2087,7 @@ function renderAdvisor(v){
   const content=document.getElementById('advisor-content');
   const av=getAv(v,currentYear),res=getRes(v,currentYear),obj=state.objectifs[v];
   const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
-  const suggestion=getSuggestion(v,currentYear),score=globalScore(v,currentYear),cls=statusCls(score,md.length);
+  const suggestion=getSuggestion(v,currentYear),score=globalScore(v,currentYear),cls=score>=4?"ok":score>=2?"warn":"ko";
 
   let html=`<div class="advisor-hero">
     <div class="advisor-avatar" style="background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
@@ -1852,8 +2292,135 @@ function drawChart(canvasId,v,ki){
 }
 
 /* ════════════════════════════════════════════════════════════
-   SYNTHESE
+   TABLEAU DE BORD MOBILE
 ════════════════════════════════════════════════════════════ */
+function renderDashboardMobile() {
+  const div = document.getElementById('dashboard-content-mobile');
+  if (!div) return;
+  const beEmojis = ['','😞','😕','😐','🙂','😄'];
+  const beMois = new Date().toISOString().slice(0,7);
+  let html = '';
+
+  // ── Stat globales ──
+  const totalNonTenus = VENDEURS.reduce((s,v)=>s+((state.engagements&&state.engagements[v]||[]).filter(e=>e.statut==='non_tenu').length),0);
+  const avgMois = Math.round(VENDEURS.map(v=>Object.keys(getRes(v,currentYear)).length).reduce((a,b)=>a+b,0)/VENDEURS.length);
+  const teamOk = VENDEURS.reduce((s,v)=>s+globalScore(v,currentYear),0);
+  const teamMax = VENDEURS.length*5;
+  html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+    <div class="card" style="padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:800;color:var(--teal)">${teamOk}/${teamMax}</div>
+      <div style="font-size:11px;color:var(--t2);font-weight:600;margin-top:3px">KPI en trajectoire</div>
+    </div>
+    <div class="card" style="padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:800;color:${totalNonTenus>0?'var(--ko)':'var(--ok)'}">${totalNonTenus||'—'}</div>
+      <div style="font-size:11px;color:var(--t2);font-weight:600;margin-top:3px">Engagements non tenus</div>
+    </div>
+  </div>`;
+
+  // ── Tableau comparatif ──
+  html+=`<div class="section-label">Performance par conseiller</div>
+  <div class="card" style="padding:0;overflow:hidden;margin-bottom:12px">
+    <div style="overflow-x:auto">
+    <table class="stable" style="min-width:400px">
+      <thead><tr>
+        <th style="text-align:left;padding-left:12px;white-space:nowrap">Conseiller</th>`;
+  KPI_LABELS.forEach(l=>{html+=`<th>${l}</th>`;});
+  html+=`<th>Climat</th></tr></thead><tbody>`;
+  VENDEURS.forEach(v=>{
+    const av=getAv(v,currentYear);
+    const md=Object.keys(getRes(v,currentYear)).length;
+    const beVal=(state.bienetre&&state.bienetre[v]&&state.bienetre[v][beMois])||0;
+    html+=`<tr onclick="openVendeur('${v}')" style="cursor:pointer">
+      <td style="text-align:left;padding-left:12px;white-space:nowrap">
+        <div style="display:flex;align-items:center;gap:7px">
+          <div style="width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
+          <span style="font-weight:700;font-size:13px">${NOMS[v]}</span>
+        </div></td>`;
+    KPI_KEYS.forEach(k=>{
+      const pct=Math.round(av[k].pct);
+      const cls=statusCls(av[k].pct,md);
+      const col=cls==='ok'?'var(--ok)':cls==='warn'?'var(--warn)':'var(--ko)';
+      html+=`<td><span style="font-size:12px;font-weight:700;color:${col}">${pct}%</span></td>`;
+    });
+    html+=`<td style="font-size:16px">${beVal>0?beEmojis[beVal]:'—'}</td></tr>`;
+  });
+  html+=`</tbody></table></div></div>`;
+
+  // ── Graphique ──
+  html+=`<div class="section-label">% Réalisation par KPI</div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="chart-wrap h220"><canvas id="chart-dashboard-mobile" role="img" aria-label="Dashboard mobile"></canvas></div>
+  </div>`;
+
+  // ── Engagements ouverts ──
+  const allEngs=[];
+  VENDEURS.forEach(v=>{
+    ((state.engagements&&state.engagements[v])||[]).filter(e=>e.statut==='ouvert').forEach(e=>{
+      allEngs.push({...e,vendeur:v});
+    });
+  });
+  if(allEngs.length>0){
+    html+=`<div class="section-label">Engagements ouverts</div>
+    <div class="kpi-stack">`;
+    allEngs.forEach(e=>{
+      html+=`<div class="kpi-card" onclick="openVendeur('${e.vendeur}')" style="cursor:pointer">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <div style="width:8px;height:8px;border-radius:50%;background:${COLORS[e.vendeur]};flex-shrink:0"></div>
+          <span style="font-size:12px;font-weight:700;color:${COLORS[e.vendeur]}">${NOMS[e.vendeur]}</span>
+          <span style="font-size:10px;color:var(--t3);margin-left:auto">${e.auteur==='manager'?'👤':'🙋'} ${e.date}</span>
+        </div>
+        <div style="font-size:13px;color:var(--text);line-height:1.4">${e.texte}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  // ── Prochains RDV ──
+  const rdvList=VENDEURS.map(v=>({v,rdv:(state.rdv&&state.rdv[v])||{}}))
+    .filter(x=>x.rdv.prochain).sort((a,b)=>a.rdv.prochain.localeCompare(b.rdv.prochain));
+  if(rdvList.length>0){
+    html+=`<div class="section-label">Prochains RDV</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">`;
+    rdvList.forEach(({v,rdv})=>{
+      const d=new Date(rdv.prochain);
+      const fmt=d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long'});
+      html+=`<div class="card" style="padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openVendeur('${v}')">
+        <div style="width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)">${NOMS[v]}</div>
+          <div style="font-size:11px;color:var(--teal);font-weight:600">📅 ${fmt}</div>
+        </div>
+        <div style="margin-left:auto;font-size:18px;color:var(--t3)">›</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  html+=`<div style="height:24px"></div>`;
+  div.innerHTML=html;
+
+  // Graphique
+  setTimeout(()=>{
+    const canvas=document.getElementById('chart-dashboard-mobile'); if(!canvas)return;
+    if(chartInstances['chart-dashboard-mobile'])chartInstances['chart-dashboard-mobile'].destroy();
+    const tc='#9BA5B8';
+    chartInstances['chart-dashboard-mobile']=new Chart(canvas,{
+      type:'bar',
+      data:{labels:KPI_LABELS,datasets:VENDEURS.map(v=>({
+        label:NOMS[v],
+        data:KPI_KEYS.map(k=>Math.round(getAv(v,currentYear)[k].pct)),
+        backgroundColor:COLORS[v]+'40',borderColor:COLORS[v],borderWidth:2,borderRadius:4,
+      }))},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'bottom',labels:{color:tc,font:{size:10},padding:10}}},
+        scales:{
+          x:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:9}}},
+          y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:9},callback:v=>v+'%'},min:0}
+        }
+      }
+    });
+  },60);
+}
 function renderSynthese(){
   const div=document.getElementById('synthese-content');
   let html=`<div class="card"><div class="card-title">% Réalisation annuelle</div>
@@ -1904,7 +2471,7 @@ function renderSynthese(){
    OBJECTIFS
 ════════════════════════════════════════════════════════════ */
 function renderObjectifs(){
-  const div=document.getElementById('objectifs-content');
+  const div=document.getElementById(isDesktop()?'objectifs-content-desktop':'objectifs-content');
   let html='';
   VENDEURS.forEach(v=>{
     const obj=state.objectifs[v];
@@ -1997,14 +2564,16 @@ function runSplash(callback) {
    INIT
 ════════════════════════════════════════════════════════════ */
 function populateYearSelector(){
-  const sel=document.getElementById('year-selector'); if(!sel)return;
   const years=getAvailableYears();
-  sel.innerHTML='';
-  years.forEach(y=>{
-    const o=document.createElement('option');
-    o.value=y; o.textContent=y;
-    if(y===currentYear)o.selected=true;
-    sel.appendChild(o);
+  ['year-selector','year-selector-mobile','year-selector-desktop'].forEach(id=>{
+    const sel=document.getElementById(id); if(!sel)return;
+    sel.innerHTML='';
+    years.forEach(y=>{
+      const o=document.createElement('option');
+      o.value=y; o.textContent=y;
+      if(y===currentYear)o.selected=true;
+      sel.appendChild(o);
+    });
   });
 }
 
