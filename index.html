@@ -366,6 +366,20 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 .dash-gauge-label{font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
 .dash-gauge-val{font-size:12px;font-weight:700}
 .dash-be{font-size:20px;text-align:center}
+/* ── JAUGES CIRCULAIRES ──────────────────────────────────── */
+.gauges-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:5px}
+.gauge-container{position:relative;width:72px;height:72px}
+.gauge-svg{transform:rotate(-90deg)}
+.gauge-track{fill:none;stroke:var(--surf2);stroke-width:7}
+.gauge-fill{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)}
+.gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.gauge-val{font-size:12px;font-weight:800;color:var(--text);line-height:1}
+.gauge-sub{font-size:8px;color:var(--t3);margin-top:1px;font-weight:600}
+.gauge-lbl{font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;text-align:center;max-width:72px}
+/* ── RADAR CHART ─────────────────────────────────────────── */
+.radar-wrap{position:relative;width:100%;height:280px}
+
 .logout-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:var(--r);background:var(--surf);border:1px solid var(--brd);cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s}
 .logout-row:active{transform:scale(.98)}
 
@@ -1364,6 +1378,32 @@ function getSuggestion(vendeur,year){
 }
 
 /* ════════════════════════════════════════════════════════════
+   JAUGE CIRCULAIRE SVG
+════════════════════════════════════════════════════════════ */
+function makeGauge(pct, label, shortVal, color, size=72) {
+  const r = (size-10)/2;
+  const circ = 2*Math.PI*r;
+  const filled = Math.min(1, pct/100) * circ;
+  const offset = circ - filled;
+  return `<div class="gauge-wrap">
+    <div class="gauge-container" style="width:${size}px;height:${size}px">
+      <svg class="gauge-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+        <circle class="gauge-track" cx="${size/2}" cy="${size/2}" r="${r}"/>
+        <circle class="gauge-fill" cx="${size/2}" cy="${size/2}" r="${r}"
+          stroke="${color}"
+          stroke-dasharray="${circ}"
+          stroke-dashoffset="${offset}"/>
+      </svg>
+      <div class="gauge-center">
+        <div class="gauge-val" style="color:${color}">${shortVal}</div>
+        <div class="gauge-sub">${Math.round(pct)}%</div>
+      </div>
+    </div>
+    <div class="gauge-lbl">${label}</div>
+  </div>`;
+}
+
+/* ════════════════════════════════════════════════════════════
    KPI CARD
 ════════════════════════════════════════════════════════════ */
 function makeKpiCard(vendeur,k,i,av,moisDoneCount){
@@ -1556,16 +1596,16 @@ function renderDashboard() {
   });
   html += `</tbody></table></div>`;
 
-  // Graphique barres comparatif
+
+  // Graphique radar
   html += `<div class="card">
-    <div class="card-title">% Réalisation par KPI</div>
-    <div class="legend" style="margin-bottom:12px">`;
-  const kColors = ['#009688','#003087','#F57C00','#5C6BC0','#546E7A'];
-  VENDEURS.forEach((v,i) => {
+    <div class="card-title">Performance par KPI — Toile d'araignée</div>
+    <div class="legend" style="margin-bottom:8px">`;
+  VENDEURS.forEach(v => {
     html += `<div class="legend-item"><div class="dot" style="background:${COLORS[v]}"></div>${NOMS[v]}</div>`;
   });
   html += `</div>
-    <div class="chart-wrap" style="height:260px"><canvas id="chart-dashboard-bar" role="img" aria-label="Tableau de bord">Synthèse</canvas></div>
+    <div class="radar-wrap"><canvas id="chart-dashboard-bar" role="img" aria-label="Radar performance">Radar</canvas></div>
   </div></div>`;
 
   // ── Engagements ouverts ──
@@ -1623,27 +1663,40 @@ function renderDashboard() {
     if (chartInstances['chart-dashboard-bar']) chartInstances['chart-dashboard-bar'].destroy();
     const tc = '#9BA5B8';
     chartInstances['chart-dashboard-bar'] = new Chart(canvas, {
-      type: 'bar',
+      type: 'radar',
       data: {
         labels: KPI_LABELS,
         datasets: VENDEURS.map(v => ({
           label: NOMS[v],
-          data: KPI_KEYS.map(k => Math.round(getAv(v, currentYear)[k].pct)),
-          backgroundColor: COLORS[v] + '40',
+          data: KPI_KEYS.map(k => {
+            const res=getRes(v,currentYear);
+            const md=Object.keys(res).map(Number);
+            const hasData=md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]));
+            return hasData ? Math.min(120, Math.round(getAv(v,currentYear)[k].pct)) : 0;
+          }),
+          backgroundColor: COLORS[v] + '18',
           borderColor: COLORS[v],
           borderWidth: 2,
-          borderRadius: 4,
+          pointBackgroundColor: COLORS[v],
+          pointBorderColor: '#fff',
+          pointBorderWidth: 1.5,
+          pointRadius: 4,
         }))
       },
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: {
-          legend: { display: true, position: 'bottom', labels: { color: tc, font: { size: 11 }, padding: 16 } },
-          tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y}%` } }
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => `${ctx.dataset.label} : ${ctx.parsed.r}% de l'objectif` } }
         },
         scales: {
-          x: { grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { color: tc, font: { size: 11 } } },
-          y: { grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { color: tc, font: { size: 10 }, callback: v => v+'%' }, min: 0 }
+          r: {
+            min: 0, max: 120,
+            ticks: { stepSize: 30, color: tc, font: { size: 9 }, backdropColor: 'transparent', callback: v => v+'%' },
+            grid: { color: 'rgba(0,0,0,0.06)' },
+            pointLabels: { color: '#4A6A35', font: { size: 11, weight: '600' } },
+            angleLines: { color: 'rgba(0,0,0,0.06)' },
+          }
         }
       }
     });
@@ -1773,17 +1826,18 @@ function renderVendeur(v){
   html+=`</div>`;
 
   // ── MINI-SCORES ──
-  html+=`<div class="hero-scores">`;
+  // ── JAUGES CIRCULAIRES ──
+  const gaugeColors=['#009688','#003087','#5C6BC0','#78BE20','#546E7A'];
+  html+=`<div class="gauges-row">`;
   KPI_KEYS.forEach((k,i)=>{
     const a=av[k];
     const hasData=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
-    const sc=hasData?statusCls(a.pct,md.length):'';
-    let msg='—';
-    if(hasData){
-      if(KPI_IS_PCT[k]){const e=a.realise-obj[k];msg=(e>=0?'+':'')+e.toFixed(1)+' pt';}
-      else{const e=a.realise-(obj[k]/12*md.length);msg=(e>=0?'+':'−')+KPI_FMT[k](Math.abs(e));}
-    }
-    html+=`<div class="hero-score-item ${sc?sc+'-score':''}"><div class="hero-score-val" style="${!hasData?'color:var(--t3)':''}">${msg}</div><div class="hero-score-lbl">${KPI_LABELS[i]}</div></div>`;
+    const pct=hasData?Math.min(100,a.pct):0;
+    const col=hasData?(pct>=statusCls(pct,md.length)==='ok'?STATUS_BAR.ok:gaugeColors[i]):gaugeColors[i];
+    const cls=hasData?statusCls(pct,md.length):'';
+    const gCol=cls==='ok'?STATUS_BAR.ok:cls==='warn'?STATUS_BAR.warn:cls==='ko'?STATUS_BAR.ko:gaugeColors[i];
+    const shortVal=hasData?KPI_FMT[k](a.realise).toString().replace('€\u202f','').replace(' ','')||'—':'—';
+    html+=makeGauge(hasData?pct:0, KPI_LABELS[i], hasData?shortVal:'—', hasData?gCol:'var(--brd)');
   });
   html+=`</div>`;
 
@@ -2444,7 +2498,22 @@ function renderAdvisor(v){
     </div>
   </div>`;
 
-  html+=`<div class="section-label">Mes performances</div><div class="kpi-stack">`;
+  html+=`<div class="section-label">Mes performances</div>`;
+
+  // Jauges circulaires conseiller
+  html+=`<div class="gauges-row" style="margin-bottom:16px">`;
+  KPI_KEYS.forEach((k,i)=>{
+    const a=av[k];
+    const hasData=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
+    const pct=hasData?Math.min(100,a.pct):0;
+    const cls=hasData?statusCls(pct,md.length):'';
+    const gCol=cls==='ok'?STATUS_BAR.ok:cls==='warn'?STATUS_BAR.warn:cls==='ko'?STATUS_BAR.ko:'var(--brd)';
+    const shortVal=hasData?KPI_FMT[k](a.realise).toString().replace('€\u202f','').replace(' ','')||'—':'—';
+    html+=makeGauge(hasData?pct:0,KPI_LABELS[i],hasData?shortVal:'—',hasData?gCol:'var(--brd)');
+  });
+  html+=`</div>`;
+
+  html+=`<div class="kpi-stack">`;
   KPI_KEYS.forEach((k,i)=>{html+=makeKpiCard(v,k,i,av,md.length);});
   html+=`</div>`;
 
@@ -2826,53 +2895,56 @@ function renderDashboardMobile() {
     html+=`</div>`;
   }
 
+  // ── Toile d'araignée mobile ──
+  html+=`<div class="section-label">Performance par KPI</div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="radar-wrap"><canvas id="chart-radar-mobile" role="img" aria-label="Radar mobile">Radar</canvas></div>
+  </div>`;
+
   html+=`<div style="height:24px"></div>`;
   div.innerHTML=html;
-}
 
-function renderSynthese(){
-  const div=document.getElementById('synthese-content');
-  let html=`<div class="card"><div class="card-title">% Réalisation annuelle</div>
-    <div class="chart-wrap h220"><canvas id="chart-syn" role="img" aria-label="Synthèse">Synthèse</canvas></div>
-  </div>
-  <div class="card"><div class="card-title">Détail par KPI</div>
-    <div style="overflow-x:auto"><table class="stable"><thead><tr><th style="text-align:left">Vendeur</th>`;
-  KPI_LABELS.forEach(l=>{html+=`<th>${l}</th>`;});
-  html+=`</tr></thead><tbody>`;
-  VENDEURS.forEach(v=>{
-    const av=getAv(v,currentYear),md=Object.keys(getRes(v,currentYear)).length;
-    html+=`<tr><td style="text-align:left;white-space:nowrap">
-      <div style="display:flex;align-items:center;gap:7px">
-        <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
-        <span style="font-weight:700">${NOMS[v]}</span>
-      </div></td>`;
-    KPI_KEYS.forEach(k=>{
-      const pct=Math.round(av[k].pct),cls=statusCls(av[k].pct,md);
-      html+=`<td><span class="badge ${cls}">${pct}%</span></td>`;
-    });
-    html+=`</tr>`;
-  });
-  html+=`</tbody></table></div></div><div style="height:24px"></div>`;
-  div.innerHTML=html;
+  // Radar mobile
   setTimeout(()=>{
-    const canvas=document.getElementById('chart-syn');if(!canvas)return;
-    if(chartInstances['chart-syn'])chartInstances['chart-syn'].destroy();
-    const tc='#9BA5B8',kC=['#009688','#003087','#F57C00','#5C6BC0','#546E7A'];
-    chartInstances['chart-syn']=new Chart(canvas,{
-      type:'bar',
-      data:{labels:VENDEURS.map(v=>NOMS[v]),datasets:KPI_KEYS.map((k,i)=>({
-        label:KPI_LABELS[i],data:VENDEURS.map(v=>Math.round(getAv(v)[k].pct)),
-        backgroundColor:kC[i]+'50',borderColor:kC[i],borderWidth:1.5,borderRadius:5,
-      }))},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}%`}}},
-        scales:{x:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:13,weight:'600'}}},
-          y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},callback:v=>v+'%'},min:0}}
+    const canvas=document.getElementById('chart-radar-mobile');if(!canvas)return;
+    if(chartInstances['chart-radar-mobile'])chartInstances['chart-radar-mobile'].destroy();
+    const tc='#9BA5B8';
+    chartInstances['chart-radar-mobile']=new Chart(canvas,{
+      type:'radar',
+      data:{
+        labels:KPI_LABELS,
+        datasets:VENDEURS.map(v=>({
+          label:NOMS[v],
+          data:KPI_KEYS.map(k=>{
+            const res=getRes(v,currentYear);
+            const md=Object.keys(res).map(Number);
+            const hasData=md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]));
+            return hasData?Math.min(120,Math.round(getAv(v,currentYear)[k].pct)):0;
+          }),
+          backgroundColor:COLORS[v]+'18',
+          borderColor:COLORS[v],
+          borderWidth:2,
+          pointBackgroundColor:COLORS[v],
+          pointBorderColor:'#fff',
+          pointBorderWidth:1.5,
+          pointRadius:3,
+        }))
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{display:true,position:'bottom',labels:{color:tc,font:{size:10},padding:10}},
+          tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label} : ${ctx.parsed.r}%`}}
+        },
+        scales:{r:{
+          min:0,max:120,
+          ticks:{stepSize:30,color:tc,font:{size:8},backdropColor:'transparent',callback:v=>v+'%'},
+          grid:{color:'rgba(0,0,0,0.06)'},
+          pointLabels:{color:'#4A6A35',font:{size:10,weight:'600'}},
+          angleLines:{color:'rgba(0,0,0,0.06)'},
+        }}
       }
     });
-    const legDiv=document.createElement('div');legDiv.className='legend';legDiv.style.marginTop='10px';
-    kC.forEach((c,i)=>{const it=document.createElement('div');it.className='legend-item';it.innerHTML=`<div class="dot" style="background:${c}"></div>${KPI_LABELS[i]}`;legDiv.appendChild(it);});
-    canvas.parentElement.parentElement.appendChild(legDiv);
   },60);
 }
 
