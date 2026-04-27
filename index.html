@@ -1775,12 +1775,15 @@ function renderVendeur(v){
   // ── MINI-SCORES ──
   html+=`<div class="hero-scores">`;
   KPI_KEYS.forEach((k,i)=>{
-    const a=av[k],sc=statusCls(a.pct,md.length); let msg='—';
-    if(md.length>0){
+    const a=av[k];
+    const hasData=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
+    const sc=hasData?statusCls(a.pct,md.length):'';
+    let msg='—';
+    if(hasData){
       if(KPI_IS_PCT[k]){const e=a.realise-obj[k];msg=(e>=0?'+':'')+e.toFixed(1)+' pt';}
       else{const e=a.realise-(obj[k]/12*md.length);msg=(e>=0?'+':'−')+KPI_FMT[k](Math.abs(e));}
     }
-    html+=`<div class="hero-score-item ${sc}-score"><div class="hero-score-val">${msg}</div><div class="hero-score-lbl">${KPI_LABELS[i]}</div></div>`;
+    html+=`<div class="hero-score-item ${sc?sc+'-score':''}"><div class="hero-score-val" style="${!hasData?'color:var(--t3)':''}">${msg}</div><div class="hero-score-lbl">${KPI_LABELS[i]}</div></div>`;
   });
   html+=`</div>`;
 
@@ -2083,166 +2086,290 @@ async function exportPDF(v) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
   const obj = state.objectifs[v];
-  const av = getAv(v, currentYear);
+  const av  = getAv(v, currentYear);
   const res = getRes(v, currentYear);
-  const md = Object.keys(res).map(Number).sort((a,b)=>a-b);
+  const md  = Object.keys(res).map(Number).sort((a,b)=>a-b);
+  const yd  = getYearData(currentYear);
   const rdv = (state.rdv&&state.rdv[v])||{};
   const engs = (state.engagements&&state.engagements[v])||[];
   const beData = (state.bienetre&&state.bienetre[v])||{};
+  const comm = yd.commentaires[v]||{};
+  const sugg = getSuggestion(v, currentYear);
   const now = new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  const moisCumul = md.length>0 ? md.length : new Date().getMonth()+1;
 
-  // ── En-tête ──
-  doc.setFillColor(13,33,55); // sidebar color
-  doc.rect(0,0,210,28,'F');
+  const NR = 'Non renseigné'; // fallback
+
+  // Helpers couleurs jsPDF
+  const setTeal  = () => doc.setTextColor(0,96,88);
+  const setDark  = () => doc.setTextColor(30,30,30);
+  const setGray  = () => doc.setTextColor(150,150,150);
+  const setLight = () => doc.setTextColor(90,100,120);
+
+  // ── 1. EN-TÊTE ──────────────────────────────────────────────
+  doc.setFillColor(13,33,55);
+  doc.rect(0,0,210,30,'F');
+  // Triangle LM
+  doc.setFillColor(120,190,32);
+  doc.setDrawColor(120,190,32);
+  doc.lines([[8,0],[-4,12],[-4,-12]],14,10,null,'F');
+  // Titre
   doc.setTextColor(255,255,255);
-  doc.setFontSize(18); doc.setFont('helvetica','bold');
-  doc.text('RDV Perf — Suivi de performance', 14, 12);
-  doc.setFontSize(10); doc.setFont('helvetica','normal');
-  doc.text(`${NOMS[v]} · Leroy Merlin · ${currentYear}`, 14, 20);
-  doc.text(`Généré le ${now}`, 210-14, 20, {align:'right'});
+  doc.setFontSize(13); doc.setFont('helvetica','bold');
+  doc.text('RDV Perf — Suivi de performance', 27, 13);
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.setTextColor(128,203,196);
+  doc.text('Leroy Merlin Livry-Gargan · Groupe ADEO · '+currentYear, 27, 20);
+  // Droite
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(10); doc.setFont('helvetica','bold');
+  doc.text(NOMS[v]+' ·', 196, 13, {align:'right'});
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.setTextColor(128,203,196);
+  doc.text('Généré le '+now, 196, 20, {align:'right'});
 
-  let y = 36;
+  let y = 38;
 
-  // ── Infos RDV ──
-  doc.setTextColor(30,30,30);
-  doc.setFontSize(12); doc.setFont('helvetica','bold');
-  doc.text('Informations RDV', 14, y); y+=6;
-  doc.setFontSize(10); doc.setFont('helvetica','normal');
-  if(rdv.dernier) { doc.text(`Dernier RDV : ${rdv.dernier}`, 14, y); y+=5; }
-  if(rdv.prochain) { doc.text(`Prochain RDV : ${rdv.prochain}`, 14, y); y+=5; }
-  y+=4;
+  const section = (title) => {
+    doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+    doc.setTextColor(138,171,106);
+    doc.text(title.toUpperCase(), 14, y); y+=3;
+    doc.setDrawColor(221,232,212); doc.setLineWidth(0.4);
+    doc.line(14,y,196,y); y+=5;
+  };
 
-  // ── KPI ──
-  const moisCumul=md.length>0?md.length:new Date().getMonth()+1;
-  const moisNom=MOIS_L[moisCumul-1]||'';
-  doc.setFontSize(12); doc.setFont('helvetica','bold');
-  doc.setTextColor(0,96,88);
-  doc.text(`Performance — Cumul ${moisCumul} mois (${MOIS_L[0]} → ${MOIS_L[moisCumul-1]}) · ${currentYear}`, 14, y); y+=6;
-  doc.setTextColor(30,30,30);
-  KPI_KEYS.forEach((k,i)=>{
-    const a=av[k];
-    const pct=Math.round(a.pct);
-    const realise=KPI_FMT[k](a.realise);
-    const cible=KPI_FMT[k](obj[k]);
-    const cls=statusCls(a.pct,md.length);
-    const statusTxt=cls==='ok'?'✓ Objectif en vue':cls==='warn'?`↗ ${Math.round(av[k].pct)}% de l'obj. annuel`:`${Math.round(av[k].pct)}% de l'objectif annuel`;
-    doc.setFont('helvetica','bold'); doc.setFontSize(9);
-    doc.text(`${KPI_FULL[i]}`, 14, y);
-    doc.setFont('helvetica','normal');
-    doc.text(`${realise} / ${cible} (${pct}%) — ${statusTxt}`, 80, y);
-    y+=5;
+  const footer = () => {
+    doc.setFontSize(7); doc.setFont('helvetica','italic');
+    setGray();
+    doc.text('RDV Perf · Leroy Merlin · Document de suivi — challenger et accompagner', 105, 290, {align:'center'});
+    doc.text('Page '+doc.internal.getCurrentPageInfo().pageNumber, 196, 290, {align:'right'});
+  };
+
+  // ── 2. INFORMATIONS ─────────────────────────────────────────
+  section('Informations');
+  const infoData = [
+    ['Conseiller', NOMS[v], 'Responsable Rayon', 'Sammy M. — Responsable Rayon'],
+    ['Prochain RDV', rdv.prochain || NR, '', ''],
+  ];
+  // Dessin manuel du tableau infos
+  infoData.forEach(row => {
+    doc.setFontSize(8.5); doc.setFont('helvetica','bold'); setLight();
+    doc.text(row[0], 14, y); doc.text(row[2]||'', 110, y);
+    doc.setFont('helvetica','normal'); setDark();
+    doc.text(row[1], 48, y); doc.text(row[3]||'', 148, y);
+    y+=6;
   });
   y+=4;
 
-  // ── Historique mensuel ──
-  if(md.length>0){
-    doc.setFontSize(12); doc.setFont('helvetica','bold');
-    doc.setTextColor(0,96,88);
-    doc.text('Historique mensuel', 14, y); y+=6;
-    doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(80,80,80);
-    doc.text('Mois', 14, y); doc.text('CA (€)', 40, y); doc.text('Transfo', 70, y);
-    doc.text('Opt-in', 90, y); doc.text('Chantiers', 112, y); doc.text('Fidélité', 138, y);
-    y+=4;
-    doc.setDrawColor(200,200,200); doc.line(14,y,196,y); y+=3;
-    doc.setFont('helvetica','normal'); doc.setTextColor(30,30,30);
-    const comm=(state.commentaires&&state.commentaires[v])||{};
-    md.forEach(m=>{
-      const r=res[m];
-      doc.text(MOIS_S[m], 14, y);
-      doc.text(KPI_FMT.ca(r.ca).toString(), 40, y);
-      doc.text(KPI_FMT.taux(r.taux).toString(), 70, y);
-      doc.text(KPI_FMT.optin(r.optin).toString(), 90, y);
-      doc.text(KPI_FMT.chantiers(r.chantiers).toString(), 112, y);
-      doc.text(KPI_FMT.fidelite(r.fidelite).toString(), 138, y);
-      y+=5;
-      if(comm[m]){ doc.setTextColor(120,120,120); doc.setFontSize(7.5);
-        doc.text(`↳ ${comm[m]}`, 18, y); doc.setTextColor(30,30,30); doc.setFontSize(8); y+=4; }
-      if(y>270){ doc.addPage(); y=20; }
-    });
-    y+=4;
-  }
+  // ── 3. CLIMAT DU MOMENT ─────────────────────────────────────
+  section('Climat du moment');
+  doc.setFontSize(7.5); doc.setFont('helvetica','italic'); setGray();
+  doc.text('Ressenti partagé par le conseiller — à titre indicatif uniquement.', 14, y); y+=7;
 
-  // ── Engagements ──
-  if(engs.length>0){
-    if(y>250){ doc.addPage(); y=20; }
-    doc.setFontSize(12); doc.setFont('helvetica','bold');
-    doc.setTextColor(0,96,88);
-    doc.text('Engagements', 14, y); y+=6;
-    doc.setFontSize(9); doc.setTextColor(30,30,30);
-    engs.forEach(e=>{
-      const icon = e.statut==='tenu'?'✓':e.statut==='non_tenu'?'✗':'•';
-      const who = e.auteur==='manager'?'Manager':'Conseiller';
-      doc.setFont('helvetica','bold');
-      doc.text(`${icon} [${who}] ${e.date}`, 14, y); y+=4;
-      doc.setFont('helvetica','normal');
-      const lines=doc.splitTextToSize(e.texte, 176);
-      doc.text(lines, 18, y); y+=lines.length*4+3;
-      if(y>270){ doc.addPage(); y=20; }
-    });
-    y+=4;
-  }
+  const beMoisList = Object.keys(beData).sort().slice(-6);
+  const beTexts = ['Difficile','Compliqué','Neutre','Bien','Excellent'];
+  const beColors = [[239,68,68],[249,115,22],[155,165,184],[0,150,136],[120,190,32]];
 
-  // ── Climat du moment (courbe emoji) ──
-  const beMoisList=Object.keys(beData).sort().slice(-6);
   if(beMoisList.length>0){
-    if(y>240){ doc.addPage(); y=20; }
-    doc.setFontSize(12); doc.setFont('helvetica','bold');
-    doc.setTextColor(0,96,88);
-    doc.text('Climat du moment', 14, y); y+=5;
-    doc.setFontSize(7.5); doc.setFont('helvetica','italic'); doc.setTextColor(150,150,150);
-    doc.text('Ressenti partagé par le conseiller — à titre indicatif uniquement.', 14, y); y+=8;
-
-    // Courbe
-    const beLabels3=['😞','😕','😐','🙂','😄'];
-    const beTexts3=['Difficile','Compliqué','Neutre','Bien','Excellent'];
-    const n=beMoisList.length;
-    const chartX=20, chartW=170, chartH=28;
-    const padL=10, padR=10;
+    const chartX=20, chartW=170, chartH=26, padL=10, padR=10;
     const drawW=chartW-padL-padR;
-
-    // Grille légère
+    const n=beMoisList.length;
+    // Grille
     doc.setDrawColor(232,234,240); doc.setLineWidth(0.2);
     for(let lv=1;lv<=5;lv++){
       const gy=y+chartH-(lv-1)/4*chartH;
       doc.line(chartX+padL,gy,chartX+chartW-padR,gy);
     }
-
-    // Calcul coordonnées
     const pts=beMoisList.map((m,i)=>{
       const val=beData[m];
       const px=chartX+padL+(n>1?i/(n-1)*drawW:drawW/2);
       const py=y+chartH-(val-1)/4*chartH;
       return{px,py,val,mois:MOIS_S[parseInt(m.slice(5))-1]||m};
     });
-
-    // Ligne de courbe
+    // Courbe
     doc.setDrawColor(0,150,136); doc.setLineWidth(1.5);
-    for(let i=1;i<pts.length;i++){
-      doc.line(pts[i-1].px,pts[i-1].py,pts[i].px,pts[i].py);
-    }
-
-    // Points + emojis
+    for(let i=1;i<pts.length;i++) doc.line(pts[i-1].px,pts[i-1].py,pts[i].px,pts[i].py);
+    // Points
     pts.forEach(({px,py,val,mois})=>{
-      doc.setFillColor(255,255,255); doc.setDrawColor(0,150,136); doc.setLineWidth(1);
-      doc.circle(px,py,2,'FD');
-      doc.setFontSize(13); doc.setTextColor(30,30,30);
-      doc.text(beLabels3[val-1],px,py-5,{align:'center'});
-      doc.setFontSize(7); doc.setTextColor(155,165,184);
-      doc.text(mois,px,py+8,{align:'center'});
-      doc.setFontSize(6.5); doc.setTextColor(74,106,53);
-      doc.text(beTexts3[val-1],px,py-10,{align:'center'});
+      const [r,g,b]=beColors[val-1];
+      doc.setFillColor(r,g,b); doc.setDrawColor(255,255,255); doc.setLineWidth(1);
+      doc.circle(px,py,2.5,'FD');
+      doc.setFontSize(7); doc.setFont('helvetica','bold');
+      doc.setTextColor(r,g,b);
+      doc.text(beTexts[val-1],px,py-5,{align:'center'});
+      doc.setFontSize(7); doc.setFont('helvetica','normal'); setGray();
+      doc.text(mois,px,py+5.5,{align:'center'});
     });
-    y+=chartH+14;
+    y+=chartH+10;
+  } else {
+    doc.setFontSize(9); doc.setFont('helvetica','italic'); setGray();
+    doc.text(NR, 14, y); y+=8;
   }
 
-  // ── Pied de page ──
-  doc.setFontSize(8); doc.setTextColor(150,150,150); doc.setFont('helvetica','italic');
-  doc.text('RDV Perf · Leroy Merlin · Document de suivi — challenger et accompagner', 105, 290, {align:'center'});
+  // ── 4. PERFORMANCE KPI ──────────────────────────────────────
+  section('Performance — Cumul '+moisCumul+' mois ('+MOIS_L[0]+' → '+MOIS_L[moisCumul-1]+') · '+currentYear);
 
-  // Téléchargement
+  // En-tête tableau
+  const kpiCols=[52,28,34,22,44];
+  const kpiX=[14,66,94,128,150];
+  doc.setFillColor(13,33,55);
+  doc.rect(14,y-2,182,8,'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
+  ['KPI','Réalisé','Objectif','% atteint','Statut'].forEach((h,i)=>{
+    doc.text(h, kpiX[i]+(i>0?kpiCols[i]/2:0), y+3, {align:i>0?'center':'left'});
+  });
+  y+=9;
+
+  KPI_KEYS.forEach((k,i)=>{
+    const a=av[k];
+    const kpiRes=getRes(v,currentYear);
+    const mdArr=Object.keys(kpiRes).map(Number);
+    const hasData=mdArr.some(m=>kpiRes[m][k]!=null&&!isNaN(kpiRes[m][k]));
+    const pct=hasData?Math.round(a.pct):null;
+    const realise=hasData?KPI_FMT[k](a.realise).toString():NR;
+    const cible=KPI_FMT[k](obj[k]).toString();
+    let statut='', bg=null, fg=null;
+    if(!hasData){ statut=NR; }
+    else {
+      const cls=statusCls(a.pct,mdArr.length);
+      if(cls==='ok'){ statut='✓ Objectif en vue'; bg=[234,245,204]; fg=[58,125,0]; }
+      else { statut=pct+'% de l\'objectif'; bg=[254,243,199]; fg=[180,83,9]; }
+    }
+
+    // Ligne alternée
+    if(i%2===0){ doc.setFillColor(245,246,250); doc.rect(14,y-2,182,7,'F'); }
+    doc.setFontSize(8.5); doc.setFont('helvetica','bold'); setDark();
+    doc.text(KPI_FULL[i], 14, y+2.5);
+    doc.setFont('helvetica','normal');
+    doc.text(realise, kpiX[1]+kpiCols[1]/2, y+2.5, {align:'center'});
+    doc.text(cible, kpiX[2]+kpiCols[2]/2, y+2.5, {align:'center'});
+    doc.text(pct!==null?pct+'%':'—', kpiX[3]+kpiCols[3]/2, y+2.5, {align:'center'});
+    // Statut coloré
+    if(bg){
+      doc.setFillColor(...bg);
+      doc.rect(kpiX[4],y-1.5,kpiCols[4],6,2,2,'F');
+      doc.setTextColor(...fg); doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+    } else { setGray(); doc.setFont('helvetica','italic'); doc.setFontSize(7.5); }
+    doc.text(statut, kpiX[4]+kpiCols[4]/2, y+2.5, {align:'center'});
+    y+=7;
+  });
+  y+=4;
+
+  // ── 5. HISTORIQUE MENSUEL ────────────────────────────────────
+  if(y>250){ doc.addPage(); footer(); y=20; }
+  section('Historique mensuel');
+
+  if(md.length===0){
+    doc.setFontSize(9); doc.setFont('helvetica','italic'); setGray();
+    doc.text(NR, 14, y); y+=8;
+  } else {
+    // En-tête
+    doc.setFillColor(13,33,55);
+    doc.rect(14,y-2,182,7,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
+    const hCols=['Mois','CA','Transfo','Opt-in','Chant.','Fidél.','Contexte'];
+    const hX=[14,32,62,80,98,112,128];
+    hCols.forEach((h,i)=>{ doc.text(h, hX[i], y+2.5); }); y+=8;
+
+    md.forEach((m,idx)=>{
+      if(y>270){ doc.addPage(); footer(); y=20; }
+      const r=res[m];
+      if(idx%2===0){ doc.setFillColor(245,246,250); doc.rect(14,y-2,182,6,'F'); }
+      doc.setFontSize(8); doc.setFont('helvetica','bold'); setDark();
+      doc.text(MOIS_S[m], hX[0], y+1.5);
+      doc.setFont('helvetica','normal');
+      const vals=[
+        r.ca!=null?KPI_FMT.ca(r.ca).toString():NR,
+        r.taux!=null?KPI_FMT.taux(r.taux).toString():NR,
+        r.optin!=null?KPI_FMT.optin(r.optin).toString():NR,
+        r.chantiers!=null?KPI_FMT.chantiers(r.chantiers).toString():NR,
+        r.fidelite!=null?KPI_FMT.fidelite(r.fidelite).toString():NR,
+      ];
+      [1,2,3,4,5].forEach((ci,vi)=>{ doc.text(vals[vi], hX[ci], y+1.5); });
+      // Contexte
+      if(comm[m]){ doc.setFont('helvetica','italic'); setLight(); doc.text(comm[m].slice(0,30), hX[6], y+1.5); }
+      y+=6;
+    });
+  }
+  y+=4;
+
+  // ── 6. ENGAGEMENTS ──────────────────────────────────────────
+  if(y>255){ doc.addPage(); footer(); y=20; }
+  section('Engagements');
+
+  if(engs.length===0){
+    doc.setFontSize(9); doc.setFont('helvetica','italic'); setGray();
+    doc.text(NR, 14, y); y+=8;
+  } else {
+    const emap={'ouvert':['●','OUVERT',[0,150,136],[224,242,241]],'tenu':['✓','TENU',[58,125,0],[234,245,204]],'non_tenu':['✗','NON TENU',[185,28,28],[254,226,226]]};
+    engs.forEach(e=>{
+      if(y>265){ doc.addPage(); footer(); y=20; }
+      const [bu,lab,fg,bg]=emap[e.statut]||['●','OUVERT',[0,150,136],[224,242,241]];
+      const who=e.auteur==='manager'?'Manager':'Conseiller';
+      // Fond statut
+      doc.setFillColor(...bg);
+      doc.rect(168,y-1,28,5,1.5,1.5,'F');
+      doc.setFontSize(7.5); doc.setFont('helvetica','bold'); doc.setTextColor(...fg);
+      doc.text(lab, 182, y+2.5, {align:'center'});
+      // Texte
+      doc.setFontSize(8.5); doc.setFont('helvetica','bold'); setDark();
+      doc.text(bu+' ['+who+'] '+e.date, 14, y+2.5);
+      y+=6;
+      doc.setFont('helvetica','normal');
+      const lines=doc.splitTextToSize(e.texte, 150);
+      doc.text(lines, 18, y); y+=lines.length*4.5+2;
+    });
+  }
+  y+=4;
+
+  // ── 7. OBJECTIF MOIS SUIVANT ─────────────────────────────────
+  if(y>250){ doc.addPage(); footer(); y=20; }
+  section(sugg?'Objectif conseillé — '+MOIS_L[sugg.moisSuivant]+' '+currentYear:'Objectif mois suivant');
+
+  if(!sugg){
+    doc.setFontSize(9); doc.setFont('helvetica','italic'); setGray();
+    doc.text(NR, 14, y); y+=8;
+  } else {
+    // Note travaux R05 si mai ou juin
+    if(sugg.moisSuivant===4||sugg.moisSuivant===5){
+      doc.setFillColor(254,243,199); doc.rect(14,y-2,182,8,2,2,'F');
+      doc.setFontSize(8); doc.setFont('helvetica','italic'); doc.setTextColor(180,83,9);
+      doc.text('⚠  Travaux R05 prévus — impact attendu. Les cibles tiennent compte de ce contexte.', 17, y+2.5);
+      y+=10;
+    }
+    // Grille objectifs 2×3
+    const oKeys=[['ca','taux'],['optin','chantiers'],['fidelite','']];
+    doc.setFillColor(242,246,238);
+    doc.rect(14,y-2,182,oKeys.length*9+4,3,3,'F');
+    oKeys.forEach(pair=>{
+      pair.forEach((k,pi)=>{
+        if(!k) return;
+        const ki=KPI_KEYS.indexOf(k);
+        const val=KPI_FMT[k](sugg.sugg[k].val);
+        const xL=14+pi*91, xR=xL+91;
+        doc.setFontSize(8); doc.setFont('helvetica','bold'); setLight();
+        doc.text(KPI_FULL[ki], xL+2, y+2);
+        doc.setFontSize(11); doc.setFont('helvetica','bold'); setTeal();
+        doc.text(val.toString(), xL+2, y+7.5);
+      });
+      y+=9;
+    });
+    y+=4;
+  }
+
+  // ── 8. PROCHAIN RDV ──────────────────────────────────────────
+  if(y>270){ doc.addPage(); footer(); y=20; }
+  section('Prochain RDV');
+  doc.setFontSize(10); doc.setFont('helvetica','bold'); setTeal();
+  doc.text(rdv.prochain ? '  '+rdv.prochain : '  '+NR, 14, y+1);
+  y+=8;
+
+  // Footer dernière page
+  footer();
+
   const filename=`RDV-Perf_${NOMS[v]}_${currentYear}_${now.replace(/ /g,'-')}.pdf`;
   doc.save(filename);
-  toast(`PDF généré — ${filename}`);
+  toast('PDF généré ✓ — '+filename);
 }
 
 async function saveVendeurEntry(v){
@@ -2786,7 +2913,7 @@ async function saveObjectifs(){
 /* ════════════════════════════════════════════════════════════
    SPLASH ANIMATION — 5 secondes
 ════════════════════════════════════════════════════════════ */
-function runSplash(callback) {
+function runSplash(callback, duration=5000) {
   const bars = [
     { id:"sb1", h: 80,  delay: 0   },
     { id:"sb2", h: 145,  delay: 100 },
@@ -2831,7 +2958,7 @@ function runSplash(callback) {
     }, 1200 + i * 220);
   });
 
-  // Phase 5 — fade out (5000ms)
+  // Phase 5 — fade out
   setTimeout(() => {
     const splash = document.getElementById('screen-splash');
     if (splash) splash.classList.add('fade-out');
@@ -2839,7 +2966,7 @@ function runSplash(callback) {
       if (splash) splash.style.display = 'none';
       callback();
     }, 700);
-  }, 5000);
+  }, duration);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -2862,17 +2989,19 @@ function populateYearSelector(){
 const nowInit=new Date();
 currentYear=nowInit.getFullYear();
 
+// Détection iframe/aperçu — raccourcit l'animation
+const isPreview = window.self !== window.top || window.innerWidth < 500;
+
 runSplash(async function() {
   document.body.style.background = 'var(--bg)';
   const loginEl = document.getElementById('screen-login');
-  loginEl.style.visibility = 'visible';
-  loginEl.classList.add('active');
+  if(loginEl){ loginEl.style.visibility = 'visible'; loginEl.classList.add('active'); }
   if(tryRestoreSession()){
     await afterLogin();
   }else{
     initLogin();
   }
-});
+}, isPreview ? 2000 : 5000);
 </script>
 </body>
 </html>
