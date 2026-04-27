@@ -894,13 +894,11 @@ function defaultState() {
       laura:  { ca:500000, taux:30, optin:80, chantiers:65, fidelite:120 },
       thomas: { ca:380000, taux:30, optin:80, chantiers:45, fidelite:120 },
     },
-    annees: {}, // { 2026: { resultats:{...}, commentaires:{...} }, 2027: {...} }
-    resultats: { karim:{}, evan:{}, laura:{}, thomas:{} }, // année courante (compatibilité)
-    commentaires: { karim:{}, evan:{}, laura:{}, thomas:{} },
+    annees: {},
     rdv: { karim:{}, evan:{}, laura:{}, thomas:{} },
     pins: {},
-    engagements: { karim:[], evan:[], laura:[], thomas:[] }, // [{id, date, auteur:'manager'|'conseiller', texte, statut:'ouvert'|'tenu'|'non_tenu'}]
-    bienetre: { karim:{}, evan:{}, laura:{}, thomas:{} },    // { '2026-04': 4, '2026-05': 2, ... }
+    engagements: { karim:[], evan:[], laura:[], thomas:[] },
+    bienetre: { karim:{}, evan:{}, laura:{}, thomas:{} },
   };
 }
 
@@ -909,25 +907,58 @@ function getYearData(year) {
   const y = year || currentYear;
   if (!state.annees) state.annees = {};
   if (!state.annees[y]) {
+    // Créer des objets NEUFS et ISOLÉS pour chaque vendeur
     state.annees[y] = {
-      resultats:    { karim:{}, evan:{}, laura:{}, thomas:{} },
-      commentaires: { karim:{}, evan:{}, laura:{}, thomas:{} },
+      resultats:    {},
+      commentaires: {},
     };
   }
-  // S'assurer que chaque vendeur a son propre objet (sécurité)
-  VENDEURS.forEach(v=>{
-    if(!state.annees[y].resultats[v])    state.annees[y].resultats[v]={};
-    if(!state.annees[y].commentaires[v]) state.annees[y].commentaires[v]={};
+  // Garantir que chaque vendeur a son propre objet isolé
+  VENDEURS.forEach(v => {
+    if (!state.annees[y].resultats[v] || typeof state.annees[y].resultats[v] !== 'object') {
+      state.annees[y].resultats[v] = {};
+    }
+    if (!state.annees[y].commentaires[v] || typeof state.annees[y].commentaires[v] !== 'object') {
+      state.annees[y].commentaires[v] = {};
+    }
   });
   return state.annees[y];
 }
 
-// Retourne les résultats pour l'année active
+// Retourne les résultats pour l'année — objet direct (lecture seule)
+// Pour écrire, utiliser getYearData(year).resultats[v][m] = val
 function getRes(v, year) {
-  return getYearData(year).resultats[v] || {};
+  const y = year || currentYear;
+  getYearData(y); // s'assurer que les objets existent
+  return state.annees[y].resultats[v] || {};
 }
 function getComm(v, year) {
-  return getYearData(year).commentaires[v] || {};
+  const y = year || currentYear;
+  getYearData(y);
+  return state.annees[y].commentaires[v] || {};
+}
+
+// Migration : si l'état vient de l'ancien format (state.resultats), le migrer dans state.annees
+function migrateOldFormat() {
+  if (!state.resultats) return;
+  const y = new Date().getFullYear();
+  if (!state.annees) state.annees = {};
+  if (!state.annees[y]) state.annees[y] = { resultats:{}, commentaires:{} };
+  VENDEURS.forEach(v => {
+    if (state.resultats[v] && Object.keys(state.resultats[v]).length > 0) {
+      if (!state.annees[y].resultats[v]) state.annees[y].resultats[v] = {};
+      // Copie profonde pour éviter les références partagées
+      state.annees[y].resultats[v] = JSON.parse(JSON.stringify(state.resultats[v]));
+    }
+    if (state.commentaires && state.commentaires[v]) {
+      if (!state.annees[y].commentaires[v]) state.annees[y].commentaires[v] = {};
+      state.annees[y].commentaires[v] = JSON.parse(JSON.stringify(state.commentaires[v]));
+    }
+  });
+  // Nettoyer l'ancien format
+  delete state.resultats;
+  delete state.commentaires;
+  console.log('Migration ancien format effectuée');
 }
 
 function getAvailableYears() {
@@ -938,9 +969,16 @@ function getAvailableYears() {
 
 function switchYear(y) {
   currentYear = parseInt(y);
-  document.getElementById('year-selector').value = y;
-  if (currentVendeur) renderVendeur(currentVendeur);
-  else renderHome();
+  ['year-selector','year-selector-mobile','year-selector-desktop'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value=y;
+  });
+  if (isDesktop()) {
+    if (currentVendeur) { showDesktopVendeur(currentVendeur); }
+    else { showDesktopView('home'); renderHome(); }
+  } else {
+    if (currentVendeur) renderVendeur(currentVendeur);
+    else renderHome();
+  }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -975,14 +1013,51 @@ async function remoteWrite(data) {
 }
 
 function localSave() { try{localStorage.setItem(LOCAL_KEY,JSON.stringify(state));}catch(e){} }
-function localLoad() { try{const s=localStorage.getItem(LOCAL_KEY);if(s){const p=JSON.parse(s);if(p&&p.objectifs&&p.resultats)state=p;}}catch(e){} }
+function localLoad() {
+  try {
+    const s=localStorage.getItem(LOCAL_KEY);
+    if(s){
+      const p=JSON.parse(s);
+      if(p&&p.objectifs){
+        // Deep copy systématique — jamais de références partagées
+        state=JSON.parse(JSON.stringify(p));
+        migrateOldFormat();
+        // Vérification d'intégrité post-chargement
+        if(state.annees){
+          Object.keys(state.annees).forEach(y=>{
+            const yr=state.annees[y];
+            if(!yr.resultats) yr.resultats={};
+            VENDEURS.forEach(v=>{
+              if(!yr.resultats[v]) yr.resultats[v]={};
+              if(!yr.commentaires) yr.commentaires={};
+              if(!yr.commentaires[v]) yr.commentaires[v]={};
+            });
+          });
+        }
+      }
+    }
+  } catch(e){ console.warn('localLoad error',e); }
+}
+
+// Réinitialisation d'urgence — accessible via console : resetAllData()
+function resetAllData(){
+  if(!confirm('⚠ Supprimer toutes les données locales et recharger depuis JSONBin ?')) return;
+  localStorage.removeItem(LOCAL_KEY);
+  state=defaultState();
+  loadState().then(()=>{ renderHome(); toast('Données réinitialisées'); });
+}
 
 async function saveState() { localSave(); await remoteWrite(state); }
 
 async function loadState() {
-  localLoad();                          // cache local affiché immédiatement
-  const remote = await remoteRead();
-  if (remote && remote.objectifs && remote.resultats) { state = remote; localSave(); }
+  localLoad();
+  const remote=await remoteRead();
+  if(remote&&remote.objectifs){
+    // Deep copy systématique pour isoler complètement les données
+    state=JSON.parse(JSON.stringify(remote));
+    migrateOldFormat();
+    localSave();
+  }
 }
 
 function setSyncIcon(status) {
@@ -2173,11 +2248,15 @@ async function exportPDF(v) {
 async function saveVendeurEntry(v){
   const m=parseInt(document.getElementById(`s-mois-${v}`).value);
   const yd=getYearData(currentYear);
-  // S'assurer que le conteneur du vendeur existe
-  if(!yd.resultats[v]) yd.resultats[v]={};
-  if(!yd.commentaires[v]) yd.commentaires[v]={};
-  // Partir des données existantes (saisie partielle possible)
-  const existing=yd.resultats[v][m]||{};
+
+  // Garantir l'isolation stricte de chaque vendeur
+  VENDEURS.forEach(vv=>{
+    if(!yd.resultats[vv]) yd.resultats[vv]={};
+    if(!yd.commentaires[vv]) yd.commentaires[vv]={};
+  });
+
+  // Deep copy de l'entrée existante pour éviter toute référence partagée
+  const existing=yd.resultats[v][m]?JSON.parse(JSON.stringify(yd.resultats[v][m])):{};
   const keys=['ca','taux','optin','chantiers','fidelite'];
   const vals={...existing};
   let atLeastOne=false;
@@ -2188,10 +2267,29 @@ async function saveVendeurEntry(v){
     if(!isNaN(num)){vals[k]=num;atLeastOne=true;}
   });
   if(!atLeastOne&&Object.keys(existing).length===0){toast('Remplis au moins un champ');return;}
-  yd.resultats[v][m]=vals;
+
+  // Écriture isolée — seulement pour ce vendeur v, ce mois m
+  yd.resultats[v][m]=JSON.parse(JSON.stringify(vals)); // deep copy à l'écriture
+
+  // Vérification d'intégrité — aucun autre vendeur ne doit avoir ce mois avec exactement ces valeurs
+  // si c'est le cas c'est un bug de référence partagée
+  VENDEURS.filter(vv=>vv!==v).forEach(vv=>{
+    const other=yd.resultats[vv][m];
+    if(other&&JSON.stringify(other)===JSON.stringify(vals)){
+      // Bug détecté — nettoyer
+      console.warn(`Bug référence partagée détecté sur ${vv} mois ${m} — nettoyage`);
+      delete yd.resultats[vv][m];
+    }
+  });
+
   const comm=document.getElementById(`s-comment-${v}`).value.trim();
   if(comm) yd.commentaires[v][m]=comm;
-  await saveState();
+
+  // Sauvegarder avec deep copy globale pour JSONBin
+  const stateCopy=JSON.parse(JSON.stringify(state));
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(stateCopy));
+  await remoteWrite(stateCopy);
+
   const manquants=keys.filter(k=>vals[k]==null||isNaN(vals[k]));
   if(manquants.length>0){
     const labels={ca:'Montant',taux:'Transfo',optin:'Opt-in',chantiers:'Chantiers',fidelite:'Fidélité'};
@@ -2615,7 +2713,7 @@ function renderSynthese(){
   KPI_LABELS.forEach(l=>{html+=`<th>${l}</th>`;});
   html+=`</tr></thead><tbody>`;
   VENDEURS.forEach(v=>{
-    const av=getAv(v),md=Object.keys(state.resultats[v]).length;
+    const av=getAv(v,currentYear),md=Object.keys(getRes(v,currentYear)).length;
     html+=`<tr><td style="text-align:left;white-space:nowrap">
       <div style="display:flex;align-items:center;gap:7px">
         <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
