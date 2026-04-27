@@ -380,6 +380,44 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 /* ── RADAR CHART ─────────────────────────────────────────── */
 .radar-wrap{position:relative;width:100%;height:280px}
 
+/* ── CURSEUR OBJECTIF ────────────────────────────────────── */
+.radar-focus-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.radar-badge{flex:1;min-width:120px;padding:10px 14px;border-radius:10px;border:1.5px solid}
+.radar-badge.win{background:#EAF5CC;border-color:#78BE20;color:#3A7D00}
+.radar-badge.qw {background:#FFF8E1;border-color:#FFB300;color:#E65100}
+.radar-badge-icon{font-size:18px;margin-bottom:3px}
+.radar-badge-kpi{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.7}
+.radar-badge-val{font-size:16px;font-weight:800;margin-top:2px}
+/* ── OBJECTIF AJUSTABLE ──────────────────────────────────── */
+.obj-card{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.obj-kpi-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd)}
+.obj-kpi-row:last-child{border-bottom:none;padding-bottom:0}
+.obj-kpi-label{flex:1;font-size:12px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
+.obj-kpi-controls{display:flex;align-items:center;gap:8px}
+.obj-btn{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--brd);background:var(--surf2);color:var(--text);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:inherit;flex-shrink:0}
+.obj-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-l)}
+.obj-val-wrap{min-width:80px;text-align:center}
+.obj-val{font-size:16px;font-weight:800;color:var(--teal);display:block}
+.obj-delta{font-size:10px;margin-top:1px;font-weight:600}
+.obj-delta.up{color:var(--ok)}.obj-delta.down{color:var(--warn)}.obj-delta.same{color:var(--t3)}
+.obj-reset{font-size:10px;font-weight:600;color:var(--t3);cursor:pointer;text-decoration:underline;white-space:nowrap}
+.obj-reset:hover{color:var(--teal)}
+.frein-block{margin-top:10px;animation:fadeIn .25s ease}
+.frein-block label{font-size:11px;font-weight:700;color:var(--warn);margin-bottom:5px;display:block}
+.frein-block input{width:100%;padding:9px 12px;border:1.5px solid var(--warn);border-radius:var(--rs);font-size:13px;font-family:inherit;background:var(--surf);color:var(--text);box-sizing:border-box}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+/* ── HEATMAP ─────────────────────────────────────────────── */
+.heatmap-table{width:100%;border-collapse:collapse;font-size:12px}
+.heatmap-table th{padding:8px 6px;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;background:var(--surf2);border-bottom:1px solid var(--brd);text-align:center;white-space:nowrap}
+.heatmap-table th:first-child{text-align:left;padding-left:12px}
+.heatmap-table td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--brd)}
+.heatmap-table td:first-child{text-align:left;padding-left:12px}
+.hm-pill{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:24px;border-radius:20px;font-size:11px;font-weight:700;padding:0 6px}
+.hm-ok{background:var(--ok-bg);color:var(--ok)}.hm-warn{background:var(--warn-bg);color:var(--warn)}.hm-ko{background:var(--ko-bg);color:var(--ko)}.hm-na{background:var(--surf2);color:var(--t3);font-style:italic}
+.hm-best{font-size:11px;font-weight:800;color:var(--ok);background:var(--ok-bg);border-radius:6px;padding:2px 7px}
+.hm-neg{font-size:11px;font-weight:600;color:var(--ko);background:var(--ko-bg);border-radius:6px;padding:2px 7px}
+.hm-neu{font-size:11px;color:var(--t3);padding:2px 7px}
+
 .logout-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:var(--r);background:var(--surf);border:1px solid var(--brd);cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s}
 .logout-row:active{transform:scale(.98)}
 
@@ -394,7 +432,9 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 @media (min-width:900px){
   /* Reset mobile constraints */
   html,body{overflow:hidden;height:100vh}
-  .screen.active{flex-direction:row;height:100vh;overflow:hidden}
+  /* Seul home utilise le layout sidebar (row) — tous les autres restent en colonne */
+  .screen.active{flex-direction:column;height:100vh;overflow:hidden}
+  #screen-home.active{flex-direction:row!important}
 
   /* ── Sidebar ── */
   .desktop-sidebar{
@@ -457,8 +497,13 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
   .scroll-content{max-width:none;padding:0}
   #mobile-topbar{display:none!important}
   #mobile-home-scroll{display:none!important}
-  /* Sur desktop, screen.active reste en flex-direction:row */
-  .screen.active{flex-direction:row}
+  /* Sur desktop, les écrans non-home gardent leur structure mobile (topbar + scroll-content) */
+  #screen-advisor .topbar,#screen-vendor .topbar,#screen-dashboard .topbar,#screen-objectifs .topbar{display:flex!important}
+  #screen-advisor .bottom-bar,#screen-vendor .bottom-bar,#screen-dashboard .bottom-bar,#screen-objectifs .bottom-bar{display:flex!important}
+  #screen-advisor .scroll-content,#screen-vendor .scroll-content,#screen-dashboard .scroll-content,#screen-objectifs .scroll-content{display:flex!important;flex-direction:column;overflow-y:auto;flex:1}
+  #screen-advisor.active,#screen-vendor.active,#screen-dashboard.active,#screen-objectifs.active{flex-direction:column}
+  /* Sur desktop, screen.active reste en flex-direction:row pour home */
+  #screen-home.active{flex-direction:row}
 
   /* Action buttons desktop style */
   .desktop-action-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
@@ -1033,17 +1078,29 @@ function localLoad() {
     if(s){
       const p=JSON.parse(s);
       if(p&&p.objectifs){
-        // Deep copy systématique — jamais de références partagées
         state=JSON.parse(JSON.stringify(p));
         migrateOldFormat();
-        // Vérification d'intégrité post-chargement
+        // Garantir que tous les champs existent
+        const def=defaultState();
+        if(!state.objectifs) state.objectifs=def.objectifs;
+        VENDEURS.forEach(v=>{ if(!state.objectifs[v]) state.objectifs[v]=def.objectifs[v]; });
+        if(!state.annees) state.annees={};
+        if(!state.rdv) state.rdv=def.rdv;
+        if(!state.pins) state.pins={};
+        if(!state.engagements) state.engagements=def.engagements;
+        if(!state.bienetre) state.bienetre=def.bienetre;
+        VENDEURS.forEach(v=>{
+          if(!state.rdv[v]) state.rdv[v]={};
+          if(!state.engagements[v]) state.engagements[v]=[];
+          if(!state.bienetre[v]) state.bienetre[v]={};
+        });
         if(state.annees){
           Object.keys(state.annees).forEach(y=>{
             const yr=state.annees[y];
             if(!yr.resultats) yr.resultats={};
+            if(!yr.commentaires) yr.commentaires={};
             VENDEURS.forEach(v=>{
               if(!yr.resultats[v]) yr.resultats[v]={};
-              if(!yr.commentaires) yr.commentaires={};
               if(!yr.commentaires[v]) yr.commentaires[v]={};
             });
           });
@@ -1362,16 +1419,22 @@ function getSuggestion(vendeur,year){
   if(ms>11)return null;
   const mr=12-ms,sugg={};
   KPI_KEYS.forEach(k=>{
+    const objMensuel=obj[k]/12;
+    const maxVal=KPI_IS_PCT[k]?100:objMensuel*2.2; // plafond 120% de l'objectif mensuel
     if(md.length===0){
-      sugg[k]={val:KPI_IS_PCT[k]?obj[k]:obj[k]/12};
+      sugg[k]={val:KPI_IS_PCT[k]?obj[k]:objMensuel,algo:KPI_IS_PCT[k]?obj[k]:objMensuel};
     }else if(KPI_IS_PCT[k]){
       const vals=md.map(m=>res[m][k]).filter(v=>v!=null&&!isNaN(v));
       const moy=vals.length>0?vals.reduce((a,b)=>a+b,0)/vals.length:obj[k];
-      sugg[k]={val:Math.max(0,obj[k]+(obj[k]-moy)*.3)};
+      const raw=Math.max(0,Math.min(maxVal,obj[k]+(obj[k]-moy)*.3));
+      sugg[k]={val:raw,algo:raw};
     }else{
-      const realise=md.reduce((s,m)=>s+(res[m][k]||0),0);
+      const realise=md.reduce((s,m)=>s+(res[m][k]!=null&&!isNaN(res[m][k])?res[m][k]:0),0);
       const retard=(obj[k]/12*ms)-realise;
-      sugg[k]={val:Math.max(0,obj[k]/12+(retard>0?retard/mr*.5:0))};
+      // Lissage : on rattrape le retard sur les mois restants, plafonné à 120% de l'objectif mensuel
+      const rattrapageMensuel=retard>0?retard/mr:retard/mr; // négatif si avance
+      const raw=Math.max(0,Math.min(maxVal,objMensuel+rattrapageMensuel));
+      sugg[k]={val:raw,algo:raw};
     }
   });
   return{sugg,moisSuivant:ms};
@@ -1532,17 +1595,12 @@ function renderDashboard() {
   const div = document.getElementById('dashboard-content');
   if (!div) return;
 
-  // ── KPI globaux équipe ──
-  const totalNonTenus = VENDEURS.reduce((s,v)=>s+((state.engagements&&state.engagements[v]||[]).filter(e=>e.statut==='non_tenu').length),0);
   const avgMois = Math.round(VENDEURS.map(v=>Object.keys(getRes(v,currentYear)).length).reduce((a,b)=>a+b,0)/VENDEURS.length);
-  const teamOk = VENDEURS.reduce((s,v)=>s+globalScore(v,currentYear),0);
-  const teamMax = VENDEURS.length*5;
-  let html = `<div class="desktop-grid-4" style="margin-bottom:20px">`;
+  const nextRdvCount = VENDEURS.filter(v=>(state.rdv&&state.rdv[v]&&state.rdv[v].prochain)).length;
+  let html = `<div class="desktop-grid-2" style="margin-bottom:20px;max-width:500px">`;
   const statCards = [
     { label:'Conseillers suivis', val:VENDEURS.length, icon:'👥', color:'var(--teal)' },
     { label:'Mois saisis (moy.)', val:avgMois, icon:'📅', color:'var(--violet)' },
-    { label:'KPI équipe en trajectoire', val:`${teamOk}/${teamMax}`, icon:'✓', color:'var(--ok)' },
-    { label:'Engagements non tenus', val:totalNonTenus||'—', icon:'⚠', color:totalNonTenus>0?'var(--ko)':'var(--ok)' },
   ];
   statCards.forEach(s => {
     html += `<div class="dash-stat-card">
@@ -1555,82 +1613,138 @@ function renderDashboard() {
   });
   html += `</div>`;
 
-  // ── Tableau comparatif ──
+  // ── Heatmap + Radar ──
+  const beMois=new Date().toISOString().slice(0,7);
   html += `<div class="desktop-grid-2" style="margin-bottom:20px">`;
 
-  // Tableau KPI par vendeur
+  // Heatmap
   html += `<div class="card" style="padding:0;overflow:hidden">
-    <div style="padding:16px 20px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between">
-      <div class="card-title" style="margin:0">Performance par conseiller · ${currentYear}</div>
-    </div>
-    <table class="stable" style="margin:0">
-      <thead><tr>
-        <th style="text-align:left;padding-left:20px">Conseiller</th>`;
-  KPI_LABELS.forEach(l => { html += `<th>${l}</th>`; });
-  html += `<th>Climat</th></tr></thead><tbody>`;
-  VENDEURS.forEach(v => {
-    const av = getAv(v, currentYear);
-    const md = Object.keys(getRes(v, currentYear)).length;
-    const beMois = new Date().toISOString().slice(0,7);
-    const beVal = (state.bienetre&&state.bienetre[v]&&state.bienetre[v][beMois])||0;
-    const beEmojis = ['','😞','😕','😐','🙂','😄'];
-    html += `<tr><td style="text-align:left;padding-left:20px;white-space:nowrap">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
-        <div>
-          <div style="font-weight:700;font-size:13px">${NOMS[v]}</div>
-          <div style="font-size:10px;color:var(--t3)">${md} mois · <b style="color:${scoreColor(globalScore(v,currentYear))}">${globalScore(v,currentYear)}/5 KPI ✓</b></div>
-        </div>
-      </div></td>`;
-    KPI_KEYS.forEach(k => {
-      const pct = Math.round(av[k].pct);
-      const cls = statusCls(av[k].pct, md);
-      html += `<td><div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-        <span style="font-size:13px;font-weight:700;color:${cls==='ok'?'var(--ok)':cls==='warn'?'var(--warn)':'var(--ko)'}">${pct}%</span>
-        <div style="width:36px;height:4px;border-radius:2px;background:var(--surf2);overflow:hidden">
-          <div style="height:100%;border-radius:2px;width:${Math.min(100,pct)}%;background:${cls==='ok'?'var(--ok-bar)':cls==='warn'?'var(--warn-bar)':'var(--ko-bar)'}"></div>
-        </div>
-      </div></td>`;
+    <div style="padding:14px 20px;border-bottom:1px solid var(--brd)"><div class="card-title" style="margin:0">Performance · ${currentYear} — Heatmap</div></div>
+    <div style="overflow-x:auto"><table class="heatmap-table"><thead><tr>
+      <th>Conseiller</th>`;
+  KPI_LABELS.forEach(l=>{html+=`<th>${l}</th>`;});
+  html+=`<th>↗ Meilleure progression</th></tr></thead><tbody>`;
+  VENDEURS.forEach(v=>{
+    const av=getAv(v,currentYear);
+    const res=getRes(v,currentYear);
+    const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
+    const beVal=(state.bienetre&&state.bienetre[v]&&state.bienetre[v][beMois])||0;
+    const progressions=KPI_KEYS.map(k=>{
+      if(md.length<2)return null;
+      const last=md[md.length-1],prev=md[md.length-2];
+      const vL=res[last]&&res[last][k]!=null?res[last][k]:null;
+      const vP=res[prev]&&res[prev][k]!=null?res[prev][k]:null;
+      if(vL===null||vP===null||vP===0)return null;
+      return((vL-vP)/Math.abs(vP))*100;
     });
-    html += `<td style="font-size:18px;text-align:center">${beVal>0?beEmojis[beVal]:'—'}</td></tr>`;
+    const validProgs=progressions.map((p,i)=>({p,i})).filter(x=>x.p!==null);
+    const bestProg=validProgs.length>0?validProgs.reduce((a,b)=>a.p>b.p?a:b):null;
+    html+=`<tr onclick="${isDesktop()?`showDesktopVendeur('${v}')`:`openVendeur('${v}')`}" style="cursor:pointer">
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
+        <div><div style="font-weight:700;font-size:13px">${NOMS[v]}</div>
+        <div style="font-size:10px;color:var(--t3)">${md.length} mois · <b style="color:${scoreColor(globalScore(v,currentYear))}">${globalScore(v,currentYear)}/5</b>${beVal>0?' '+['','😞','😕','😐','🙂','😄'][beVal]:''}</div>
+      </div></div></td>`;
+    KPI_KEYS.forEach((k,ki)=>{
+      const hasData=md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]));
+      if(!hasData){html+=`<td><span class="hm-pill hm-na">—</span></td>`;return;}
+      const cls=statusCls(av[k].pct,md.length);
+      const progVal=progressions[ki];
+      // Pour les KPI % (Transfo, Optin) : afficher la valeur réelle, pas le % d'objectif
+      const displayVal = KPI_IS_PCT[k]
+        ? KPI_FMT[k](Math.round(av[k].realise*10)/10)
+        : Math.round(av[k].pct)+'%';
+      html+=`<td><span class="hm-pill hm-${cls}">${displayVal}</span>`;
+      if(progVal!==null){const sym=progVal>0?'+':'';html+=`<br><span style="font-size:9px;color:var(--t3)">${sym}${Math.round(progVal)}%</span>`;}
+      html+=`</td>`;
+    });
+    if(bestProg){
+      const sym=bestProg.p>0?'+':'';
+      html+=`<td><span class="${bestProg.p>5?'hm-best':bestProg.p<-5?'hm-neg':'hm-neu'}">${KPI_LABELS[bestProg.i]} ${sym}${Math.round(bestProg.p)}%</span></td>`;
+    }else{html+=`<td><span class="hm-neu">—</span></td>`;}
+    html+=`</tr>`;
   });
-  html += `</tbody></table></div>`;
+  html+=`</tbody></table></div></div>`;
 
-
-  // Graphique radar
+  // Radar
   html += `<div class="card">
-    <div class="card-title">Performance par KPI — Toile d'araignée</div>
+    <div class="card-title">Toile d'araignée par KPI</div>
     <div class="legend" style="margin-bottom:8px">`;
-  VENDEURS.forEach(v => {
-    html += `<div class="legend-item"><div class="dot" style="background:${COLORS[v]}"></div>${NOMS[v]}</div>`;
-  });
+  VENDEURS.forEach(v=>{html+=`<div class="legend-item"><div class="dot" style="background:${COLORS[v]}"></div>${NOMS[v]}</div>`;});
   html += `</div>
-    <div class="radar-wrap"><canvas id="chart-dashboard-bar" role="img" aria-label="Radar performance">Radar</canvas></div>
+    <div class="radar-wrap"><canvas id="chart-dashboard-bar" role="img" aria-label="Radar">Radar</canvas></div>
   </div></div>`;
 
-  // ── Engagements ouverts ──
-  const allEngs = [];
+  // ── Historique complet des engagements ──
+  const allEngsAll = [];
   VENDEURS.forEach(v => {
-    ((state.engagements&&state.engagements[v])||[]).filter(e=>e.statut==='ouvert').forEach(e => {
-      allEngs.push({...e, vendeur:v});
+    ((state.engagements&&state.engagements[v])||[]).forEach(e => {
+      allEngsAll.push({...e, vendeur:v});
     });
   });
-  if (allEngs.length > 0) {
-    html += `<div class="card" style="margin-bottom:20px">
-      <div class="card-title">Engagements ouverts</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">`;
-    allEngs.forEach(e => {
-      const dotColor = e.auteur==='manager'?'var(--teal)':'var(--violet)';
-      html += `<div style="background:var(--surf2);border-radius:10px;padding:12px 14px;border:1px solid var(--brd)">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <div style="width:8px;height:8px;border-radius:50%;background:${COLORS[e.vendeur]};flex-shrink:0"></div>
-          <span style="font-size:12px;font-weight:700;color:${COLORS[e.vendeur]}">${NOMS[e.vendeur]}</span>
-          <span style="font-size:10px;color:var(--t3);margin-left:auto">${e.auteur==='manager'?'👤':'🙋'} ${e.date}</span>
-        </div>
-        <div style="font-size:13px;color:var(--text);line-height:1.4">${e.texte}</div>
-      </div>`;
+  if (allEngsAll.length > 0) {
+    // Trier : ouverts en premier, puis par date
+    allEngsAll.sort((a,b)=>{
+      if(a.statut==='ouvert'&&b.statut!=='ouvert') return -1;
+      if(a.statut!=='ouvert'&&b.statut==='ouvert') return 1;
+      return 0;
     });
-    html += `</div></div>`;
+    const ouverts = allEngsAll.filter(e=>e.statut==='ouvert');
+    const archives = allEngsAll.filter(e=>e.statut!=='ouvert');
+
+    html += `<div class="card" style="margin-bottom:20px">
+      <div class="card-title">Historique des engagements</div>`;
+
+    if(ouverts.length>0){
+      html+=`<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">En cours</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">`;
+      ouverts.forEach(e => {
+        const col=e.auteur==='manager'?'var(--teal)':'var(--violet)';
+        html+=`<div style="background:var(--surf2);border-radius:10px;padding:12px 14px;border:1px solid var(--brd);display:flex;align-items:flex-start;gap:12px">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <div style="width:8px;height:8px;border-radius:50%;background:${COLORS[e.vendeur]};flex-shrink:0"></div>
+              <span style="font-size:12px;font-weight:700;color:${COLORS[e.vendeur]}">${NOMS[e.vendeur]}</span>
+              <span style="font-size:10px;color:var(--t3)">${e.auteur==='manager'?'👤 Manager':'🙋 Conseiller'} · ${e.date}</span>
+            </div>
+            <div style="font-size:13px;color:var(--text);line-height:1.4">${e.texte}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button class="eng-btn eng-btn-tenu" onclick="updateEngagement('${e.vendeur}','${e.id}','tenu');renderDashboard()">✓ Tenu</button>
+            <button class="eng-btn eng-btn-non" onclick="updateEngagement('${e.vendeur}','${e.id}','non_tenu');renderDashboard()">✗ Non tenu</button>
+          </div>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+
+    if(archives.length>0){
+      html+=`<details>
+        <summary style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;cursor:pointer;margin-bottom:8px">
+          Archivés (${archives.length})
+        </summary>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">`;
+      archives.forEach(e => {
+        const isTenu=e.statut==='tenu';
+        const statutColor=isTenu?'var(--ok)':'var(--ko)';
+        const statutBg=isTenu?'var(--ok-bg)':'var(--ko-bg)';
+        html+=`<div style="background:var(--surf2);border-radius:10px;padding:10px 14px;border:1px solid var(--brd);display:flex;align-items:flex-start;gap:12px;opacity:.75">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+              <div style="width:8px;height:8px;border-radius:50%;background:${COLORS[e.vendeur]};flex-shrink:0"></div>
+              <span style="font-size:12px;font-weight:700;color:${COLORS[e.vendeur]}">${NOMS[e.vendeur]}</span>
+              <span style="font-size:10px;padding:1px 6px;border-radius:10px;font-weight:700;background:${statutBg};color:${statutColor}">${isTenu?'✓ Tenu':'✗ Non tenu'}</span>
+              <span style="font-size:10px;color:var(--t3);margin-left:auto">${e.date}</span>
+            </div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.4;text-decoration:line-through">${e.texte}</div>
+          </div>
+          <button class="eng-btn" style="background:var(--surf);border:1px solid var(--brd);color:var(--t2);flex-shrink:0"
+            onclick="updateEngagement('${e.vendeur}','${e.id}','ouvert');renderDashboard()">↺ Réouvrir</button>
+        </div>`;
+      });
+      html+=`</div></details>`;
+    }
+    html+=`</div>`;
   }
 
   // ── Prochains RDV ──
@@ -1858,7 +1972,47 @@ function renderVendeur(v){
   // Bloc RDV
   const rdv=(state.rdv&&state.rdv[v])||{};
   html+=`<div class="section-label">Performance annuelle</div><div class="kpi-stack">`;
+  KPI_KEYS.forEach((k,i)=>{html+=makeKpiCard(v,k,i,av,md.length);});
   html+=`</div>`;
+
+  // ── RADAR AUTO-FOCUS ──
+  if(md.length>0){
+    // Identifier victoire (meilleur score) et quick-win (moins bon score parmi les KPI renseignés)
+    const kpiScores=KPI_KEYS.map((k,i)=>{
+      const hasData=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
+      return{k,i,pct:hasData?av[k].pct:null,hasData};
+    }).filter(x=>x.hasData);
+    const winKpi=kpiScores.length>0?kpiScores.reduce((a,b)=>a.pct>b.pct?a:b):null;
+    const qwKpi=kpiScores.length>1?kpiScores.reduce((a,b)=>a.pct<b.pct?a:b):null;
+
+    // Radar data — on met en évidence victoire et quick-win
+    const radarData=KPI_KEYS.map((k,i)=>{
+      const hasData=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
+      return hasData?Math.min(120,Math.round(av[k].pct)):null;
+    });
+
+    html+=`<div class="card" style="padding:14px 16px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">Radar KPI — Auto-focus</div>
+      <div style="position:relative;height:220px"><canvas id="radar-${v}"></canvas></div>
+      <div class="radar-focus-row">`;
+    if(winKpi){
+      html+=`<div class="radar-badge win">
+        <div class="radar-badge-icon">🏆</div>
+        <div class="radar-badge-kpi">Victoire · ${KPI_FULL[winKpi.i]}</div>
+        <div class="radar-badge-val">${KPI_FMT[winKpi.k](av[winKpi.k].realise)}</div>
+        <div style="font-size:10px;margin-top:2px;opacity:.7">${Math.round(winKpi.pct)}% de l'objectif</div>
+      </div>`;
+    }
+    if(qwKpi&&qwKpi.k!==winKpi?.k){
+      html+=`<div class="radar-badge qw">
+        <div class="radar-badge-icon">⚡</div>
+        <div class="radar-badge-kpi">Quick Win · ${KPI_FULL[qwKpi.i]}</div>
+        <div class="radar-badge-val">${KPI_FMT[qwKpi.k](av[qwKpi.k].realise)}</div>
+        <div style="font-size:10px;margin-top:2px;opacity:.7">${Math.round(qwKpi.pct)}% — levier à actionner</div>
+      </div>`;
+    }
+    html+=`</div></div>`;
+  }
 
   html+=`<div class="section-label">Saisie du mois</div>
   <div class="saisie-card" id="saisie-wrap-${v}">
@@ -1913,11 +2067,13 @@ function renderVendeur(v){
   }
 
   if(suggestion){
-    const ms=suggestion.moisSuivant,mr=12-ms; let hl,sl;
-    if(score>=90){hl=`C'est en bonne route pour dépasser l'objectif annuel !`;sl=`Cibles pour maintenir l'élan en ${MOIS_S[ms]}.`;}
-    else if(score>=70){hl=`C'est en bonne route pour dépasser l'objectif annuel !`;sl=`Ces objectifs pour ${MOIS_S[ms]} permettront de rester dans la course.`;}
-    else{hl=`${mr} mois pour renverser la vapeur. Courage !`;sl=`Des cibles réalistes pour ${MOIS_S[ms]}.`;}
-    html+=`<div class="section-label">Objectif du mois suivant</div>
+    const ms=suggestion.moisSuivant,mr=12-ms;
+    let hl,sl;
+    const scoreLabel=globalScoreLabel(v,currentYear);
+    if(score>=4){hl=`C'est en bonne route — garde l'élan en ${MOIS_S[ms]} !`;sl=`Objectifs pour maintenir la trajectoire annuelle.`;}
+    else if(score>=2){hl=`${mr} mois pour consolider. Tu peux le faire !`;sl=`Ces cibles permettent de raccrocher la trajectoire annuelle.`;}
+    else{hl=`${mr} mois pour renverser la vapeur. Courage !`;sl=`Des objectifs lissés et atteignables pour ${MOIS_S[ms]}.`;}
+    html+=`<div class="section-label">Objectif conseillé · ${MOIS_S[ms]} <span style="font-size:11px;font-weight:400;color:var(--t3)">${mr} mois restant${mr>1?'s':''}</span></div>
     <div class="goal-card">
       <svg class="goal-card-bg" width="160" height="130" viewBox="0 0 160 130" fill="none">
         <polygon points="80,0 160,60 160,130 0,130 0,60" fill="white"/>
@@ -1931,10 +2087,18 @@ function renderVendeur(v){
       <div class="goal-sub">${sl}</div>
       <div class="goal-grid">`;
     KPI_KEYS.forEach((k,i)=>{
-      const val=suggestion.sugg[k].val,base=KPI_IS_PCT[k]?obj[k]:obj[k]/12,diff=val-base;
+      const val=suggestion.sugg[k].algo;
+      const objM=KPI_IS_PCT[k]?obj[k]:obj[k]/12;
+      const diff=val-objM;
       let dl,dc;
-      if(diff>.5){dl='↑ rattrapage';dc='down';}else if(diff<-.5){dl='↓ en avance';dc='up';}else{dl='→ rythme de croisière';dc='same';}
-      html+=`<div class="goal-item"><div class="goal-kpi">${KPI_FULL[i]}</div><div class="goal-val">${KPI_FMT[k](val)}</div><div class="goal-delta ${dc}">${dl}</div></div>`;
+      if(diff>0.5){dl='↑ rattrapage';dc='down';}
+      else if(diff<-0.5){dl='↓ en avance';dc='up';}
+      else{dl='→ rythme de croisière';dc='same';}
+      html+=`<div class="goal-item">
+        <div class="goal-kpi">${KPI_FULL[i]}</div>
+        <div class="goal-val">${KPI_FMT[k](KPI_IS_PCT[k]?Math.round(val*10)/10:Math.round(val))}</div>
+        <div class="goal-delta ${dc}">${dl}</div>
+      </div>`;
     });
     html+=`</div></div>`;
   }
@@ -2038,14 +2202,104 @@ function renderVendeur(v){
     chip.onclick=()=>{selKpi=i;chipsDiv.querySelectorAll('.chip').forEach((c,j)=>c.classList.toggle('active',j===i));drawChart('chart-'+v,v,selKpi);};
     chipsDiv.appendChild(chip);
   });
+  const _v=v, _md=md, _res=res, _av=av;
   setTimeout(()=>{
-    drawChart('chart-'+v,v,0);
+    drawChart('chart-'+_v,_v,0);
+    // Radar auto-focus
+    const radarCanvas=document.getElementById('radar-'+_v);
+    if(radarCanvas&&_md.length>0){
+      if(chartInstances['radar-'+_v])chartInstances['radar-'+_v].destroy();
+      const kpiScores=KPI_KEYS.map((k,i)=>{
+        const hasData=_md.some(m=>_res[m]&&_res[m][k]!=null&&!isNaN(_res[m][k]));
+        return{k,i,pct:hasData?Math.min(120,Math.round(_av[k].pct)):0,hasData};
+      });
+      const filledScores=kpiScores.filter(x=>x.hasData);
+      const winItem=filledScores.length>0?filledScores.reduce((a,b)=>a.pct>b.pct?a:b):null;
+      const qwItem=filledScores.length>1?filledScores.reduce((a,b)=>a.pct<b.pct?a:b):null;
+      const pointColors=kpiScores.map(x=>
+        winItem&&x.k===winItem.k?'#78BE20':qwItem&&x.k===qwItem.k?'#FFB300':COLORS[_v]
+      );
+      const pointSizes=kpiScores.map(x=>(winItem&&x.k===winItem.k)||(qwItem&&x.k===qwItem.k)?8:4);
+      chartInstances['radar-'+_v]=new Chart(radarCanvas,{
+        type:'radar',
+        data:{labels:KPI_LABELS,datasets:[{
+          label:NOMS[_v],
+          data:kpiScores.map(x=>x.pct),
+          backgroundColor:COLORS[_v]+'25',
+          borderColor:COLORS[_v],
+          borderWidth:2,
+          pointBackgroundColor:pointColors,
+          pointBorderColor:'#fff',
+          pointBorderWidth:2,
+          pointRadius:pointSizes,
+        }]},
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.r}% de l'objectif`}}},
+          scales:{r:{min:0,max:120,
+            ticks:{stepSize:30,color:'#9BA5B8',font:{size:9},backdropColor:'transparent',callback:v=>v+'%'},
+            grid:{color:'rgba(0,0,0,0.06)'},
+            pointLabels:{color:'#4A6A35',font:{size:10,weight:'600'}},
+            angleLines:{color:'rgba(0,0,0,0.06)'},
+          }}
+        }
+      });
+    }
   },60);
 }
 
 function toggleSaisie(v){
   const form=document.getElementById(`saisie-form-${v}`),icon=document.getElementById(`saisie-icon-${v}`);
   form.classList.toggle('open');icon.classList.toggle('open',form.classList.contains('open'));
+}
+
+function adjustObj(v, k, step, ki) {
+  const valEl = document.getElementById(`obj-val-${v}-${k}`);
+  const deltaEl = document.getElementById(`obj-delta-${v}-${k}`);
+  if(!valEl) return;
+  const obj = state.objectifs[v];
+  const algo = parseFloat(valEl.dataset.algo);
+  const current = parseFloat(valEl.dataset.current);
+  const objM = KPI_IS_PCT[k] ? obj[k] : Math.round(obj[k]/12);
+  const maxVal = KPI_IS_PCT[k] ? 100 : Math.ceil(objM * 2.2);
+  const newVal = Math.max(0, Math.min(maxVal, current + parseFloat(step)));
+  valEl.dataset.current = newVal;
+  valEl.textContent = KPI_FMT[k](KPI_IS_PCT[k] ? newVal : Math.round(newVal));
+  // Delta
+  const diff = newVal - objM;
+  let label = '→ rythme normal', cls = 'same';
+  if(diff > 0.5){ label = `↑ rattrapage +${KPI_FMT[k](Math.round(Math.abs(diff)))}`; cls = 'down'; }
+  else if(diff < -0.5){ label = `↓ en avance −${KPI_FMT[k](Math.round(Math.abs(diff)))}`; cls = 'up'; }
+  if(deltaEl){ deltaEl.textContent = label; deltaEl.className = `obj-delta ${cls}`; }
+  // Frein si en dessous de la suggestion
+  const frein = document.getElementById(`frein-${v}-${k}`);
+  if(frein) frein.style.display = newVal < algo - 0.5 ? 'block' : 'none';
+  // Mise à jour du graphique
+  updateChartWithObjTarget(v, k, newVal);
+}
+
+function resetObj(v, k) {
+  const valEl = document.getElementById(`obj-val-${v}-${k}`);
+  if(!valEl) return;
+  const algo = parseFloat(valEl.dataset.algo);
+  valEl.dataset.current = algo;
+  const ki = KPI_KEYS.indexOf(k);
+  adjustObj(v, k, 0, ki); // recalc delta
+  const frein = document.getElementById(`frein-${v}-${k}`);
+  if(frein) frein.style.display = 'none';
+}
+
+// Met à jour la ligne objectif du graphique en temps réel
+function updateChartWithObjTarget(v, k, newVal) {
+  const ki = KPI_KEYS.indexOf(k);
+  const canvasId = 'chart-' + v;
+  const inst = chartInstances[canvasId];
+  if(!inst) return;
+  // La dataset index 1 est la ligne objectif mensuel
+  if(inst.data.datasets[1]) {
+    inst.data.datasets[1].data = MOIS_S.map(() => newVal);
+    inst.data.datasets[1].label = `Objectif ajusté · ${KPI_FULL[ki]}`;
+    inst.update('none'); // sans animation pour fluidité
+  }
 }
 
 function prefillSaisie(v){
@@ -2139,52 +2393,46 @@ async function exportPDF(v) {
   if(typeof window.jspdf === 'undefined') { toast('PDF en cours de chargement…'); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-  const obj = state.objectifs[v];
-  const av  = getAv(v, currentYear);
-  const res = getRes(v, currentYear);
-  const md  = Object.keys(res).map(Number).sort((a,b)=>a-b);
-  const yd  = getYearData(currentYear);
-  const rdv = (state.rdv&&state.rdv[v])||{};
+
+  // ── Données ──────────────────────────────────────────────
+  const obj  = state.objectifs[v];
+  const av   = getAv(v, currentYear);
+  const res  = getRes(v, currentYear);
+  const yd   = getYearData(currentYear);
+  const md   = Object.keys(res).map(Number).sort((a,b)=>a-b);
+  const rdv  = (state.rdv&&state.rdv[v])||{};
   const engs = (state.engagements&&state.engagements[v])||[];
   const beData = (state.bienetre&&state.bienetre[v])||{};
   const comm = yd.commentaires[v]||{};
   const sugg = getSuggestion(v, currentYear);
-  const now = new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
-  const moisCumul = md.length>0 ? md.length : new Date().getMonth()+1;
+  const now  = new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
 
-  const NR = 'Non renseigné'; // fallback
+  // Mois réellement saisis — premier et dernier
+  const premierMois = md.length>0 ? md[0] : 0;
+  const dernierMois = md.length>0 ? md[md.length-1] : new Date().getMonth();
+  const nbMoisSaisis = md.length;
+  const NR = 'Non renseigné';
 
-  // Helpers couleurs jsPDF
-  const setTeal  = () => doc.setTextColor(0,96,88);
+  // ── Helpers ───────────────────────────────────────────────
+  const setTeal  = () => doc.setTextColor(0,150,136);
   const setDark  = () => doc.setTextColor(30,30,30);
   const setGray  = () => doc.setTextColor(150,150,150);
   const setLight = () => doc.setTextColor(90,100,120);
+  const setWarn  = () => doc.setTextColor(180,83,9);
 
-  // ── 1. EN-TÊTE ──────────────────────────────────────────────
-  doc.setFillColor(13,33,55);
-  doc.rect(0,0,210,30,'F');
-  // Triangle LM
-  doc.setFillColor(120,190,32);
-  doc.setDrawColor(120,190,32);
-  doc.lines([[8,0],[-4,12],[-4,-12]],14,10,null,'F');
-  // Titre
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(13); doc.setFont('helvetica','bold');
-  doc.text('RDV Perf — Suivi de performance', 27, 13);
-  doc.setFontSize(8); doc.setFont('helvetica','normal');
-  doc.setTextColor(128,203,196);
-  doc.text('Leroy Merlin Livry-Gargan · Groupe ADEO · '+currentYear, 27, 20);
-  // Droite
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(10); doc.setFont('helvetica','bold');
-  doc.text(NOMS[v]+' ·', 196, 13, {align:'right'});
-  doc.setFontSize(8); doc.setFont('helvetica','normal');
-  doc.setTextColor(128,203,196);
-  doc.text('Généré le '+now, 196, 20, {align:'right'});
+  const newPage = () => { footer(); doc.addPage(); y=20; };
+  const checkY  = (needed) => { if(y+needed>272) newPage(); };
 
-  let y = 38;
+  const footer = () => {
+    const pg = doc.internal.getCurrentPageInfo().pageNumber;
+    doc.setFontSize(7); doc.setFont('helvetica','italic'); setGray();
+    doc.text('RDV Perf · Leroy Merlin · Document de suivi — challenger et accompagner', 105, 290, {align:'center'});
+    doc.setFont('helvetica','normal');
+    doc.text('Page '+pg, 196, 290, {align:'right'});
+  };
 
   const section = (title) => {
+    checkY(14);
     doc.setFontSize(8.5); doc.setFont('helvetica','bold');
     doc.setTextColor(138,171,106);
     doc.text(title.toUpperCase(), 14, y); y+=3;
@@ -2192,233 +2440,242 @@ async function exportPDF(v) {
     doc.line(14,y,196,y); y+=5;
   };
 
-  const footer = () => {
-    doc.setFontSize(7); doc.setFont('helvetica','italic');
-    setGray();
-    doc.text('RDV Perf · Leroy Merlin · Document de suivi — challenger et accompagner', 105, 290, {align:'center'});
-    doc.text('Page '+doc.internal.getCurrentPageInfo().pageNumber, 196, 290, {align:'right'});
-  };
+  // ── 1. EN-TÊTE ────────────────────────────────────────────
+  doc.setFillColor(13,33,55);
+  doc.rect(0,0,210,30,'F');
+  doc.setFillColor(120,190,32);
+  doc.setDrawColor(120,190,32);
+  doc.lines([[8,0],[-4,12],[-4,-12]],14,10,null,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(13); doc.setFont('helvetica','bold');
+  doc.text('RDV Perf — Suivi de performance', 27, 13);
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.setTextColor(128,203,196);
+  doc.text('Leroy Merlin Livry-Gargan · Groupe ADEO · '+currentYear, 27, 20);
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(10); doc.setFont('helvetica','bold');
+  doc.text(NOMS[v], 196, 13, {align:'right'});
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.setTextColor(128,203,196);
+  doc.text('Généré le '+now, 196, 20, {align:'right'});
 
-  // ── 2. INFORMATIONS ─────────────────────────────────────────
+  let y = 38;
+
+  // ── 2. INFORMATIONS ───────────────────────────────────────
   section('Informations');
-  const infoData = [
+  const infoRows = [
     ['Conseiller', NOMS[v], 'Responsable Rayon', 'Sammy M. — Responsable Rayon'],
-    ['Prochain RDV', rdv.prochain || NR, '', ''],
+    ['Prochain RDV', rdv.prochain||NR, '', ''],
   ];
-  // Dessin manuel du tableau infos
-  infoData.forEach(row => {
+  infoRows.forEach(row => {
     doc.setFontSize(8.5); doc.setFont('helvetica','bold'); setLight();
-    doc.text(row[0], 14, y); doc.text(row[2]||'', 110, y);
+    doc.text(row[0], 14, y);
+    if(row[2]) doc.text(row[2], 110, y);
     doc.setFont('helvetica','normal'); setDark();
-    doc.text(row[1], 48, y); doc.text(row[3]||'', 148, y);
+    doc.text(row[1], 50, y);
+    if(row[3]) doc.text(row[3], 150, y);
     y+=6;
   });
   y+=4;
 
-  // ── 3. CLIMAT DU MOMENT ─────────────────────────────────────
+  // ── 3. CLIMAT DU MOMENT ───────────────────────────────────
   section('Climat du moment');
   doc.setFontSize(7.5); doc.setFont('helvetica','italic'); setGray();
   doc.text('Ressenti partagé par le conseiller — à titre indicatif uniquement.', 14, y); y+=7;
-
   const beMoisList = Object.keys(beData).sort().slice(-6);
   const beTexts = ['Difficile','Compliqué','Neutre','Bien','Excellent'];
-  const beColors = [[239,68,68],[249,115,22],[155,165,184],[0,150,136],[120,190,32]];
-
+  const beColorsPDF = [[239,68,68],[249,115,22],[155,165,184],[0,150,136],[120,190,32]];
   if(beMoisList.length>0){
-    const chartX=20, chartW=170, chartH=26, padL=10, padR=10;
-    const drawW=chartW-padL-padR;
-    const n=beMoisList.length;
-    // Grille
+    checkY(36);
+    const cX=20,cW=170,cH=26,pL=10,pR=10,dW=cW-pL-pR,n=beMoisList.length;
     doc.setDrawColor(232,234,240); doc.setLineWidth(0.2);
-    for(let lv=1;lv<=5;lv++){
-      const gy=y+chartH-(lv-1)/4*chartH;
-      doc.line(chartX+padL,gy,chartX+chartW-padR,gy);
-    }
-    const pts=beMoisList.map((m,i)=>{
-      const val=beData[m];
-      const px=chartX+padL+(n>1?i/(n-1)*drawW:drawW/2);
-      const py=y+chartH-(val-1)/4*chartH;
-      return{px,py,val,mois:MOIS_S[parseInt(m.slice(5))-1]||m};
-    });
-    // Courbe
+    for(let lv=1;lv<=5;lv++) doc.line(cX+pL,y+cH-(lv-1)/4*cH,cX+cW-pR,y+cH-(lv-1)/4*cH);
+    const pts=beMoisList.map((m,i)=>({
+      px:cX+pL+(n>1?i/(n-1)*dW:dW/2),
+      py:y+cH-(beData[m]-1)/4*cH,
+      val:beData[m],
+      mois:MOIS_S[parseInt(m.slice(5))-1]||m
+    }));
     doc.setDrawColor(0,150,136); doc.setLineWidth(1.5);
     for(let i=1;i<pts.length;i++) doc.line(pts[i-1].px,pts[i-1].py,pts[i].px,pts[i].py);
-    // Points
     pts.forEach(({px,py,val,mois})=>{
-      const [r,g,b]=beColors[val-1];
+      const [r,g,b]=beColorsPDF[val-1];
       doc.setFillColor(r,g,b); doc.setDrawColor(255,255,255); doc.setLineWidth(1);
       doc.circle(px,py,2.5,'FD');
-      doc.setFontSize(7); doc.setFont('helvetica','bold');
-      doc.setTextColor(r,g,b);
+      doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(r,g,b);
       doc.text(beTexts[val-1],px,py-5,{align:'center'});
       doc.setFontSize(7); doc.setFont('helvetica','normal'); setGray();
       doc.text(mois,px,py+5.5,{align:'center'});
     });
-    y+=chartH+10;
+    y+=cH+10;
   } else {
     doc.setFontSize(9); doc.setFont('helvetica','italic'); setGray();
-    doc.text(NR, 14, y); y+=8;
+    doc.text(NR,14,y); y+=8;
   }
 
-  // ── 4. PERFORMANCE KPI ──────────────────────────────────────
-  section('Performance — Cumul '+moisCumul+' mois ('+MOIS_L[0]+' → '+MOIS_L[moisCumul-1]+') · '+currentYear);
+  // ── 4. PERFORMANCE KPI ────────────────────────────────────
+  // Titre précis : mois réellement saisis
+  const titrePerf = nbMoisSaisis>0
+    ? `Performance — ${nbMoisSaisis} mois saisi${nbMoisSaisis>1?'s':''} (${MOIS_L[premierMois]}${premierMois!==dernierMois?' → '+MOIS_L[dernierMois]:''}) · ${currentYear}`
+    : `Performance — Aucune saisie · ${currentYear}`;
+  checkY(12);
+  section(titrePerf);
 
-  // En-tête tableau
-  const kpiCols=[52,28,34,22,44];
-  const kpiX=[14,66,94,128,150];
-  doc.setFillColor(13,33,55);
-  doc.rect(14,y-2,182,8,'F');
+  const kpiX=[14,72,104,136,158];
+  const kpiW=[58,32,32,22,38];
+  doc.setFillColor(13,33,55); doc.rect(14,y-2,182,8,'F');
   doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
-  ['KPI','Réalisé','Objectif','% atteint','Statut'].forEach((h,i)=>{
-    doc.text(h, kpiX[i]+(i>0?kpiCols[i]/2:0), y+3, {align:i>0?'center':'left'});
+  ['KPI','Réalisé','Obj. mensuel','% mois','Statut'].forEach((h,i)=>{
+    doc.text(h, kpiX[i]+(i>0?kpiW[i]/2:0), y+3, {align:i>0?'center':'left'});
   });
   y+=9;
 
   KPI_KEYS.forEach((k,i)=>{
+    checkY(8);
     const a=av[k];
-    const kpiRes=getRes(v,currentYear);
-    const mdArr=Object.keys(kpiRes).map(Number);
-    const hasData=mdArr.some(m=>kpiRes[m][k]!=null&&!isNaN(kpiRes[m][k]));
-    const pct=hasData?Math.round(a.pct):null;
-    const realise=hasData?KPI_FMT[k](a.realise).toString():NR;
-    const cible=KPI_FMT[k](obj[k]).toString();
-    let statut='', bg=null, fg=null;
-    if(!hasData){ statut=NR; }
-    else {
-      const cls=statusCls(a.pct,mdArr.length);
-      if(cls==='ok'){ statut='✓ Objectif en vue'; bg=[234,245,204]; fg=[58,125,0]; }
-      else { statut=pct+'% de l\'objectif'; bg=[254,243,199]; fg=[180,83,9]; }
+    const hasData=md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]));
+    // Valeur réalisée : cumul pour cumulatifs, moyenne pour %
+    const realiseStr = hasData ? KPI_FMT[k](KPI_IS_PCT[k]?Math.round(a.realise*10)/10:a.realise).toString() : NR;
+    // Objectif de comparaison : mensuel pour tous (cohérent avec le graphique)
+    const objMensuel = KPI_IS_PCT[k] ? obj[k] : obj[k]/12;
+    const objStr = KPI_FMT[k](KPI_IS_PCT[k]?objMensuel:Math.round(objMensuel)).toString();
+    const pct = hasData ? Math.round(a.pct) : null;
+    let statutStr='', bg=null, fg=null;
+    if(!hasData){ statutStr=NR; }
+    else{
+      const cls=statusCls(a.pct,md.length);
+      if(cls==='ok'){ statutStr='✓ En trajectoire'; bg=[234,245,204]; fg=[58,125,0]; }
+      else if(cls==='warn'){ statutStr='→ À consolider'; bg=[254,243,199]; fg=[180,83,9]; }
+      else{ statutStr=pct+'% de l\'obj.'; bg=[254,226,226]; fg=[185,28,28]; }
     }
-
-    // Ligne alternée
     if(i%2===0){ doc.setFillColor(245,246,250); doc.rect(14,y-2,182,7,'F'); }
     doc.setFontSize(8.5); doc.setFont('helvetica','bold'); setDark();
-    doc.text(KPI_FULL[i], 14, y+2.5);
+    doc.text(KPI_FULL[i], kpiX[0], y+2.5);
     doc.setFont('helvetica','normal');
-    doc.text(realise, kpiX[1]+kpiCols[1]/2, y+2.5, {align:'center'});
-    doc.text(cible, kpiX[2]+kpiCols[2]/2, y+2.5, {align:'center'});
-    doc.text(pct!==null?pct+'%':'—', kpiX[3]+kpiCols[3]/2, y+2.5, {align:'center'});
-    // Statut coloré
-    if(bg){
-      doc.setFillColor(...bg);
-      doc.rect(kpiX[4],y-1.5,kpiCols[4],6,2,2,'F');
-      doc.setTextColor(...fg); doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
-    } else { setGray(); doc.setFont('helvetica','italic'); doc.setFontSize(7.5); }
-    doc.text(statut, kpiX[4]+kpiCols[4]/2, y+2.5, {align:'center'});
+    doc.text(realiseStr, kpiX[1]+kpiW[1]/2, y+2.5, {align:'center'});
+    doc.text(objStr, kpiX[2]+kpiW[2]/2, y+2.5, {align:'center'});
+    doc.text(pct!==null?pct+'%':'—', kpiX[3]+kpiW[3]/2, y+2.5, {align:'center'});
+    if(bg){ doc.setFillColor(...bg); doc.rect(kpiX[4],y-1.5,kpiW[4],6,'F'); doc.setTextColor(...fg); doc.setFont('helvetica','bold'); doc.setFontSize(7.5); }
+    else { setGray(); doc.setFont('helvetica','italic'); doc.setFontSize(7.5); }
+    doc.text(statutStr, kpiX[4]+kpiW[4]/2, y+2.5, {align:'center'});
     y+=7;
   });
-  y+=4;
+  // Note : pour les KPI cumulatifs, le "Réalisé" est le cumul et "Obj. mensuel" est l'objectif annuel/12
+  doc.setFontSize(6.5); doc.setFont('helvetica','italic'); setGray();
+  doc.text('* Réalisé = cumul des mois saisis pour CA/Chantiers/Fidélité · moyenne pour Transfo/Opt-in · Obj. mensuel = annuel ÷ 12', 14, y+1);
+  y+=7;
 
-  // ── 5. HISTORIQUE MENSUEL ────────────────────────────────────
-  if(y>250){ doc.addPage(); footer(); y=20; }
-  section('Historique mensuel');
-
+  // ── 5. HISTORIQUE MENSUEL ─────────────────────────────────
+  checkY(20); section('Historique mensuel');
   if(md.length===0){
     doc.setFontSize(9); doc.setFont('helvetica','italic'); setGray();
-    doc.text(NR, 14, y); y+=8;
+    doc.text(NR,14,y); y+=8;
   } else {
-    // En-tête
-    doc.setFillColor(13,33,55);
-    doc.rect(14,y-2,182,7,'F');
+    doc.setFillColor(13,33,55); doc.rect(14,y-2,182,7,'F');
     doc.setTextColor(255,255,255); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
-    const hCols=['Mois','CA','Transfo','Opt-in','Chant.','Fidél.','Contexte'];
-    const hX=[14,32,62,80,98,112,128];
-    hCols.forEach((h,i)=>{ doc.text(h, hX[i], y+2.5); }); y+=8;
-
+    const hC=['Mois','CA','Transfo','Opt-in','Chant.','Fidél.','Contexte'];
+    const hX=[14,34,64,82,100,114,130];
+    hC.forEach((h,i)=>{ doc.text(h, hX[i], y+2.5); }); y+=8;
     md.forEach((m,idx)=>{
-      if(y>270){ doc.addPage(); footer(); y=20; }
+      checkY(7);
       const r=res[m];
       if(idx%2===0){ doc.setFillColor(245,246,250); doc.rect(14,y-2,182,6,'F'); }
       doc.setFontSize(8); doc.setFont('helvetica','bold'); setDark();
       doc.text(MOIS_S[m], hX[0], y+1.5);
       doc.setFont('helvetica','normal');
       const vals=[
-        r.ca!=null?KPI_FMT.ca(r.ca).toString():NR,
-        r.taux!=null?KPI_FMT.taux(r.taux).toString():NR,
-        r.optin!=null?KPI_FMT.optin(r.optin).toString():NR,
-        r.chantiers!=null?KPI_FMT.chantiers(r.chantiers).toString():NR,
-        r.fidelite!=null?KPI_FMT.fidelite(r.fidelite).toString():NR,
+        r.ca!=null ? KPI_FMT.ca(r.ca).toString() : '—',
+        r.taux!=null ? KPI_FMT.taux(r.taux).toString() : '—',
+        r.optin!=null ? KPI_FMT.optin(r.optin).toString() : '—',
+        r.chantiers!=null ? KPI_FMT.chantiers(r.chantiers).toString() : '—',
+        r.fidelite!=null ? KPI_FMT.fidelite(r.fidelite).toString() : '—',
       ];
       [1,2,3,4,5].forEach((ci,vi)=>{ doc.text(vals[vi], hX[ci], y+1.5); });
-      // Contexte
-      if(comm[m]){ doc.setFont('helvetica','italic'); setLight(); doc.text(comm[m].slice(0,30), hX[6], y+1.5); }
+      if(comm[m]){
+        doc.setFont('helvetica','italic'); setLight();
+        doc.text(comm[m].slice(0,28), hX[6], y+1.5);
+      }
       y+=6;
     });
   }
   y+=4;
 
-  // ── 6. ENGAGEMENTS ──────────────────────────────────────────
-  if(y>255){ doc.addPage(); footer(); y=20; }
-  section('Engagements');
-
+  // ── 6. ENGAGEMENTS ────────────────────────────────────────
+  checkY(20); section('Engagements');
+  const engsOuverts = engs.filter(e=>e.statut==='ouvert');
+  const engsArchives = engs.filter(e=>e.statut!=='ouvert');
   if(engs.length===0){
     doc.setFontSize(9); doc.setFont('helvetica','italic'); setGray();
-    doc.text(NR, 14, y); y+=8;
+    doc.text(NR,14,y); y+=8;
   } else {
-    const emap={'ouvert':['●','OUVERT',[0,150,136],[224,242,241]],'tenu':['✓','TENU',[58,125,0],[234,245,204]],'non_tenu':['✗','NON TENU',[185,28,28],[254,226,226]]};
-    engs.forEach(e=>{
-      if(y>265){ doc.addPage(); footer(); y=20; }
-      const [bu,lab,fg,bg]=emap[e.statut]||['●','OUVERT',[0,150,136],[224,242,241]];
-      const who=e.auteur==='manager'?'Manager':'Conseiller';
-      // Fond statut
-      doc.setFillColor(...bg);
-      doc.rect(168,y-1,28,5,1.5,1.5,'F');
+    const emap={
+      'ouvert':  ['●','OUVERT',   [0,150,136],[224,242,241]],
+      'tenu':    ['✓','TENU',     [58,125,0], [234,245,204]],
+      'non_tenu':['✗','NON TENU', [185,28,28],[254,226,226]],
+    };
+    // Ouverts en premier
+    [...engsOuverts, ...engsArchives].forEach(e=>{
+      const [bu,lab,fg,bg]=emap[e.statut]||emap['ouvert'];
+      const who=e.auteur==='manager'?'👤 Manager':'🙋 Conseiller';
+      const lines=doc.splitTextToSize(e.texte,150);
+      checkY(6+lines.length*4.5);
+      doc.setFillColor(...bg); doc.rect(168,y-1,28,5,'F');
       doc.setFontSize(7.5); doc.setFont('helvetica','bold'); doc.setTextColor(...fg);
       doc.text(lab, 182, y+2.5, {align:'center'});
-      // Texte
       doc.setFontSize(8.5); doc.setFont('helvetica','bold'); setDark();
-      doc.text(bu+' ['+who+'] '+e.date, 14, y+2.5);
-      y+=6;
+      doc.text(bu+' '+who+' · '+e.date, 14, y+2.5); y+=6;
       doc.setFont('helvetica','normal');
-      const lines=doc.splitTextToSize(e.texte, 150);
       doc.text(lines, 18, y); y+=lines.length*4.5+2;
     });
   }
   y+=4;
 
-  // ── 7. OBJECTIF MOIS SUIVANT ─────────────────────────────────
-  if(y>250){ doc.addPage(); footer(); y=20; }
-  section(sugg?'Objectif conseillé — '+MOIS_L[sugg.moisSuivant]+' '+currentYear:'Objectif mois suivant');
-
+  // ── 7. OBJECTIF CONSEILLÉ ─────────────────────────────────
+  checkY(20);
+  section(sugg ? 'Objectif conseillé — '+MOIS_L[sugg.moisSuivant]+' '+currentYear : 'Objectif mois suivant');
   if(!sugg){
     doc.setFontSize(9); doc.setFont('helvetica','italic'); setGray();
-    doc.text(NR, 14, y); y+=8;
+    doc.text(NR,14,y); y+=8;
   } else {
-    // Note travaux R05 si mai ou juin
+    const mr=12-sugg.moisSuivant;
     if(sugg.moisSuivant===4||sugg.moisSuivant===5){
-      doc.setFillColor(254,243,199); doc.rect(14,y-2,182,8,2,2,'F');
-      doc.setFontSize(8); doc.setFont('helvetica','italic'); doc.setTextColor(180,83,9);
-      doc.text('⚠  Travaux R05 prévus — impact attendu. Les cibles tiennent compte de ce contexte.', 17, y+2.5);
+      checkY(10);
+      doc.setFillColor(254,243,199); doc.rect(14,y-2,182,8,'F');
+      doc.setFontSize(8); doc.setFont('helvetica','italic'); setWarn();
+      doc.text('⚠  Travaux R05 prévus — impact sur fréquentation. Cibles ajustées en conséquence.', 17, y+2.5);
       y+=10;
     }
-    // Grille objectifs 2×3
-    const oKeys=[['ca','taux'],['optin','chantiers'],['fidelite','']];
-    doc.setFillColor(242,246,238);
-    doc.rect(14,y-2,182,oKeys.length*9+4,3,3,'F');
-    oKeys.forEach(pair=>{
-      pair.forEach((k,pi)=>{
-        if(!k) return;
-        const ki=KPI_KEYS.indexOf(k);
-        const val=KPI_FMT[k](sugg.sugg[k].val);
-        const xL=14+pi*91, xR=xL+91;
-        doc.setFontSize(8); doc.setFont('helvetica','bold'); setLight();
-        doc.text(KPI_FULL[ki], xL+2, y+2);
-        doc.setFontSize(11); doc.setFont('helvetica','bold'); setTeal();
-        doc.text(val.toString(), xL+2, y+7.5);
-      });
+    checkY(32);
+    doc.setFillColor(242,246,238); doc.rect(14,y-2,182,KPI_KEYS.length*9+2,'F');
+    KPI_KEYS.forEach((k,i)=>{
+      const val = sugg.sugg[k].algo; // valeur lissée de l'algorithme
+      const valFmt = KPI_FMT[k](KPI_IS_PCT[k] ? Math.round(val*10)/10 : Math.round(val));
+      const objM = KPI_IS_PCT[k] ? obj[k] : obj[k]/12;
+      const diff = val - objM;
+      let deltaStr = '→ rythme de croisière';
+      if(diff > 0.5) deltaStr = '↑ rattrapage';
+      else if(diff < -0.5) deltaStr = '↓ en avance';
+      const col = diff>0.5?[180,83,9]:diff<-0.5?[58,125,0]:[90,100,120];
+      doc.setFontSize(8); doc.setFont('helvetica','bold'); setLight();
+      doc.text(KPI_FULL[i], 16, y+3);
+      doc.setFontSize(10); doc.setFont('helvetica','bold'); setTeal();
+      doc.text(valFmt.toString(), 80, y+3);
+      doc.setFontSize(7.5); doc.setFont('helvetica','italic'); doc.setTextColor(...col);
+      doc.text(deltaStr, 110, y+3);
       y+=9;
     });
-    y+=4;
+    doc.setFontSize(6.5); doc.setFont('helvetica','italic'); setGray();
+    doc.text(`Objectif lissé sur ${mr} mois restant${mr>1?'s':''} — plafonné à 120% de l'objectif mensuel initial.`, 14, y+1);
+    y+=6;
   }
 
-  // ── 8. PROCHAIN RDV ──────────────────────────────────────────
-  if(y>270){ doc.addPage(); footer(); y=20; }
-  section('Prochain RDV');
-  doc.setFontSize(10); doc.setFont('helvetica','bold'); setTeal();
-  doc.text(rdv.prochain ? '  '+rdv.prochain : '  '+NR, 14, y+1);
-  y+=8;
+  // ── 8. PROCHAIN RDV ───────────────────────────────────────
+  checkY(16); section('Prochain RDV');
+  doc.setFontSize(11); doc.setFont('helvetica','bold'); setTeal();
+  doc.text(rdv.prochain||NR, 16, y+2);
+  y+=10;
 
-  // Footer dernière page
+  // Footer
   footer();
 
   const filename=`RDV-Perf_${NOMS[v]}_${currentYear}_${now.replace(/ /g,'-')}.pdf`;
@@ -2486,6 +2743,12 @@ async function saveVendeurEntry(v){
 ════════════════════════════════════════════════════════════ */
 function renderAdvisor(v){
   const content=document.getElementById('advisor-content');
+  if(!content){ console.error('advisor-content not found'); return; }
+  if(!state.objectifs||!state.objectifs[v]){
+    content.innerHTML=`<div style="padding:20px;color:var(--t2);text-align:center">Chargement…</div>`;
+    return;
+  }
+  try {
   const av=getAv(v,currentYear),res=getRes(v,currentYear),obj=state.objectifs[v];
   const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
   const suggestion=getSuggestion(v,currentYear),score=globalScore(v,currentYear),cls=score>=4?"ok":score>=2?"warn":"ko";
@@ -2601,6 +2864,7 @@ function renderAdvisor(v){
     chipsDiv.appendChild(chip);
   });
   setTimeout(()=>drawChart('chart-adv-'+v,v,0),60);
+  } catch(e){ console.error('renderAdvisor error:', e); content.innerHTML=`<div style="padding:20px;color:red">Erreur : ${e.message}</div>`; }
 }
 
 /* ════════════════════════════════════════════════════════════
