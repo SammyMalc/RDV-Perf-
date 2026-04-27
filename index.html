@@ -110,7 +110,15 @@ select,input{font-size:16px !important}
 .bottom-bar-save:active{opacity:.85}
 
 /* ── CONTENT ─────────────────────────────────────────────── */
-.scroll-content{flex:1;overflow-y:auto;padding:20px 16px;max-width:640px;width:100%;margin:0 auto}
+.scroll-content{flex:1;overflow-y:auto;padding:16px 14px;max-width:640px;width:100%;margin:0 auto;box-sizing:border-box}
+.kpi-card{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:14px;margin-bottom:10px;box-shadow:var(--shadow);width:100%;box-sizing:border-box}
+.gauges-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px;width:100%}
+.gauge-container{position:relative;width:100%;padding-bottom:100%}
+.gauge-svg{position:absolute;top:0;left:0;width:100%;height:100%;transform:rotate(-90deg)}
+.gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.gauge-val{font-size:11px;font-weight:800;color:var(--text);line-height:1}
+.gauge-sub{font-size:7px;color:var(--t3);margin-top:1px;font-weight:600}
+.gauge-lbl{font-size:8px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;text-align:center;max-width:100%;margin-top:3px;line-height:1.2}
 .page-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;letter-spacing:-.3px}
 .page-sub{font-size:13px;color:var(--t2);margin-bottom:18px}
 
@@ -505,6 +513,16 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
   /* Sur desktop, screen.active reste en flex-direction:row pour home */
   #screen-home.active{flex-direction:row}
 
+  /* Dashboard desktop — plus grand */
+  #desktop-dashboard-view .desktop-grid-2{grid-template-columns:55% 43%;gap:20px}
+  #desktop-dashboard-view .radar-wrap{height:360px}
+  #desktop-dashboard-view .heatmap-table{font-size:13px}
+  #desktop-dashboard-view .heatmap-table th{font-size:11px;padding:10px 8px}
+  #desktop-dashboard-view .heatmap-table td{padding:10px 8px}
+  #desktop-dashboard-view .hm-pill{min-width:58px;height:28px;font-size:12px}
+  #desktop-dashboard-view .dash-stat-card{padding:24px}
+  #desktop-dashboard-view .dash-stat-val{font-size:36px}
+
   /* Action buttons desktop style */
   .desktop-action-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
   .desktop-action-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:8px;border:1.5px solid var(--brd);background:var(--surf);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:var(--shadow)}
@@ -594,6 +612,7 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
       <svg width="56" height="50" viewBox="0 0 32 28" fill="none"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
       <div class="splash-title">RDV Perf</div>
       <div class="splash-subtitle">Être acteur de sa performance</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-top:8px;font-weight:500">Crafted by Sammy Malc</div>
     </div>
 
   <!-- KPI animés -->
@@ -695,6 +714,9 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
       <svg width="28" height="24" viewBox="0 0 32 28" fill="none"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
       <div class="sidebar-logo-text"><span class="my">my</span><span class="dev">DEV'</span> <span style="color:rgba(255,255,255,.3);font-weight:400;font-size:12px">Perf</span></div>
     </div>
+    <div style="padding:6px 20px 12px;border-bottom:1px solid rgba(255,255,255,.07)">
+      <div style="font-size:9px;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;font-weight:400">Crafted by Sammy Malc</div>
+    </div>
     <div class="sidebar-year">
       <span class="sidebar-year-label">Année</span>
       <select id="year-selector-desktop" onchange="switchYear(this.value)"></select>
@@ -783,7 +805,7 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
       <svg width="26" height="23" viewBox="0 0 32 28" fill="none" style="flex-shrink:0"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
       <div class="topbar-center">
         <div class="topbar-title">Pilotage Performance</div>
-        <div class="topbar-sub">Responsable Rayon</div>
+        <div class="topbar-sub">Responsable Rayon · <span style="font-size:9px;opacity:.6;letter-spacing:.5px">Crafted by Sammy Malc</span></div>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
@@ -845,7 +867,7 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
       <svg width="26" height="23" viewBox="0 0 32 28" fill="none" style="flex-shrink:0"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
       <div class="topbar-center">
         <div class="topbar-title" id="advisor-title">Mon suivi</div>
-        <div class="topbar-sub">Leroy Merlin · myDEV'</div>
+        <div class="topbar-sub">Leroy Merlin · myDEV' · <span style="font-size:9px;opacity:.6">Crafted by Sammy Malc</span></div>
       </div>
     </div>
     <button class="topbar-action" onclick="doLogout()">🔒 Quitter</button>
@@ -1443,19 +1465,20 @@ function getSuggestion(vendeur,year){
 /* ════════════════════════════════════════════════════════════
    JAUGE CIRCULAIRE SVG
 ════════════════════════════════════════════════════════════ */
-function makeGauge(pct, label, shortVal, color, size=72) {
-  const r = (size-10)/2;
+function makeGauge(pct, label, shortVal, color) {
+  const r = 32; // radius in SVG units (viewBox 0 0 80 80)
   const circ = 2*Math.PI*r;
   const filled = Math.min(1, pct/100) * circ;
   const offset = circ - filled;
   return `<div class="gauge-wrap">
-    <div class="gauge-container" style="width:${size}px;height:${size}px">
-      <svg class="gauge-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-        <circle class="gauge-track" cx="${size/2}" cy="${size/2}" r="${r}"/>
-        <circle class="gauge-fill" cx="${size/2}" cy="${size/2}" r="${r}"
-          stroke="${color}"
+    <div class="gauge-container">
+      <svg class="gauge-svg" viewBox="0 0 80 80">
+        <circle class="gauge-track" cx="40" cy="40" r="${r}" stroke-width="8"/>
+        <circle class="gauge-fill" cx="40" cy="40" r="${r}"
+          stroke="${color}" stroke-width="8"
           stroke-dasharray="${circ}"
-          stroke-dashoffset="${offset}"/>
+          stroke-dashoffset="${offset}"
+          stroke-linecap="round"/>
       </svg>
       <div class="gauge-center">
         <div class="gauge-val" style="color:${color}">${shortVal}</div>
@@ -1901,190 +1924,171 @@ function renderHome(){
 }
 
 /* ════════════════════════════════════════════════════════════
-   VENDOR (manager)
+   VENDOR (manager) — Ordre RDV
 ════════════════════════════════════════════════════════════ */
 function renderVendeur(v){
   const contentId = isDesktop() ? 'vendor-content-desktop' : 'vendor-content';
   const content=document.getElementById(contentId)||document.getElementById('vendor-content');
   const av=getAv(v,currentYear),res=getRes(v,currentYear),obj=state.objectifs[v];
   const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
-  const suggestion=getSuggestion(v,currentYear),score=globalScore(v,currentYear),cls=score>=4?"ok":score>=2?"warn":"ko";
+  const suggestion=getSuggestion(v,currentYear),score=globalScore(v,currentYear);
+  const rdv=(state.rdv&&state.rdv[v])||{};
+  const yd=getYearData(currentYear);
 
-  // ── BIEN-ÊTRE EN PREMIER ──
+  // Détecter mode cumul (données saisies à partir d'un mois > 0)
+  const startMonth = md.length>0 ? md[0] : 0;
+  const isCumulMode = startMonth > 0 && md.length === 1;
+
+  // ── 1. SAISIE DES RÉSULTATS (en premier, ouvert par défaut) ──
+  let html=`<div class="section-label" style="display:flex;align-items:center;justify-content:space-between;margin-top:0">
+    <span>✏️ Saisie des résultats</span>
+    <button class="saisie-toggle" id="saisie-icon-${v}" onclick="toggleSaisie('${v}')" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
+      ▼ Ouvrir
+    </button>
+  </div>
+  <div class="saisie-card" id="saisie-wrap-${v}">
+    <div class="saisie-toggle-header" onclick="toggleSaisie('${v}')">
+      <span class="saisie-toggle-label" id="saisie-label-${v}">Saisir les résultats</span>
+      <span class="saisie-toggle-icon" id="saisie-icon-${v}">›</span>
+    </div>
+    <div class="saisie-form open" id="saisie-form-${v}">`;
+
+  // Note cumul si premier mois saisi > janvier
+  if(isCumulMode || md.length===0){
+    html+=`<div style="background:var(--teal-l);border:1px solid var(--teal-m);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--teal-d)">
+      💡 <b>Saisie en cumul :</b> Pour les KPI cumulatifs (CA, Chantiers, Fidélité), saisis le cumul depuis janvier. Pour Transfo et Opt-in, saisis la valeur du mois.
+    </div>`;
+  }
+
+  html+=`<div class="form-group"><label class="form-label">Mois</label><select id="s-mois-${v}" onchange="prefillSaisie('${v}')"></select></div>
+      <div class="form-group"><label class="form-label">Montant commandé (€)</label><input type="number" id="s-ca-${v}" placeholder="ex : 42 000" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label">Taux transformation (%)</label><input type="number" id="s-taux-${v}" placeholder="ex : 33" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label">Opt-in contactabilité (%)</label><input type="number" id="s-optin-${v}" placeholder="ex : 72" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label">Chantiers vendus</label><input type="number" id="s-chantiers-${v}" placeholder="ex : 4" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label">Adhésions fidélité</label><input type="number" id="s-fidelite-${v}" placeholder="ex : 11" inputmode="decimal"></div>
+      <div class="form-group">
+        <label class="form-label">Contexte du mois (optionnel)</label>
+        <textarea class="comment-area" id="s-comment-${v}" placeholder="Ex : absence 1 semaine, opération promo, travaux R05…"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="saveVendeurEntry('${v}')">Enregistrer</button>
+    </div>
+  </div>`;
+
+  // ── 2. OBJECTIFS ANNUELS ──
+  html+=`<div class="section-label">Objectifs annuels</div>
+  <div class="card" style="padding:12px 14px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">`;
+  KPI_KEYS.forEach((k,i)=>{
+    html+=`<div style="background:var(--surf2);border-radius:10px;padding:10px 12px;border:1px solid var(--brd)">
+      <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">${KPI_FULL[i]}</div>
+      <div style="font-size:18px;font-weight:800;color:var(--text)">${KPI_FMT[k](obj[k])}</div>
+    </div>`;
+  });
+  html+=`</div></div>`;
+
+  // ── 3. CLIMAT DU MOMENT ──
   const beMoisTop=new Date().toISOString().slice(0,7);
   const beValTop=(state.bienetre&&state.bienetre[v]&&state.bienetre[v][beMoisTop])||0;
   const beEmojisTop=['😞','😕','😐','🙂','😄'];
   const beLabelsTop=['Difficile','Compliqué','Neutre','Bien','Excellent'];
   const beBgTop=['#FEE2E2','#FEF3C7','#F2F6EE','#E0F2F1','#EAF5CC'];
   const beColorTop=['#B91C1C','#B45309','#4A6A35','#00796B','#3A7D00'];
-  let html=`<div class="section-label">Climat du moment</div>
-  <div class="card" style="padding:14px 16px;margin-bottom:14px">
-    <div style="font-size:13px;color:var(--t2);margin-bottom:4px">Comment ${NOMS[v]} se sent-il/elle en ce moment ?</div>
-    <div style="font-size:11px;color:var(--t3);margin-bottom:10px;font-style:italic">Indicateur de dialogue — non évaluatif, confidentiel, à l'initiative du conseiller.</div>
+  html+=`<div class="section-label">Climat du moment</div>
+  <div class="card" style="padding:12px 14px;margin-bottom:12px">
+    <div style="font-size:12px;color:var(--t2);margin-bottom:4px">Comment ${NOMS[v]} se sent-il/elle en ce moment ?</div>
+    <div style="font-size:10px;color:var(--t3);margin-bottom:8px;font-style:italic">Indicateur de dialogue — non évaluatif.</div>
     <div class="bienetre-gauge">`;
   beEmojisTop.forEach((em,i)=>{
     html+=`<button class="bienetre-btn${beValTop===i+1?' selected':''}" onclick="saveBienetre('${v}',${i+1})" title="${beLabelsTop[i]}">${em}</button>`;
   });
   html+=`</div>`;
   if(beValTop>0){
-    html+=`<div style="display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px 14px;border-radius:10px;background:${beBgTop[beValTop-1]}">
-      <span style="font-size:28px">${beEmojisTop[beValTop-1]}</span>
-      <div>
-        <div style="font-size:15px;font-weight:800;color:${beColorTop[beValTop-1]}">${beLabelsTop[beValTop-1]}</div>
-        <div style="font-size:11px;color:var(--t2);margin-top:1px">${NOMS[v]} · ${beMoisTop}</div>
-      </div>
+    html+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 12px;border-radius:10px;background:${beBgTop[beValTop-1]}">
+      <span style="font-size:22px">${beEmojisTop[beValTop-1]}</span>
+      <div><div style="font-size:13px;font-weight:800;color:${beColorTop[beValTop-1]}">${beLabelsTop[beValTop-1]}</div>
+      <div style="font-size:10px;color:var(--t2);margin-top:1px">${NOMS[v]} · ${beMoisTop}</div></div>
     </div>`;
-  } else {
-    html+=`<div class="bienetre-label">Pas encore renseigné par ${NOMS[v]} ce mois-ci</div>`;
-  }
+  }else{html+=`<div class="bienetre-label">Non renseigné ce mois-ci</div>`;}
   html+=`</div>`;
 
-  // ── MINI-SCORES ──
-  // ── JAUGES CIRCULAIRES ──
-  const gaugeColors=['#009688','#003087','#5C6BC0','#78BE20','#546E7A'];
-  html+=`<div class="gauges-row">`;
-  KPI_KEYS.forEach((k,i)=>{
-    const a=av[k];
-    const hasData=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
-    const pct=hasData?Math.min(100,a.pct):0;
-    const col=hasData?(pct>=statusCls(pct,md.length)==='ok'?STATUS_BAR.ok:gaugeColors[i]):gaugeColors[i];
-    const cls=hasData?statusCls(pct,md.length):'';
-    const gCol=cls==='ok'?STATUS_BAR.ok:cls==='warn'?STATUS_BAR.warn:cls==='ko'?STATUS_BAR.ko:gaugeColors[i];
-    const shortVal=hasData?KPI_FMT[k](a.realise).toString().replace('€\u202f','').replace(' ','')||'—':'—';
-    html+=makeGauge(hasData?pct:0, KPI_LABELS[i], hasData?shortVal:'—', hasData?gCol:'var(--brd)');
-  });
-  html+=`</div>`;
-
-  // Phrase de tendance
+  // ── 4. VICTOIRE + QUICK WIN (si données) ──
   if(md.length>0){
-    const kpiEnHausse=KPI_KEYS.filter(k=>{const t=getTrend(v,k,currentYear);return t!==null&&t>1;}).length;
-    const kpiEnBaisse=KPI_KEYS.filter(k=>{const t=getTrend(v,k,currentYear);return t!==null&&t<-1;}).length;
-    const kpiOk=KPI_KEYS.filter(k=>statusCls(av[k].pct,md.length)==='ok').length;
-    let phrase='', phraseColor='var(--teal-d)';
-    if(kpiEnHausse>=3) phrase=`📈 ${kpiEnHausse} KPI progressent ce mois-ci — belle dynamique !`;
-    else if(kpiEnBaisse>=3) phrase=`📉 ${kpiEnBaisse} KPI en baisse vs mois précédent — point à aborder.`;
-    else if(kpiOk===5) phrase=`✅ Tous les KPI sont en trajectoire — objectif annuel bien engagé.`;
-    else if(kpiOk>=3) phrase=`🟡 ${kpiOk}/5 KPI en trajectoire — quelques points à renforcer.`;
-    else phrase=`🔴 ${kpiOk}/5 KPI en trajectoire — bilan à approfondir en RDV.`;
-    html+=`<div class="trend-phrase">${phrase}</div>`;
-  }
-
-  // Bloc RDV
-  const rdv=(state.rdv&&state.rdv[v])||{};
-  html+=`<div class="section-label">Performance annuelle</div><div class="kpi-stack">`;
-  KPI_KEYS.forEach((k,i)=>{html+=makeKpiCard(v,k,i,av,md.length);});
-  html+=`</div>`;
-
-  // ── RADAR AUTO-FOCUS ──
-  if(md.length>0){
-    // Identifier victoire (meilleur score) et quick-win (moins bon score parmi les KPI renseignés)
     const kpiScores=KPI_KEYS.map((k,i)=>{
       const hasData=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
       return{k,i,pct:hasData?av[k].pct:null,hasData};
     }).filter(x=>x.hasData);
-    const winKpi=kpiScores.length>0?kpiScores.reduce((a,b)=>a.pct>b.pct?a:b):null;
-    const qwKpi=kpiScores.length>1?kpiScores.reduce((a,b)=>a.pct<b.pct?a:b):null;
+    if(kpiScores.length>0){
+      const winKpi=kpiScores.reduce((a,b)=>a.pct>b.pct?a:b);
+      const qwKpi=kpiScores.length>1?kpiScores.reduce((a,b)=>a.pct<b.pct?a:b):null;
+      html+=`<div class="section-label">Mise en lumière</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="radar-badge win">
+          <div class="radar-badge-icon">🏆</div>
+          <div class="radar-badge-kpi">Victoire · ${KPI_FULL[winKpi.i]}</div>
+          <div class="radar-badge-val">${KPI_FMT[winKpi.k](av[winKpi.k].realise)}</div>
+          <div style="font-size:10px;margin-top:2px;opacity:.7">${Math.round(winKpi.pct)}% de l'objectif</div>
+        </div>`;
+      if(qwKpi){
+        html+=`<div class="radar-badge qw">
+          <div class="radar-badge-icon">⚡</div>
+          <div class="radar-badge-kpi">Quick Win · ${KPI_FULL[qwKpi.i]}</div>
+          <div class="radar-badge-val">${KPI_FMT[qwKpi.k](av[qwKpi.k].realise)}</div>
+          <div style="font-size:10px;margin-top:2px;opacity:.7">${Math.round(qwKpi.pct)}% — levier à actionner</div>
+        </div>`;
+      }
+      html+=`</div>`;
 
-    // Radar data — on met en évidence victoire et quick-win
-    const radarData=KPI_KEYS.map((k,i)=>{
-      const hasData=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
-      return hasData?Math.min(120,Math.round(av[k].pct)):null;
-    });
-
-    html+=`<div class="card" style="padding:14px 16px;margin-bottom:12px">
-      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">Radar KPI — Auto-focus</div>
-      <div style="position:relative;height:220px"><canvas id="radar-${v}"></canvas></div>
-      <div class="radar-focus-row">`;
-    if(winKpi){
-      html+=`<div class="radar-badge win">
-        <div class="radar-badge-icon">🏆</div>
-        <div class="radar-badge-kpi">Victoire · ${KPI_FULL[winKpi.i]}</div>
-        <div class="radar-badge-val">${KPI_FMT[winKpi.k](av[winKpi.k].realise)}</div>
-        <div style="font-size:10px;margin-top:2px;opacity:.7">${Math.round(winKpi.pct)}% de l'objectif</div>
+      // Radar auto-focus
+      html+=`<div class="card" style="padding:12px 14px;margin-bottom:12px">
+        <div style="position:relative;height:200px"><canvas id="radar-${v}"></canvas></div>
       </div>`;
     }
-    if(qwKpi&&qwKpi.k!==winKpi?.k){
-      html+=`<div class="radar-badge qw">
-        <div class="radar-badge-icon">⚡</div>
-        <div class="radar-badge-kpi">Quick Win · ${KPI_FULL[qwKpi.i]}</div>
-        <div class="radar-badge-val">${KPI_FMT[qwKpi.k](av[qwKpi.k].realise)}</div>
-        <div style="font-size:10px;margin-top:2px;opacity:.7">${Math.round(qwKpi.pct)}% — levier à actionner</div>
-      </div>`;
-    }
-    html+=`</div></div>`;
   }
 
-  html+=`<div class="section-label">Saisie du mois</div>
-  <div class="saisie-card" id="saisie-wrap-${v}">
-    <div class="saisie-toggle" onclick="toggleSaisie('${v}')">
-      <span class="saisie-toggle-label" id="saisie-label-${v}">Saisir les résultats</span>
-      <span class="saisie-toggle-icon" id="saisie-icon-${v}">+</span>
-    </div>
-    <div class="saisie-form" id="saisie-form-${v}">
-      <div class="divider"></div>
-      <div class="form-group"><label class="form-label">Mois</label><select id="s-mois-${v}" onchange="prefillSaisie('${v}')"></select></div>
-      <div class="form-group"><label class="form-label">Montant commandé (€)</label><input type="number" id="s-ca-${v}" placeholder="ex : 42 000" inputmode="decimal"></div>
-      <div class="form-group"><label class="form-label">Taux de transformation (%)</label><input type="number" id="s-taux-${v}" placeholder="ex : 35.5" inputmode="decimal" step="0.1"></div>
-      <div class="form-group"><label class="form-label">Opt-in contactabilité (%)</label><input type="number" id="s-optin-${v}" placeholder="ex : 72.0" inputmode="decimal" step="0.1" min="0" max="100"></div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Chantiers vendus</label><input type="number" id="s-chantiers-${v}" placeholder="ex : 5" inputmode="numeric"></div>
-        <div class="form-group"><label class="form-label">Adhésions fidélité</label><input type="number" id="s-fidelite-${v}" placeholder="ex : 12" inputmode="numeric"></div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Contexte du mois (optionnel)</label>
-        <textarea class="comment-area" id="s-comment-${v}" placeholder="Ex : absence 1 semaine, opération promo, travaux R05..."></textarea>
-      </div>
-      <button class="btn btn-primary" onclick="saveVendeurEntry('${v}')">Enregistrer</button>
-    </div>
-  </div>`;
+  // ── 5. PERFORMANCE ANNUELLE (jauges) ──
+  html+=`<div class="section-label">Performance annuelle</div>
+  <div class="gauges-row">`;
+  const gaugeColors=['#009688','#003087','#5C6BC0','#78BE20','#546E7A'];
+  KPI_KEYS.forEach((k,i)=>{
+    const a=av[k];
+    const hasData=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
+    const pct=hasData?Math.min(100,a.pct):0;
+    const clsG=hasData?statusCls(a.pct,md.length):'';
+    const gCol=clsG==='ok'?STATUS_BAR.ok:clsG==='warn'?STATUS_BAR.warn:clsG==='ko'?STATUS_BAR.ko:gaugeColors[i];
+    const shortVal=hasData?KPI_FMT[k](a.realise).toString().replace('€\u202f','').replace(' ','')||'—':'—';
+    html+=makeGauge(hasData?pct:0,KPI_LABELS[i],hasData?shortVal:'—',hasData?gCol:'var(--brd)');
+  });
+  html+=`</div>`;
 
+  // KPI cards
+  html+=`<div class="kpi-stack">`;
+  KPI_KEYS.forEach((k,i)=>{html+=makeKpiCard(v,k,i,av,md.length);});
+  html+=`</div>`;
+
+  // ── 6. ÉVOLUTION MENSUELLE ──
   html+=`<div class="section-label">Évolution mensuelle</div>
   <div class="card">
     <div class="chips" id="chips-${v}"></div>
-    <div class="legend">
-      <div class="legend-item"><div class="dot" style="background:${COLORS[v]}"></div>Réalisé</div>
-      <div class="legend-item"><div class="dot" style="background:#80CBC4;border:1px solid #4DB6AC"></div>Objectif</div>
-    </div>
-    <div class="chart-wrap h220"><canvas id="chart-${v}" role="img" aria-label="Évolution ${NOMS[v]}">Évolution mensuelle</canvas></div>
+    <div class="chart-wrap h220"><canvas id="chart-${v}" role="img" aria-label="Évolution ${NOMS[v]}"></canvas></div>
   </div>`;
 
-  if(md.length>0){
-  const commentaires=(state.commentaires&&state.commentaires[v])||{};
-    html+=`<div class="section-label">Historique</div>
-    <div class="card"><div style="overflow-x:auto"><table class="htable">
-      <thead><tr><th>Mois</th><th class="num">CA</th><th class="num">Transfo</th><th class="num">Opt-in</th><th class="num">Chant.</th><th class="num">Fidél.</th></tr></thead><tbody>`;
-    md.forEach(m=>{
-      const r=res[m];
-      const comm=commentaires[m]||'';
-      html+=`<tr><td style="font-weight:700">${MOIS_S[m]}
-        ${comm?`<div class="comment-display">💬 ${comm}</div>`:''}
-      </td>
-        <td class="num">${KPI_FMT.ca(r.ca)}</td><td class="num">${KPI_FMT.taux(r.taux)}</td>
-        <td class="num">${KPI_FMT.optin(r.optin)}</td><td class="num">${KPI_FMT.chantiers(r.chantiers)}</td>
-        <td class="num">${KPI_FMT.fidelite(r.fidelite)}</td></tr>`;
-    });
-    html+=`</tbody></table></div></div>`;
-  }
-
+  // ── 7. OBJECTIF DU MOIS SUIVANT ──
   if(suggestion){
     const ms=suggestion.moisSuivant,mr=12-ms;
-    let hl,sl;
-    const scoreLabel=globalScoreLabel(v,currentYear);
-    if(score>=4){hl=`C'est en bonne route — garde l'élan en ${MOIS_S[ms]} !`;sl=`Objectifs pour maintenir la trajectoire annuelle.`;}
-    else if(score>=2){hl=`${mr} mois pour consolider. Tu peux le faire !`;sl=`Ces cibles permettent de raccrocher la trajectoire annuelle.`;}
-    else{hl=`${mr} mois pour renverser la vapeur. Courage !`;sl=`Des objectifs lissés et atteignables pour ${MOIS_S[ms]}.`;}
+    let hl,sl2;
+    if(score>=4){hl=`C'est en bonne route — garde l'élan en ${MOIS_S[ms]} !`;sl2='Objectifs pour maintenir la trajectoire.';}
+    else if(score>=2){hl=`${mr} mois pour consolider. Tu peux le faire !`;sl2='Ces cibles permettent de raccrocher la trajectoire.';}
+    else{hl=`${mr} mois pour renverser la vapeur. Courage !`;sl2=`Des objectifs lissés et atteignables pour ${MOIS_S[ms]}.`;}
     html+=`<div class="section-label">Objectif conseillé · ${MOIS_S[ms]} <span style="font-size:11px;font-weight:400;color:var(--t3)">${mr} mois restant${mr>1?'s':''}</span></div>
     <div class="goal-card">
       <svg class="goal-card-bg" width="160" height="130" viewBox="0 0 160 130" fill="none">
         <polygon points="80,0 160,60 160,130 0,130 0,60" fill="white"/>
         <rect x="55" y="65" width="50" height="65" fill="white" opacity=".6"/>
         <rect x="68" y="85" width="24" height="45" fill="white" opacity=".4"/>
-        <rect x="60" y="70" width="16" height="16" fill="white" opacity=".4"/>
-        <rect x="84" y="70" width="16" height="16" fill="white" opacity=".4"/>
       </svg>
       <div class="goal-month">Objectif conseillé · ${MOIS_S[ms]} · ${mr} mois restant${mr>1?'s':''}</div>
       <div class="goal-headline">${hl}</div>
-      <div class="goal-sub">${sl}</div>
+      <div class="goal-sub">${sl2}</div>
       <div class="goal-grid">`;
     KPI_KEYS.forEach((k,i)=>{
       const val=suggestion.sugg[k].algo;
@@ -2103,7 +2107,27 @@ function renderVendeur(v){
     html+=`</div></div>`;
   }
 
-  // ── ENGAGEMENTS ──
+  // ── 8. HISTORIQUE ──
+  if(md.length>0){
+    html+=`<div class="section-label">Historique mensuel</div>
+    <div class="card"><div style="overflow-x:auto"><table class="htable">
+      <thead><tr><th>Mois</th><th class="num">CA</th><th class="num">Transfo</th><th class="num">Opt-in</th><th class="num">Chant.</th><th class="num">Fidél.</th></tr></thead><tbody>`;
+    const commV=(yd.commentaires&&yd.commentaires[v])||{};
+    md.forEach(m=>{
+      const r=res[m];
+      html+=`<tr><td style="font-weight:700">${MOIS_S[m]}${commV[m]?`<div class="comment-display">💬 ${commV[m]}</div>`:''}
+      </td>
+        <td class="num">${r.ca!=null?KPI_FMT.ca(r.ca):'—'}</td>
+        <td class="num">${r.taux!=null?KPI_FMT.taux(r.taux):'—'}</td>
+        <td class="num">${r.optin!=null?KPI_FMT.optin(r.optin):'—'}</td>
+        <td class="num">${r.chantiers!=null?KPI_FMT.chantiers(r.chantiers):'—'}</td>
+        <td class="num">${r.fidelite!=null?KPI_FMT.fidelite(r.fidelite):'—'}</td>
+      </tr>`;
+    });
+    html+=`</tbody></table></div></div>`;
+  }
+
+  // ── 9. ENGAGEMENTS ──
   const engs=(state.engagements&&state.engagements[v])||[];
   const engsOuverts=engs.filter(e=>e.statut==='ouvert');
   const engsClos=engs.filter(e=>e.statut!=='ouvert');
@@ -2131,7 +2155,7 @@ function renderVendeur(v){
     html+=`</div>`;
   }
   if(engsClos.length>0){
-    html+=`<details style="margin-bottom:10px"><summary style="font-size:12px;font-weight:600;color:var(--t3);cursor:pointer;margin-bottom:6px">${engsClos.length} engagement${engsClos.length>1?'s':''} clôturé${engsClos.length>1?'s':''}</summary><div class="eng-list" style="margin-top:8px">`;
+    html+=`<details style="margin-bottom:8px"><summary style="font-size:12px;font-weight:600;color:var(--t3);cursor:pointer">${engsClos.length} archivé${engsClos.length>1?'s':''}</summary><div class="eng-list" style="margin-top:8px">`;
     engsClos.forEach(e=>{
       const icon=e.statut==='tenu'?'✓':'✗';
       const col=e.statut==='tenu'?'var(--ok)':'var(--ko)';
@@ -2148,41 +2172,28 @@ function renderVendeur(v){
     html+=`</div></details>`;
   }
   html+=`<div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px">Ajouter un engagement :</div>
-    <div class="eng-who" id="eng-who-${v}">
-      <button class="eng-who-btn active" id="eng-who-mgr-${v}" onclick="setEngWho('${v}','manager')">👤 Manager</button>
-      <button class="eng-who-btn" id="eng-who-adv-${v}" onclick="setEngWho('${v}','conseiller')">🙋 Conseiller</button>
-    </div>
-    <div class="eng-add">
-      <input type="text" id="eng-input-${v}" placeholder="Ex : Relancer les devis pro chaque semaine…" maxlength="120">
-      <button class="eng-add-btn" onclick="addEngagement('${v}')">+ Ajouter</button>
-    </div>
-  </div>`;
+  <div class="eng-who" id="eng-who-${v}">
+    <button class="eng-who-btn active" id="eng-who-mgr-${v}" onclick="setEngWho('${v}','manager')">👤 Manager</button>
+    <button class="eng-who-btn" id="eng-who-adv-${v}" onclick="setEngWho('${v}','conseiller')">🙋 Conseiller</button>
+  </div>
+  <div class="eng-add">
+    <input type="text" id="eng-input-${v}" placeholder="Ex : Relancer les devis pro chaque semaine…" maxlength="120">
+    <button class="eng-add-btn" onclick="addEngagement('${v}')">+ Ajouter</button>
+  </div></div>`;
 
-  // ── PROCHAIN RDV ──
+  // ── 10. PROCHAIN RDV + PDF ──
   html+=`<div class="section-label">Planifier le prochain RDV</div>
   <div class="rdv-card">
     <div class="rdv-label">Date du prochain RDV</div>
     <input class="rdv-input" type="date" id="rdv-next-${v}" value="${rdv.prochain||''}" onchange="saveRdv('${v}')" style="margin-top:8px">
-  </div>`;
+  </div>
+  <button class="pdf-btn" onclick="exportPDF('${v}')">📄 Exporter le compte-rendu PDF</button>`;
 
-  // ── PDF EXPORT ──
-  html+=`<button class="pdf-btn" onclick="exportPDF('${v}')">📄 Exporter le compte-rendu PDF</button>`;
-
-  // ── OBJECTIFS ANNUELS ──
-  html+=`<div class="section-label">Objectifs annuels</div><div class="card" style="padding:14px 16px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">`;
-  KPI_KEYS.forEach((k,i)=>{
-    html+=`<div style="background:var(--surf2);border-radius:10px;padding:10px 12px;border:1px solid var(--brd)">
-      <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">${KPI_FULL[i]}</div>
-      <div style="font-size:18px;font-weight:800;color:var(--text)">${KPI_FMT[k](obj[k])}</div>
-    </div>`;
-  });
-  html+=`</div></div>`;
-
-  html+=`<div style="height:24px"></div>`;
+  html+=`<div style="height:32px"></div>`;
   content.innerHTML=html;
 
+  // ── Post-render JS ──
   const selMois=document.getElementById(`s-mois-${v}`);
-  const yd=getYearData(currentYear);
   MOIS_L.forEach((m,i)=>{
     const o=document.createElement('option');
     o.value=i;
@@ -2196,16 +2207,18 @@ function renderVendeur(v){
 
   let selKpi=0;
   const chipsDiv=document.getElementById('chips-'+v);
-  KPI_LABELS.forEach((lbl,i)=>{
-    const chip=document.createElement('div');
-    chip.className='chip'+(i===0?' active':'');chip.textContent=lbl;
-    chip.onclick=()=>{selKpi=i;chipsDiv.querySelectorAll('.chip').forEach((c,j)=>c.classList.toggle('active',j===i));drawChart('chart-'+v,v,selKpi);};
-    chipsDiv.appendChild(chip);
-  });
-  const _v=v, _md=md, _res=res, _av=av;
+  if(chipsDiv){
+    KPI_LABELS.forEach((lbl,i)=>{
+      const chip=document.createElement('div');
+      chip.className='chip'+(i===0?' active':'');chip.textContent=lbl;
+      chip.onclick=()=>{selKpi=i;chipsDiv.querySelectorAll('.chip').forEach((c,j)=>c.classList.toggle('active',j===i));drawChart('chart-'+v,v,selKpi);};
+      chipsDiv.appendChild(chip);
+    });
+  }
+
+  const _v=v,_md=md,_res=res,_av=av;
   setTimeout(()=>{
     drawChart('chart-'+_v,_v,0);
-    // Radar auto-focus
     const radarCanvas=document.getElementById('radar-'+_v);
     if(radarCanvas&&_md.length>0){
       if(chartInstances['radar-'+_v])chartInstances['radar-'+_v].destroy();
@@ -2213,25 +2226,17 @@ function renderVendeur(v){
         const hasData=_md.some(m=>_res[m]&&_res[m][k]!=null&&!isNaN(_res[m][k]));
         return{k,i,pct:hasData?Math.min(120,Math.round(_av[k].pct)):0,hasData};
       });
-      const filledScores=kpiScores.filter(x=>x.hasData);
-      const winItem=filledScores.length>0?filledScores.reduce((a,b)=>a.pct>b.pct?a:b):null;
-      const qwItem=filledScores.length>1?filledScores.reduce((a,b)=>a.pct<b.pct?a:b):null;
-      const pointColors=kpiScores.map(x=>
-        winItem&&x.k===winItem.k?'#78BE20':qwItem&&x.k===qwItem.k?'#FFB300':COLORS[_v]
-      );
-      const pointSizes=kpiScores.map(x=>(winItem&&x.k===winItem.k)||(qwItem&&x.k===qwItem.k)?8:4);
+      const filled=kpiScores.filter(x=>x.hasData);
+      const winItem=filled.length>0?filled.reduce((a,b)=>a.pct>b.pct?a:b):null;
+      const qwItem=filled.length>1?filled.reduce((a,b)=>a.pct<b.pct?a:b):null;
+      const ptColors=kpiScores.map(x=>winItem&&x.k===winItem.k?'#78BE20':qwItem&&x.k===qwItem.k?'#FFB300':COLORS[_v]);
+      const ptSizes=kpiScores.map(x=>(winItem&&x.k===winItem.k)||(qwItem&&x.k===qwItem.k)?8:4);
       chartInstances['radar-'+_v]=new Chart(radarCanvas,{
         type:'radar',
         data:{labels:KPI_LABELS,datasets:[{
-          label:NOMS[_v],
-          data:kpiScores.map(x=>x.pct),
-          backgroundColor:COLORS[_v]+'25',
-          borderColor:COLORS[_v],
-          borderWidth:2,
-          pointBackgroundColor:pointColors,
-          pointBorderColor:'#fff',
-          pointBorderWidth:2,
-          pointRadius:pointSizes,
+          label:NOMS[_v],data:kpiScores.map(x=>x.pct),
+          backgroundColor:COLORS[_v]+'25',borderColor:COLORS[_v],borderWidth:2,
+          pointBackgroundColor:ptColors,pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:ptSizes,
         }]},
         options:{responsive:true,maintainAspectRatio:false,
           plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.r}% de l'objectif`}}},
@@ -2394,45 +2399,42 @@ async function exportPDF(v) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
 
-  // ── Données ──────────────────────────────────────────────
-  const obj  = state.objectifs[v];
-  const av   = getAv(v, currentYear);
-  const res  = getRes(v, currentYear);
-  const yd   = getYearData(currentYear);
-  const md   = Object.keys(res).map(Number).sort((a,b)=>a-b);
-  const rdv  = (state.rdv&&state.rdv[v])||{};
-  const engs = (state.engagements&&state.engagements[v])||[];
-  const beData = (state.bienetre&&state.bienetre[v])||{};
-  const comm = yd.commentaires[v]||{};
-  const sugg = getSuggestion(v, currentYear);
-  const now  = new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
-
-  // Mois réellement saisis — premier et dernier
+  // ── Données ──
+  const obj   = state.objectifs[v];
+  const av    = getAv(v, currentYear);
+  const res   = getRes(v, currentYear);
+  const yd    = getYearData(currentYear);
+  const md    = Object.keys(res).map(Number).sort((a,b)=>a-b);
+  const rdv   = (state.rdv&&state.rdv[v])||{};
+  const engs  = (state.engagements&&state.engagements[v])||[];
+  const beData= (state.bienetre&&state.bienetre[v])||{};
+  const comm  = yd.commentaires[v]||{};
+  const sugg  = getSuggestion(v, currentYear);
+  const now   = new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  const NR    = 'Non renseigné';
   const premierMois = md.length>0 ? md[0] : 0;
-  const dernierMois = md.length>0 ? md[md.length-1] : new Date().getMonth();
-  const nbMoisSaisis = md.length;
-  const NR = 'Non renseigné';
+  const dernierMois = md.length>0 ? md[md.length-1] : 0;
 
-  // ── Helpers ───────────────────────────────────────────────
-  const setTeal  = () => doc.setTextColor(0,150,136);
-  const setDark  = () => doc.setTextColor(30,30,30);
-  const setGray  = () => doc.setTextColor(150,150,150);
-  const setLight = () => doc.setTextColor(90,100,120);
-  const setWarn  = () => doc.setTextColor(180,83,9);
+  // ── Helpers ──
+  let y = 38;
+  const sT = () => doc.setTextColor(0,150,136);
+  const sD = () => doc.setTextColor(30,30,30);
+  const sG = () => doc.setTextColor(150,150,150);
+  const sL = () => doc.setTextColor(90,100,120);
+  const sW = () => doc.setTextColor(180,83,9);
 
-  const newPage = () => { footer(); doc.addPage(); y=20; };
-  const checkY  = (needed) => { if(y+needed>272) newPage(); };
+  const chk = (n) => { if(y+n > 272) { footer(); doc.addPage(); y = 20; } };
 
   const footer = () => {
     const pg = doc.internal.getCurrentPageInfo().pageNumber;
-    doc.setFontSize(7); doc.setFont('helvetica','italic'); setGray();
+    doc.setFontSize(7); doc.setFont('helvetica','italic'); sG();
     doc.text('RDV Perf · Leroy Merlin · Document de suivi — challenger et accompagner', 105, 290, {align:'center'});
     doc.setFont('helvetica','normal');
     doc.text('Page '+pg, 196, 290, {align:'right'});
   };
 
   const section = (title) => {
-    checkY(14);
+    chk(14);
     doc.setFontSize(8.5); doc.setFont('helvetica','bold');
     doc.setTextColor(138,171,106);
     doc.text(title.toUpperCase(), 14, y); y+=3;
@@ -2440,11 +2442,14 @@ async function exportPDF(v) {
     doc.line(14,y,196,y); y+=5;
   };
 
-  // ── 1. EN-TÊTE ────────────────────────────────────────────
-  doc.setFillColor(13,33,55);
-  doc.rect(0,0,210,30,'F');
-  doc.setFillColor(120,190,32);
-  doc.setDrawColor(120,190,32);
+  const nr = (txt) => {
+    doc.setFontSize(9); doc.setFont('helvetica','italic'); sG();
+    doc.text(txt||NR, 14, y); y+=7;
+  };
+
+  // ── 1. EN-TÊTE ──
+  doc.setFillColor(13,33,55); doc.rect(0,0,210,30,'F');
+  doc.setFillColor(120,190,32); doc.setDrawColor(120,190,32);
   doc.lines([[8,0],[-4,12],[-4,-12]],14,10,null,'F');
   doc.setTextColor(255,255,255);
   doc.setFontSize(13); doc.setFont('helvetica','bold');
@@ -2459,170 +2464,172 @@ async function exportPDF(v) {
   doc.setTextColor(128,203,196);
   doc.text('Généré le '+now, 196, 20, {align:'right'});
 
-  let y = 38;
-
-  // ── 2. INFORMATIONS ───────────────────────────────────────
+  // ── 2. INFORMATIONS ──
   section('Informations');
-  const infoRows = [
-    ['Conseiller', NOMS[v], 'Responsable Rayon', 'Sammy M. — Responsable Rayon'],
-    ['Prochain RDV', rdv.prochain||NR, '', ''],
-  ];
-  infoRows.forEach(row => {
-    doc.setFontSize(8.5); doc.setFont('helvetica','bold'); setLight();
-    doc.text(row[0], 14, y);
-    if(row[2]) doc.text(row[2], 110, y);
-    doc.setFont('helvetica','normal'); setDark();
-    doc.text(row[1], 50, y);
-    if(row[3]) doc.text(row[3], 150, y);
-    y+=6;
-  });
-  y+=4;
+  doc.setFontSize(8.5); sL();
+  doc.setFont('helvetica','bold'); doc.text('Conseiller', 14, y);
+  doc.setFont('helvetica','normal'); sD(); doc.text(NOMS[v], 50, y);
+  doc.setFont('helvetica','bold'); sL(); doc.text('Responsable Rayon', 110, y);
+  doc.setFont('helvetica','normal'); sD(); doc.text('Sammy M. — Responsable Rayon', 152, y);
+  y+=6;
+  doc.setFont('helvetica','bold'); sL(); doc.text('Prochain RDV', 14, y);
+  doc.setFont('helvetica','normal'); sD(); doc.text(rdv.prochain||NR, 50, y);
+  y+=8;
 
-  // ── 3. CLIMAT DU MOMENT ───────────────────────────────────
+  // ── 3. CLIMAT DU MOMENT ──
   section('Climat du moment');
-  doc.setFontSize(7.5); doc.setFont('helvetica','italic'); setGray();
-  doc.text('Ressenti partagé par le conseiller — à titre indicatif uniquement.', 14, y); y+=7;
+  doc.setFontSize(7.5); doc.setFont('helvetica','italic'); sG();
+  doc.text('Ressenti partagé — à titre indicatif, non évaluatif.', 14, y); y+=7;
   const beMoisList = Object.keys(beData).sort().slice(-6);
   const beTexts = ['Difficile','Compliqué','Neutre','Bien','Excellent'];
-  const beColorsPDF = [[239,68,68],[249,115,22],[155,165,184],[0,150,136],[120,190,32]];
-  if(beMoisList.length>0){
-    checkY(36);
+  const beCols = [[239,68,68],[249,115,22],[155,165,184],[0,150,136],[120,190,32]];
+  if(beMoisList.length > 0) {
+    chk(36);
     const cX=20,cW=170,cH=26,pL=10,pR=10,dW=cW-pL-pR,n=beMoisList.length;
     doc.setDrawColor(232,234,240); doc.setLineWidth(0.2);
     for(let lv=1;lv<=5;lv++) doc.line(cX+pL,y+cH-(lv-1)/4*cH,cX+cW-pR,y+cH-(lv-1)/4*cH);
     const pts=beMoisList.map((m,i)=>({
       px:cX+pL+(n>1?i/(n-1)*dW:dW/2),
       py:y+cH-(beData[m]-1)/4*cH,
-      val:beData[m],
-      mois:MOIS_S[parseInt(m.slice(5))-1]||m
+      val:beData[m], mois:MOIS_S[parseInt(m.slice(5))-1]||m
     }));
     doc.setDrawColor(0,150,136); doc.setLineWidth(1.5);
     for(let i=1;i<pts.length;i++) doc.line(pts[i-1].px,pts[i-1].py,pts[i].px,pts[i].py);
     pts.forEach(({px,py,val,mois})=>{
-      const [r,g,b]=beColorsPDF[val-1];
+      const [r,g,b]=beCols[val-1];
       doc.setFillColor(r,g,b); doc.setDrawColor(255,255,255); doc.setLineWidth(1);
       doc.circle(px,py,2.5,'FD');
       doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(r,g,b);
       doc.text(beTexts[val-1],px,py-5,{align:'center'});
-      doc.setFontSize(7); doc.setFont('helvetica','normal'); setGray();
+      doc.setFontSize(7); doc.setFont('helvetica','normal'); sG();
       doc.text(mois,px,py+5.5,{align:'center'});
     });
     y+=cH+10;
-  } else {
-    doc.setFontSize(9); doc.setFont('helvetica','italic'); setGray();
-    doc.text(NR,14,y); y+=8;
-  }
+  } else { nr(NR); }
 
-  // ── 4. PERFORMANCE KPI ────────────────────────────────────
-  // Titre précis : mois réellement saisis
-  const titrePerf = nbMoisSaisis>0
-    ? `Performance — ${nbMoisSaisis} mois saisi${nbMoisSaisis>1?'s':''} (${MOIS_L[premierMois]}${premierMois!==dernierMois?' → '+MOIS_L[dernierMois]:''}) · ${currentYear}`
+  // ── 4. VICTOIRE & QUICK WIN ──
+  section('Mise en lumière');
+  const kpiScores = KPI_KEYS.map((k,i)=>{
+    const hasData = md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
+    return {k,i,pct:hasData?av[k].pct:null,hasData};
+  }).filter(x=>x.hasData);
+  if(kpiScores.length > 0) {
+    chk(20);
+    const winKpi = kpiScores.reduce((a,b)=>a.pct>b.pct?a:b);
+    const qwKpi  = kpiScores.length>1 ? kpiScores.reduce((a,b)=>a.pct<b.pct?a:b) : null;
+    // Victoire
+    doc.setFillColor(234,245,204); doc.rect(14,y-2,86,22,'F');
+    doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(58,125,0);
+    doc.text('🏆 Victoire du mois', 17, y+3);
+    doc.setFontSize(11); doc.text(KPI_FULL[winKpi.i], 17, y+10);
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text(KPI_FMT[winKpi.k](av[winKpi.k].realise)+' · '+Math.round(winKpi.pct)+"% de l'objectif", 17, y+17);
+    // Quick Win
+    if(qwKpi) {
+      doc.setFillColor(255,248,225); doc.rect(110,y-2,86,22,'F');
+      doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(180,83,9);
+      doc.text('⚡ Quick Win', 113, y+3);
+      doc.setFontSize(11); doc.text(KPI_FULL[qwKpi.i], 113, y+10);
+      doc.setFontSize(9); doc.setFont('helvetica','normal');
+      doc.text(KPI_FMT[qwKpi.k](av[qwKpi.k].realise)+' · '+Math.round(qwKpi.pct)+"% — levier", 113, y+17);
+    }
+    y+=28;
+  } else { nr(NR); }
+
+  // ── 5. PERFORMANCE KPI ──
+  const titrePerf = md.length>0
+    ? `Performance — ${md.length} mois (${MOIS_L[premierMois]}${premierMois!==dernierMois?' → '+MOIS_L[dernierMois]:''}) · ${currentYear}`
     : `Performance — Aucune saisie · ${currentYear}`;
-  checkY(12);
   section(titrePerf);
-
-  const kpiX=[14,72,104,136,158];
-  const kpiW=[58,32,32,22,38];
+  // En-tête tableau
+  const kX=[14,72,104,132,154]; const kW=[58,32,28,22,42];
   doc.setFillColor(13,33,55); doc.rect(14,y-2,182,8,'F');
   doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
-  ['KPI','Réalisé','Obj. mensuel','% mois','Statut'].forEach((h,i)=>{
-    doc.text(h, kpiX[i]+(i>0?kpiW[i]/2:0), y+3, {align:i>0?'center':'left'});
-  });
-  y+=9;
-
+  ['KPI','Réalisé','Obj/mois','% mois','Statut'].forEach((h,i)=>{
+    doc.text(h, kX[i]+(i>0?kW[i]/2:0), y+3, {align:i>0?'center':'left'});
+  }); y+=9;
   KPI_KEYS.forEach((k,i)=>{
-    checkY(8);
-    const a=av[k];
-    const hasData=md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]));
-    // Valeur réalisée : cumul pour cumulatifs, moyenne pour %
-    const realiseStr = hasData ? KPI_FMT[k](KPI_IS_PCT[k]?Math.round(a.realise*10)/10:a.realise).toString() : NR;
-    // Objectif de comparaison : mensuel pour tous (cohérent avec le graphique)
-    const objMensuel = KPI_IS_PCT[k] ? obj[k] : obj[k]/12;
-    const objStr = KPI_FMT[k](KPI_IS_PCT[k]?objMensuel:Math.round(objMensuel)).toString();
-    const pct = hasData ? Math.round(a.pct) : null;
-    let statutStr='', bg=null, fg=null;
-    if(!hasData){ statutStr=NR; }
-    else{
-      const cls=statusCls(a.pct,md.length);
-      if(cls==='ok'){ statutStr='✓ En trajectoire'; bg=[234,245,204]; fg=[58,125,0]; }
-      else if(cls==='warn'){ statutStr='→ À consolider'; bg=[254,243,199]; fg=[180,83,9]; }
-      else{ statutStr=pct+'% de l\'obj.'; bg=[254,226,226]; fg=[185,28,28]; }
+    chk(8);
+    const a = av[k];
+    const hasData = md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
+    const realStr = hasData ? KPI_FMT[k](KPI_IS_PCT[k]?Math.round(a.realise*10)/10:a.realise).toString() : NR;
+    const objM    = KPI_IS_PCT[k] ? obj[k] : Math.round(obj[k]/12);
+    const objStr  = KPI_FMT[k](objM).toString();
+    const pct     = hasData ? Math.round(a.pct) : null;
+    let statStr='', bg=null, fg=null;
+    if(!hasData){ statStr=NR; }
+    else {
+      const cls = statusCls(a.pct, md.length);
+      if(cls==='ok'){  statStr='✓ En trajectoire';  bg=[234,245,204]; fg=[58,125,0]; }
+      else if(cls==='warn'){ statStr='→ À consolider'; bg=[254,243,199]; fg=[180,83,9]; }
+      else { statStr=pct+"% de l'obj."; bg=[254,226,226]; fg=[185,28,28]; }
     }
     if(i%2===0){ doc.setFillColor(245,246,250); doc.rect(14,y-2,182,7,'F'); }
-    doc.setFontSize(8.5); doc.setFont('helvetica','bold'); setDark();
-    doc.text(KPI_FULL[i], kpiX[0], y+2.5);
+    doc.setFontSize(8.5); doc.setFont('helvetica','bold'); sD();
+    doc.text(KPI_FULL[i], kX[0], y+2.5);
     doc.setFont('helvetica','normal');
-    doc.text(realiseStr, kpiX[1]+kpiW[1]/2, y+2.5, {align:'center'});
-    doc.text(objStr, kpiX[2]+kpiW[2]/2, y+2.5, {align:'center'});
-    doc.text(pct!==null?pct+'%':'—', kpiX[3]+kpiW[3]/2, y+2.5, {align:'center'});
-    if(bg){ doc.setFillColor(...bg); doc.rect(kpiX[4],y-1.5,kpiW[4],6,'F'); doc.setTextColor(...fg); doc.setFont('helvetica','bold'); doc.setFontSize(7.5); }
-    else { setGray(); doc.setFont('helvetica','italic'); doc.setFontSize(7.5); }
-    doc.text(statutStr, kpiX[4]+kpiW[4]/2, y+2.5, {align:'center'});
+    doc.text(realStr, kX[1]+kW[1]/2, y+2.5, {align:'center'});
+    doc.text(objStr,  kX[2]+kW[2]/2, y+2.5, {align:'center'});
+    doc.text(pct!==null?pct+'%':'—', kX[3]+kW[3]/2, y+2.5, {align:'center'});
+    if(bg){ doc.setFillColor(...bg); doc.rect(kX[4],y-1.5,kW[4],6,'F');
+      doc.setTextColor(...fg); doc.setFont('helvetica','bold'); doc.setFontSize(7); }
+    else { sG(); doc.setFont('helvetica','italic'); doc.setFontSize(7); }
+    doc.text(statStr, kX[4]+kW[4]/2, y+2.5, {align:'center'});
     y+=7;
   });
-  // Note : pour les KPI cumulatifs, le "Réalisé" est le cumul et "Obj. mensuel" est l'objectif annuel/12
-  doc.setFontSize(6.5); doc.setFont('helvetica','italic'); setGray();
-  doc.text('* Réalisé = cumul des mois saisis pour CA/Chantiers/Fidélité · moyenne pour Transfo/Opt-in · Obj. mensuel = annuel ÷ 12', 14, y+1);
+  doc.setFontSize(6.5); doc.setFont('helvetica','italic'); sG();
+  doc.text('* Réalisé = cumul pour CA/Chantiers/Fidélité · moyenne pour Transfo/Opt-in', 14, y+1);
   y+=7;
 
-  // ── 5. HISTORIQUE MENSUEL ─────────────────────────────────
-  checkY(20); section('Historique mensuel');
-  if(md.length===0){
-    doc.setFontSize(9); doc.setFont('helvetica','italic'); setGray();
-    doc.text(NR,14,y); y+=8;
-  } else {
+  // ── 6. HISTORIQUE MENSUEL ──
+  chk(20); section('Historique mensuel');
+  if(md.length===0){ nr(NR); }
+  else {
     doc.setFillColor(13,33,55); doc.rect(14,y-2,182,7,'F');
     doc.setTextColor(255,255,255); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
-    const hC=['Mois','CA','Transfo','Opt-in','Chant.','Fidél.','Contexte'];
     const hX=[14,34,64,82,100,114,130];
-    hC.forEach((h,i)=>{ doc.text(h, hX[i], y+2.5); }); y+=8;
+    ['Mois','CA','Transfo','Opt-in','Chant.','Fidél.','Contexte'].forEach((h,i)=>{ doc.text(h,hX[i],y+2.5); });
+    y+=8;
     md.forEach((m,idx)=>{
-      checkY(7);
+      chk(7);
       const r=res[m];
       if(idx%2===0){ doc.setFillColor(245,246,250); doc.rect(14,y-2,182,6,'F'); }
-      doc.setFontSize(8); doc.setFont('helvetica','bold'); setDark();
+      doc.setFontSize(8); doc.setFont('helvetica','bold'); sD();
       doc.text(MOIS_S[m], hX[0], y+1.5);
       doc.setFont('helvetica','normal');
-      const vals=[
-        r.ca!=null ? KPI_FMT.ca(r.ca).toString() : '—',
-        r.taux!=null ? KPI_FMT.taux(r.taux).toString() : '—',
-        r.optin!=null ? KPI_FMT.optin(r.optin).toString() : '—',
-        r.chantiers!=null ? KPI_FMT.chantiers(r.chantiers).toString() : '—',
-        r.fidelite!=null ? KPI_FMT.fidelite(r.fidelite).toString() : '—',
-      ];
-      [1,2,3,4,5].forEach((ci,vi)=>{ doc.text(vals[vi], hX[ci], y+1.5); });
-      if(comm[m]){
-        doc.setFont('helvetica','italic'); setLight();
-        doc.text(comm[m].slice(0,28), hX[6], y+1.5);
-      }
+      [
+        r.ca!=null?KPI_FMT.ca(r.ca).toString():'—',
+        r.taux!=null?KPI_FMT.taux(r.taux).toString():'—',
+        r.optin!=null?KPI_FMT.optin(r.optin).toString():'—',
+        r.chantiers!=null?KPI_FMT.chantiers(r.chantiers).toString():'—',
+        r.fidelite!=null?KPI_FMT.fidelite(r.fidelite).toString():'—',
+      ].forEach((val,ci)=>{ doc.text(val, hX[ci+1], y+1.5); });
+      if(comm[m]){ doc.setFont('helvetica','italic'); sL(); doc.text(comm[m].slice(0,28), hX[6], y+1.5); }
       y+=6;
     });
   }
   y+=4;
 
-  // ── 6. ENGAGEMENTS ────────────────────────────────────────
-  checkY(20); section('Engagements');
-  const engsOuverts = engs.filter(e=>e.statut==='ouvert');
+  // ── 7. ENGAGEMENTS ──
+  chk(20); section('Engagements');
+  const engsOuverts  = engs.filter(e=>e.statut==='ouvert');
   const engsArchives = engs.filter(e=>e.statut!=='ouvert');
-  if(engs.length===0){
-    doc.setFontSize(9); doc.setFont('helvetica','italic'); setGray();
-    doc.text(NR,14,y); y+=8;
-  } else {
-    const emap={
-      'ouvert':  ['●','OUVERT',   [0,150,136],[224,242,241]],
-      'tenu':    ['✓','TENU',     [58,125,0], [234,245,204]],
-      'non_tenu':['✗','NON TENU', [185,28,28],[254,226,226]],
+  if(engs.length===0){ nr(NR); }
+  else {
+    const eMap = {
+      'ouvert':   ['●','OUVERT',   [0,150,136], [224,242,241]],
+      'tenu':     ['✓','TENU',     [58,125,0],  [234,245,204]],
+      'non_tenu': ['✗','NON TENU', [185,28,28], [254,226,226]],
     };
-    // Ouverts en premier
-    [...engsOuverts, ...engsArchives].forEach(e=>{
-      const [bu,lab,fg,bg]=emap[e.statut]||emap['ouvert'];
-      const who=e.auteur==='manager'?'👤 Manager':'🙋 Conseiller';
-      const lines=doc.splitTextToSize(e.texte,150);
-      checkY(6+lines.length*4.5);
+    [...engsOuverts,...engsArchives].forEach(e=>{
+      const [bu,lab,fg,bg] = eMap[e.statut]||eMap['ouvert'];
+      const who = e.auteur==='manager'?'👤 Manager':'🙋 Conseiller';
+      const lines = doc.splitTextToSize(e.texte, 148);
+      chk(6+lines.length*4.5);
       doc.setFillColor(...bg); doc.rect(168,y-1,28,5,'F');
       doc.setFontSize(7.5); doc.setFont('helvetica','bold'); doc.setTextColor(...fg);
       doc.text(lab, 182, y+2.5, {align:'center'});
-      doc.setFontSize(8.5); doc.setFont('helvetica','bold'); setDark();
+      doc.setFontSize(8.5); doc.setFont('helvetica','bold'); sD();
       doc.text(bu+' '+who+' · '+e.date, 14, y+2.5); y+=6;
       doc.setFont('helvetica','normal');
       doc.text(lines, 18, y); y+=lines.length*4.5+2;
@@ -2630,58 +2637,54 @@ async function exportPDF(v) {
   }
   y+=4;
 
-  // ── 7. OBJECTIF CONSEILLÉ ─────────────────────────────────
-  checkY(20);
+  // ── 8. OBJECTIF MOIS SUIVANT ──
+  chk(20);
   section(sugg ? 'Objectif conseillé — '+MOIS_L[sugg.moisSuivant]+' '+currentYear : 'Objectif mois suivant');
-  if(!sugg){
-    doc.setFontSize(9); doc.setFont('helvetica','italic'); setGray();
-    doc.text(NR,14,y); y+=8;
-  } else {
-    const mr=12-sugg.moisSuivant;
+  if(!sugg){ nr(NR); }
+  else {
+    const mr = 12-sugg.moisSuivant;
     if(sugg.moisSuivant===4||sugg.moisSuivant===5){
-      checkY(10);
+      chk(10);
       doc.setFillColor(254,243,199); doc.rect(14,y-2,182,8,'F');
-      doc.setFontSize(8); doc.setFont('helvetica','italic'); setWarn();
-      doc.text('⚠  Travaux R05 prévus — impact sur fréquentation. Cibles ajustées en conséquence.', 17, y+2.5);
-      y+=10;
+      doc.setFontSize(8); doc.setFont('helvetica','italic'); sW();
+      doc.text('⚠  Travaux R05 prévus — cibles ajustées en conséquence.', 17, y+3.5);
+      y+=11;
     }
-    checkY(32);
+    chk(KPI_KEYS.length*9+6);
     doc.setFillColor(242,246,238); doc.rect(14,y-2,182,KPI_KEYS.length*9+2,'F');
     KPI_KEYS.forEach((k,i)=>{
-      const val = sugg.sugg[k].algo; // valeur lissée de l'algorithme
-      const valFmt = KPI_FMT[k](KPI_IS_PCT[k] ? Math.round(val*10)/10 : Math.round(val));
+      const val = sugg.sugg[k].algo;
       const objM = KPI_IS_PCT[k] ? obj[k] : obj[k]/12;
       const diff = val - objM;
       let deltaStr = '→ rythme de croisière';
-      if(diff > 0.5) deltaStr = '↑ rattrapage';
-      else if(diff < -0.5) deltaStr = '↓ en avance';
-      const col = diff>0.5?[180,83,9]:diff<-0.5?[58,125,0]:[90,100,120];
-      doc.setFontSize(8); doc.setFont('helvetica','bold'); setLight();
+      let dCol = [90,100,120];
+      if(diff>0.5){ deltaStr='↑ rattrapage'; dCol=[180,83,9]; }
+      else if(diff<-0.5){ deltaStr='↓ en avance'; dCol=[58,125,0]; }
+      doc.setFontSize(8); doc.setFont('helvetica','bold'); sL();
       doc.text(KPI_FULL[i], 16, y+3);
-      doc.setFontSize(10); doc.setFont('helvetica','bold'); setTeal();
-      doc.text(valFmt.toString(), 80, y+3);
-      doc.setFontSize(7.5); doc.setFont('helvetica','italic'); doc.setTextColor(...col);
-      doc.text(deltaStr, 110, y+3);
+      doc.setFontSize(11); doc.setFont('helvetica','bold'); sT();
+      doc.text(KPI_FMT[k](KPI_IS_PCT[k]?Math.round(val*10)/10:Math.round(val)).toString(), 82, y+3);
+      doc.setFontSize(7.5); doc.setFont('helvetica','italic'); doc.setTextColor(...dCol);
+      doc.text(deltaStr, 112, y+3);
       y+=9;
     });
-    doc.setFontSize(6.5); doc.setFont('helvetica','italic'); setGray();
-    doc.text(`Objectif lissé sur ${mr} mois restant${mr>1?'s':''} — plafonné à 120% de l'objectif mensuel initial.`, 14, y+1);
+    doc.setFontSize(6.5); doc.setFont('helvetica','italic'); sG();
+    doc.text('Objectif lissé sur '+mr+' mois restant'+(mr>1?'s':'')+" — plafonné à 120% de l'objectif mensuel.", 14, y+1);
     y+=6;
   }
 
-  // ── 8. PROCHAIN RDV ───────────────────────────────────────
-  checkY(16); section('Prochain RDV');
-  doc.setFontSize(11); doc.setFont('helvetica','bold'); setTeal();
+  // ── 9. PROCHAIN RDV ──
+  chk(16); section('Prochain RDV');
+  doc.setFontSize(11); doc.setFont('helvetica','bold'); sT();
   doc.text(rdv.prochain||NR, 16, y+2);
   y+=10;
 
-  // Footer
   footer();
-
-  const filename=`RDV-Perf_${NOMS[v]}_${currentYear}_${now.replace(/ /g,'-')}.pdf`;
+  const filename = 'RDV-Perf_'+NOMS[v]+'_'+currentYear+'_'+now.replace(/ /g,'-')+'.pdf';
   doc.save(filename);
   toast('PDF généré ✓ — '+filename);
 }
+
 
 async function saveVendeurEntry(v){
   const m=parseInt(document.getElementById(`s-mois-${v}`).value);
@@ -3337,7 +3340,7 @@ runSplash(async function() {
   }else{
     initLogin();
   }
-}, isPreview ? 2000 : 5000);
+}, isPreview ? 3500 : 6000);
 </script>
 </body>
 </html>
