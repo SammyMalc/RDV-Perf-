@@ -46,7 +46,7 @@
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;height:100%}
-html,body{background:var(--sidebar);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;font-size:15px;min-height:100vh;min-height:100dvh;overscroll-behavior:none}
+html,body{background:var(--sidebar);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;font-size:15px;min-height:100vh;min-height:100dvh}
 /* Cibles tactiles minimum 48px pour Crosscall (gants/conditions terrain) */
 button,select,input,.vendor-card,.quick-btn,.login-user-btn,.action-btn,.bottom-bar-back,.bottom-bar-save{min-height:48px;touch-action:manipulation}
 /* Scroll fluide natif Android */
@@ -93,11 +93,13 @@ select,input{font-size:16px !important}
 
 /* ── TOPBAR ──────────────────────────────────────────────── */
 .topbar{background:var(--sidebar);color:#fff;padding:14px 16px 13px;display:flex;align-items:center;gap:10px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.topbar-back{display:none}
+.topbar-back{display:flex;align-items:center;gap:5px;padding:7px 14px 7px 10px;border-radius:20px;background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.35);color:#fff;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit;transition:background .15s;white-space:nowrap}
+.topbar-back:active{background:rgba(255,255,255,0.3)}
 .topbar-center{flex:1;min-width:0}
 .topbar-title{font-size:16px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .topbar-sub{font-size:11px;opacity:.5;margin-top:1px}
-.topbar-action{display:none}
+.topbar-action{background:#FFD100;border:none;color:#1a1200;font-size:14px;font-weight:800;padding:8px 18px;border-radius:20px;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;letter-spacing:.2px;transition:opacity .15s;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.topbar-action:active{opacity:.85}
 .topbar-teal-pill{background:var(--teal);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0;letter-spacing:.5px}
 
 /* ── BOTTOM ACTION BAR ───────────────────────────────────── */
@@ -138,7 +140,13 @@ select,input{font-size:16px !important}
 .vprogfill{height:100%;border-radius:2px;transition:width 1s ease}
 
 /* ── QUICK ACTIONS ───────────────────────────────────────── */
-.quick-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.quick-btn{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:20px 16px;cursor:pointer;text-align:left;transition:border-color .15s,box-shadow .15s;box-shadow:var(--shadow)}
+.quick-btn:hover{border-color:var(--teal-m);box-shadow:var(--shadow-md)}
+.quick-btn:active{transform:scale(.98)}
+.quick-btn-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px}
+.quick-btn-label{font-size:15px;font-weight:700;color:var(--text)}
+.quick-btn-sub{font-size:12px;color:var(--t2);margin-top:3px}
 .quick-btn{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:16px;cursor:pointer;text-align:left;transition:border-color .15s,box-shadow .15s;box-shadow:var(--shadow)}
 .quick-btn:hover{border-color:var(--teal-m);box-shadow:var(--shadow-md)}
 .quick-btn:active{transform:scale(.98)}
@@ -338,7 +346,26 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 .comment-area:focus{outline:none;border-color:var(--teal)}
 .comment-display{font-size:12px;color:var(--t2);font-style:italic;padding:6px 8px;background:var(--surf2);border-radius:var(--rs);margin-top:2px}
 
-/* ── LOGOUT ROW ──────────────────────────────────────────── */
+/* ── DASHBOARD COLORÉ ────────────────────────────────────── */
+.dash-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.dash-kpi-card{border-radius:14px;padding:16px;color:#fff;position:relative;overflow:hidden;cursor:default}
+.dash-kpi-card::after{content:'';position:absolute;right:-16px;top:-16px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.12)}
+.dash-kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.8;margin-bottom:6px}
+.dash-kpi-val{font-size:26px;font-weight:800;letter-spacing:-1px;line-height:1}
+.dash-kpi-sub{font-size:11px;opacity:.7;margin-top:4px}
+
+.dash-vendor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:12px;margin-bottom:16px}
+.dash-vendor-card{background:var(--surf);border-radius:14px;border:1px solid var(--brd);padding:16px;box-shadow:var(--shadow);cursor:pointer;transition:box-shadow .15s}
+.dash-vendor-card:hover{box-shadow:var(--shadow-md)}
+.dash-vendor-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.dash-vendor-avatar{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.dash-vendor-name{font-size:15px;font-weight:700;color:var(--text)}
+.dash-vendor-months{font-size:11px;color:var(--t3)}
+.dash-gauge-row{display:flex;justify-content:space-around;margin-bottom:8px}
+.dash-gauge{display:flex;flex-direction:column;align-items:center;gap:4px}
+.dash-gauge-label{font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.dash-gauge-val{font-size:12px;font-weight:700}
+.dash-be{font-size:20px;text-align:center}
 .logout-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:var(--r);background:var(--surf);border:1px solid var(--brd);cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s}
 .logout-row:active{transform:scale(.98)}
 
@@ -416,6 +443,8 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
   .scroll-content{max-width:none;padding:0}
   #mobile-topbar{display:none!important}
   #mobile-home-scroll{display:none!important}
+  /* Sur desktop, screen.active reste en flex-direction:row */
+  .screen.active{flex-direction:row}
 
   /* Action buttons desktop style */
   .desktop-action-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
@@ -450,6 +479,10 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
   .desktop-action-bar{display:none!important}
   #mobile-topbar{display:flex!important}
   #mobile-home-scroll{display:flex!important;flex-direction:column}
+  html,body{overflow:auto!important;height:auto!important}
+  .screen{height:auto!important;overflow:visible!important}
+  .screen.active{flex-direction:column!important;height:auto!important;overflow:visible!important;min-height:100vh}
+  .scroll-content{overflow:visible!important;flex:none}
 }
 
 /* Pixel 10 Pro — écran dense 497ppi, interface légèrement agrandie */
@@ -2287,111 +2320,144 @@ function drawChart(canvasId,v,ki){
   const k=KPI_KEYS[ki],col=COLORS[v],isPct=KPI_IS_PCT[k];
   const tc='#9BA5B8';
 
-  // Mois saisis
   const moisDone=Object.keys(res).map(Number).sort((a,b)=>a-b);
   const dernierMois=moisDone.length>0?Math.max(...moisDone):-1;
   const prochainMois=dernierMois<11?dernierMois+1:-1;
 
-  // Données réalisées — null pour mois non saisis ou KPI manquant
   const realData=MOIS_S.map((_,m)=>(res[m]&&res[m][k]!=null&&!isNaN(res[m][k]))?res[m][k]:null);
-  const hasAnyData=realData.some(v=>v!==null);
+  const hasAnyData=realData.some(d=>d!==null);
 
-  // Si aucune donnée pour ce KPI — afficher message
   if(!hasAnyData){
-    const ctx=canvas.getContext('2d');
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle='#9BA5B8';
-    ctx.font='500 13px -apple-system, sans-serif';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText('Pas d\'historique', canvas.clientWidth/2||100, canvas.clientHeight/2||60);
+    if(chartInstances[canvasId]){chartInstances[canvasId].destroy();delete chartInstances[canvasId];}
+    const ctx2=canvas.getContext('2d');
+    canvas.width=canvas.clientWidth||300;canvas.height=canvas.clientHeight||200;
+    ctx2.clearRect(0,0,canvas.width,canvas.height);
+    ctx2.fillStyle='#9BA5B8';ctx2.font='500 13px -apple-system,sans-serif';
+    ctx2.textAlign='center';ctx2.textBaseline='middle';
+    ctx2.fillText("Pas d'historique",canvas.width/2,canvas.height/2);
     return;
   }
 
-  // Objectif mensuel — ligne horizontale fixe pour tous les KPI
-  // Pour les % : la cible mensuelle = objectif annuel (c'est une moyenne)
-  // Pour les cumulatifs : la cible mensuelle = objectif annuel / 12
-  const objMensuel = isPct ? obj[k] : Math.round(obj[k] / 12);
-  const trajData = MOIS_S.map(() => objMensuel);
+  const objMensuel=isPct?obj[k]:Math.round(obj[k]/12);
+  const trajData=MOIS_S.map(()=>objMensuel);
 
-  // Suggestion mois suivant (objectif conseillé)
-  const suggData=MOIS_S.map((_,m)=>null);
+  const suggData=MOIS_S.map(()=>null);
   if(prochainMois>=0){
-    const sugg=getSuggestion(v);
-    if(sugg&&sugg.moisSuivant===prochainMois){
-      suggData[prochainMois]=sugg.sugg[k].val;
-    }
+    const sugg=getSuggestion(v,currentYear);
+    if(sugg&&sugg.moisSuivant===prochainMois) suggData[prochainMois]=sugg.sugg[k].val;
   }
+  const hasNextMonth=suggData.some(d=>d!==null);
 
-  // Légende
-  const hasNextMonth=suggData.some(v=>v!==null);
+  const hex=col.replace('#','');
+  const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b2=parseInt(hex.slice(4,6),16);
 
   chartInstances[canvasId]=new Chart(canvas,{
-    type:'bar',
+    type:'line',
     data:{labels:MOIS_S,datasets:[
-      // Barres réalisées
-      {label:'Réalisé',data:realData,
-        backgroundColor:col+'30',borderColor:col,borderWidth:1.5,borderRadius:6,order:2},
-      // Ligne trajectoire attendue
-      {label:'Trajectoire',data:trajData,
-        type:'line',borderColor:'#80CBC4',borderDash:[6,3],borderWidth:2,
-        pointRadius:0,pointHoverRadius:4,fill:false,order:0,tension:0},
-      // Barre objectif mois suivant (si disponible)
+      {
+        label:'Réalisé',
+        data:realData,
+        borderColor:col,
+        borderWidth:2.5,
+        pointBackgroundColor:col,
+        pointBorderColor:'#fff',
+        pointBorderWidth:2,
+        pointRadius:4,
+        pointHoverRadius:6,
+        fill:true,
+        backgroundColor:(ctx)=>{
+          const chart=ctx.chart;
+          const {ctx:c,chartArea}=chart;
+          if(!chartArea)return`rgba(${r},${g},${b2},0.1)`;
+          const grad=c.createLinearGradient(0,chartArea.top,0,chartArea.bottom);
+          grad.addColorStop(0,`rgba(${r},${g},${b2},0.2)`);
+          grad.addColorStop(1,`rgba(${r},${g},${b2},0.01)`);
+          return grad;
+        },
+        tension:0.4,
+        spanGaps:false,
+        order:1,
+      },
+      {
+        label:'Objectif mensuel',
+        data:trajData,
+        borderColor:'rgba(156,163,175,0.7)',
+        borderWidth:1.5,
+        borderDash:[6,4],
+        pointRadius:0,
+        fill:false,
+        tension:0,
+        order:2,
+      },
       ...(hasNextMonth?[{
-        label:'Objectif mois suivant',data:suggData,
-        backgroundColor:'rgba(255,209,0,0.25)',borderColor:'#FFD100',
-        borderWidth:2,borderRadius:6,borderDash:[4,2],order:3
+        label:'Objectif mois suivant',
+        data:suggData,
+        type:'bar',
+        backgroundColor:`rgba(${r},${g},${b2},0.15)`,
+        borderColor:col,
+        borderWidth:1.5,
+        borderRadius:6,
+        order:3,
       }]:[]),
     ]},
-    options:{responsive:true,maintainAspectRatio:false,
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{
-          display:true,
-          position:'bottom',
-          labels:{
-            color:tc,font:{size:10},
-            boxWidth:12,padding:10,
-            filter:item=>item.datasetIndex<2||(item.datasetIndex===2&&hasNextMonth)
-          }
+          display:true,position:'top',align:'end',
+          labels:{color:tc,font:{size:10},boxWidth:10,padding:12,
+            filter:item=>item.datasetIndex<2||(item.datasetIndex===2&&hasNextMonth)}
         },
-        tooltip:{callbacks:{
-          label:ctx=>ctx.parsed.y==null?null:`${ctx.dataset.label}: ${KPI_FMT[k](ctx.parsed.y)}`
-        }},
+        tooltip:{
+          backgroundColor:'rgba(13,33,55,0.92)',
+          titleColor:'#fff',
+          bodyColor:'rgba(255,255,255,0.75)',
+          padding:10,cornerRadius:8,
+          callbacks:{label:ctx=>ctx.parsed.y==null?null:`${ctx.dataset.label} : ${KPI_FMT[k](ctx.parsed.y)}`}
+        },
         annotation:{
           annotations:{
             travaux:{
-              type:'box',
-              xMin:3.5,  // entre Avr et Mai
-              xMax:5.5,  // entre Jun et Jul
-              backgroundColor:'rgba(180,83,9,0.08)',
-              borderColor:'rgba(180,83,9,0.25)',
-              borderWidth:1,
-              borderDash:[4,3],
+              type:'box',xMin:3.5,xMax:5.5,
+              backgroundColor:'rgba(180,83,9,0.06)',
+              borderColor:'rgba(180,83,9,0.2)',
+              borderWidth:1,borderDash:[4,3],
               label:{
-                display:true,
-                content:'🔧 Travaux R05',
+                display:true,content:'🔧 Travaux R05',
                 position:{x:'center',y:'start'},
-                color:'rgba(180,83,9,0.7)',
-                font:{size:10,weight:'700'},
-                padding:{top:4,bottom:4,left:6,right:6},
-                backgroundColor:'rgba(254,243,199,0.85)',
-                borderRadius:4,
+                color:'rgba(180,83,9,0.65)',
+                font:{size:9,weight:'700'},
+                padding:{top:3,bottom:3,left:5,right:5},
+                backgroundColor:'rgba(254,243,199,0.85)',borderRadius:4,
               }
             }
           }
         }
       },
       scales:{
-        x:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},autoSkip:false,maxRotation:0}},
-        y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:10},callback:val=>{
-          if(ki===0)return'€'+Math.round(val/1000)+'k';if(isPct)return val+'%';return Math.round(val);
-        }},
-        suggestedMax: isPct ? 100 : Math.ceil((obj[k]/12)*1.5),
-        min:0}
+        x:{
+          grid:{display:false},
+          border:{display:false},
+          ticks:{color:tc,font:{size:10},autoSkip:false,maxRotation:0}
+        },
+        y:{
+          grid:{color:'rgba(0,0,0,0.04)'},
+          border:{display:false},
+          ticks:{color:tc,font:{size:10},callback:val=>{
+            if(ki===0)return'€'+Math.round(val/1000)+'k';
+            if(isPct)return val+'%';
+            return Math.round(val);
+          }},
+          suggestedMax:isPct?100:Math.ceil((obj[k]/12)*1.5),
+          min:0,
+        }
       }
     }
   });
 }
+
 
 /* ════════════════════════════════════════════════════════════
    TABLEAU DE BORD MOBILE
@@ -2401,58 +2467,101 @@ function renderDashboardMobile() {
   if (!div) return;
   const beEmojis = ['','😞','😕','😐','🙂','😄'];
   const beMois = new Date().toISOString().slice(0,7);
-  let html = '';
+  const beLabels = ['','Difficile','Compliqué','Neutre','Bien','Excellent'];
 
-  // ── Stat globales ──
   const totalNonTenus = VENDEURS.reduce((s,v)=>s+((state.engagements&&state.engagements[v]||[]).filter(e=>e.statut==='non_tenu').length),0);
-  const avgMois = Math.round(VENDEURS.map(v=>Object.keys(getRes(v,currentYear)).length).reduce((a,b)=>a+b,0)/VENDEURS.length);
   const teamOk = VENDEURS.reduce((s,v)=>s+globalScore(v,currentYear),0);
   const teamMax = VENDEURS.length*5;
+  const rdvList = VENDEURS.map(v=>({v,rdv:(state.rdv&&state.rdv[v])||{}})).filter(x=>x.rdv.prochain).sort((a,b)=>a.rdv.prochain.localeCompare(b.rdv.prochain));
+
+  // ── Cards KPI équipe colorées ──
+  const kpiColors = [
+    'linear-gradient(135deg,#009688,#00796B)',
+    'linear-gradient(135deg,#003087,#1565C0)',
+    'linear-gradient(135deg,#5C6BC0,#3949AB)',
+    'linear-gradient(135deg,#78BE20,#558B2F)',
+    'linear-gradient(135deg,#F57C00,#E65100)',
+  ];
+  let html = `<div class="section-label" style="margin-top:0">Vue équipe · ${currentYear}</div>`;
+
+  // Stat cards colorées
   html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-    <div class="card" style="padding:14px;text-align:center">
-      <div style="font-size:24px;font-weight:800;color:var(--teal)">${teamOk}/${teamMax}</div>
-      <div style="font-size:11px;color:var(--t2);font-weight:600;margin-top:3px">KPI en trajectoire</div>
+    <div class="dash-kpi-card" style="background:linear-gradient(135deg,#009688,#00796B)">
+      <div class="dash-kpi-label">KPI en trajectoire</div>
+      <div class="dash-kpi-val">${teamOk}<span style="font-size:16px;font-weight:600">/${teamMax}</span></div>
+      <div class="dash-kpi-sub">sur ${VENDEURS.length} conseillers</div>
     </div>
-    <div class="card" style="padding:14px;text-align:center">
-      <div style="font-size:24px;font-weight:800;color:${totalNonTenus>0?'var(--ko)':'var(--ok)'}">${totalNonTenus||'—'}</div>
-      <div style="font-size:11px;color:var(--t2);font-weight:600;margin-top:3px">Engagements non tenus</div>
+    <div class="dash-kpi-card" style="background:linear-gradient(135deg,${totalNonTenus>0?'#D32F2F,#B71C1C':'#3A7D00,#2E7D32'})">
+      <div class="dash-kpi-label">Engagements non tenus</div>
+      <div class="dash-kpi-val">${totalNonTenus||'✓'}</div>
+      <div class="dash-kpi-sub">${totalNonTenus>0?'à retravailler':'Tout est tenu'}</div>
     </div>
   </div>`;
 
-  // ── Tableau comparatif ──
-  html+=`<div class="section-label">Performance par conseiller</div>
-  <div class="card" style="padding:0;overflow:hidden;margin-bottom:12px">
-    <div style="overflow-x:auto">
-    <table class="stable" style="min-width:400px">
-      <thead><tr>
-        <th style="text-align:left;padding-left:12px;white-space:nowrap">Conseiller</th>`;
-  KPI_LABELS.forEach(l=>{html+=`<th>${l}</th>`;});
-  html+=`<th>Climat</th></tr></thead><tbody>`;
+  // ── Cards par conseiller ──
+  html+=`<div class="section-label">Par conseiller</div>
+  <div class="dash-vendor-grid">`;
+
   VENDEURS.forEach(v=>{
     const av=getAv(v,currentYear);
-    const md=Object.keys(getRes(v,currentYear)).length;
+    const res=getRes(v,currentYear);
+    const md=Object.keys(res).length;
+    const score=globalScore(v,currentYear);
+    const scoreLabel=globalScoreLabel(v,currentYear);
     const beVal=(state.bienetre&&state.bienetre[v]&&state.bienetre[v][beMois])||0;
-    html+=`<tr onclick="openVendeur('${v}')" style="cursor:pointer">
-      <td style="text-align:left;padding-left:12px;white-space:nowrap">
-        <div style="display:flex;align-items:center;gap:7px">
-          <div style="width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
-          <span style="font-weight:700;font-size:13px">${NOMS[v]}</span>
-        </div></td>`;
-    KPI_KEYS.forEach(k=>{
-      const pct=Math.round(av[k].pct);
-      const cls=statusCls(av[k].pct,md);
-      const col=cls==='ok'?'var(--ok)':cls==='warn'?'var(--warn)':'var(--ko)';
-      html+=`<td><span style="font-size:12px;font-weight:700;color:${col}">${pct}%</span></td>`;
-    });
-    html+=`<td style="font-size:16px">${beVal>0?beEmojis[beVal]:'—'}</td></tr>`;
-  });
-  html+=`</tbody></table></div></div>`;
+    const col=COLORS[v];
+    const rdv=(state.rdv&&state.rdv[v])||{};
+    const scoreCol=score>=4?'var(--ok)':score>=2?'var(--warn)':'var(--ko)';
 
-  // ── Graphique ──
-  html+=`<div class="section-label">% Réalisation par KPI</div>
-  <div class="card" style="margin-bottom:12px">
-    <div class="chart-wrap h220"><canvas id="chart-dashboard-mobile" role="img" aria-label="Dashboard mobile"></canvas></div>
-  </div>`;
+    html+=`<div class="dash-vendor-card" onclick="${isDesktop()?`showDesktopVendeur('${v}')`:`openVendeur('${v}')`}">
+      <div class="dash-vendor-header">
+        <div class="dash-vendor-avatar" style="background:${AVATAR_BG[v]};color:${col}">${NOMS[v][0]}</div>
+        <div>
+          <div class="dash-vendor-name">${NOMS[v]}</div>
+          <div class="dash-vendor-months">${md>0?md+' mois':'Aucune saisie'}</div>
+        </div>
+        ${beVal>0?`<div class="dash-be" style="margin-left:auto">${beEmojis[beVal]}</div>`:''}
+      </div>`;
+
+    // Jauges circulaires KPI
+    html+=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:10px">`;
+    KPI_KEYS.forEach((k,i)=>{
+      const res2=getRes(v,currentYear);
+      const mdArr=Object.keys(res2).map(Number);
+      const hasData=mdArr.some(m=>res2[m][k]!=null&&!isNaN(res2[m][k]));
+      const pct=hasData?Math.min(100,Math.round(av[k].pct)):null;
+      const kCol=pct===null?'#DDE8D4':pct>=100*Math.max(1,mdArr.length)/12?'#66BB6A':pct>=70*Math.max(1,mdArr.length)/12?'#FFA726':'#EF5350';
+      const trackCol='rgba(0,0,0,0.07)';
+      const sz=50; const rad=20; const circ=2*Math.PI*rad;
+      const offset=pct!==null?circ*(1-pct/100):circ;
+      html+=`<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+        <div style="position:relative;width:${sz}px;height:${sz}px">
+          <svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" style="transform:rotate(-90deg)">
+            <circle cx="${sz/2}" cy="${sz/2}" r="${rad}" fill="none" stroke="${trackCol}" stroke-width="4"/>
+            ${pct!==null?`<circle cx="${sz/2}" cy="${sz/2}" r="${rad}" fill="none" stroke="${kCol}" stroke-width="4"
+              stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"
+              stroke-linecap="round"/>`:
+            `<circle cx="${sz/2}" cy="${sz/2}" r="${rad}" fill="none" stroke="#DDE8D4" stroke-width="4"
+              stroke-dasharray="4 4"/>`}
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:${pct!==null?9:8}px;font-weight:800;color:${pct!==null?kCol:'var(--t3)'}">
+            ${pct!==null?pct+'%':'—'}
+          </div>
+        </div>
+        <div style="font-size:8px;font-weight:600;color:var(--t3);text-align:center;text-transform:uppercase;letter-spacing:.3px;line-height:1.2">${KPI_LABELS[i]}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+
+    // Score + prochain RDV
+    html+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--brd)">
+      ${scoreLabel?`<span style="font-size:12px;font-weight:700;color:${scoreCol}">${scoreLabel} KPI ✓</span>`:'<span style="font-size:11px;color:var(--t3)">Pas encore de données</span>'}
+      ${rdv.prochain?`<span style="font-size:10px;color:var(--teal);font-weight:600">📅 ${rdv.prochain}</span>`:''}
+    </div>`;
+
+    html+=`</div>`;
+  });
+  html+=`</div>`;
 
   // ── Engagements ouverts ──
   const allEngs=[];
@@ -2463,36 +2572,30 @@ function renderDashboardMobile() {
   });
   if(allEngs.length>0){
     html+=`<div class="section-label">Engagements ouverts</div>
-    <div class="kpi-stack">`;
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">`;
     allEngs.forEach(e=>{
-      html+=`<div class="kpi-card" onclick="openVendeur('${e.vendeur}')" style="cursor:pointer">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <div style="width:8px;height:8px;border-radius:50%;background:${COLORS[e.vendeur]};flex-shrink:0"></div>
-          <span style="font-size:12px;font-weight:700;color:${COLORS[e.vendeur]}">${NOMS[e.vendeur]}</span>
-          <span style="font-size:10px;color:var(--t3);margin-left:auto">${e.auteur==='manager'?'👤':'🙋'} ${e.date}</span>
+      html+=`<div class="card" style="padding:12px 14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer" onclick="${isDesktop()?`showDesktopVendeur('${e.vendeur}')`:`openVendeur('${e.vendeur}')`}">
+        <div style="width:8px;height:8px;border-radius:50%;background:${COLORS[e.vendeur]};flex-shrink:0;margin-top:4px"></div>
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:700;color:${COLORS[e.vendeur]};margin-bottom:3px">${NOMS[e.vendeur]} · ${e.auteur==='manager'?'👤':'🙋'} · ${e.date}</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.4">${e.texte}</div>
         </div>
-        <div style="font-size:13px;color:var(--text);line-height:1.4">${e.texte}</div>
+        <div style="font-size:16px;color:var(--t3)">›</div>
       </div>`;
     });
     html+=`</div>`;
   }
 
   // ── Prochains RDV ──
-  const rdvList=VENDEURS.map(v=>({v,rdv:(state.rdv&&state.rdv[v])||{}}))
-    .filter(x=>x.rdv.prochain).sort((a,b)=>a.rdv.prochain.localeCompare(b.rdv.prochain));
   if(rdvList.length>0){
     html+=`<div class="section-label">Prochains RDV</div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">`;
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">`;
     rdvList.forEach(({v,rdv})=>{
       const d=new Date(rdv.prochain);
-      const fmt=d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long'});
-      html+=`<div class="card" style="padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openVendeur('${v}')">
-        <div style="width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
-        <div>
-          <div style="font-size:13px;font-weight:700;color:var(--text)">${NOMS[v]}</div>
-          <div style="font-size:11px;color:var(--teal);font-weight:600">📅 ${fmt}</div>
-        </div>
-        <div style="margin-left:auto;font-size:18px;color:var(--t3)">›</div>
+      const fmt=isNaN(d)?rdv.prochain:d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+      html+=`<div class="dash-kpi-card" style="background:linear-gradient(135deg,${COLORS[v]},${COLORS[v]}cc);cursor:pointer" onclick="${isDesktop()?`showDesktopVendeur('${v}')`:`openVendeur('${v}')`}">
+        <div class="dash-kpi-label">${NOMS[v]}</div>
+        <div class="dash-kpi-val" style="font-size:18px">📅 ${fmt}</div>
       </div>`;
     });
     html+=`</div>`;
@@ -2500,29 +2603,8 @@ function renderDashboardMobile() {
 
   html+=`<div style="height:24px"></div>`;
   div.innerHTML=html;
-
-  // Graphique
-  setTimeout(()=>{
-    const canvas=document.getElementById('chart-dashboard-mobile'); if(!canvas)return;
-    if(chartInstances['chart-dashboard-mobile'])chartInstances['chart-dashboard-mobile'].destroy();
-    const tc='#9BA5B8';
-    chartInstances['chart-dashboard-mobile']=new Chart(canvas,{
-      type:'bar',
-      data:{labels:KPI_LABELS,datasets:VENDEURS.map(v=>({
-        label:NOMS[v],
-        data:KPI_KEYS.map(k=>Math.round(getAv(v,currentYear)[k].pct)),
-        backgroundColor:COLORS[v]+'40',borderColor:COLORS[v],borderWidth:2,borderRadius:4,
-      }))},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:true,position:'bottom',labels:{color:tc,font:{size:10},padding:10}}},
-        scales:{
-          x:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:9}}},
-          y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{color:tc,font:{size:9},callback:v=>v+'%'},min:0}
-        }
-      }
-    });
-  },60);
 }
+
 function renderSynthese(){
   const div=document.getElementById('synthese-content');
   let html=`<div class="card"><div class="card-title">% Réalisation annuelle</div>
