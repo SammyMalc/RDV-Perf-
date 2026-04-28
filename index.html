@@ -1492,6 +1492,87 @@ function makeGauge(pct, label, shortVal, color) {
 /* ════════════════════════════════════════════════════════════
    KPI CARD
 ════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   RÉGULARITÉ
+════════════════════════════════════════════════════════════ */
+function getRegularity(vendeur, k, year) {
+  const res = getRes(vendeur, year);
+  const md  = Object.keys(res).map(Number).sort((a,b)=>a-b);
+  const vals = md.map(m => res[m][k]).filter(v => v!=null && !isNaN(v));
+  if(vals.length < 2) return null; // pas assez de données
+
+  // Coefficient de variation (écart-type / moyenne) — normalisé 0-100
+  const mean = vals.reduce((a,b)=>a+b,0) / vals.length;
+  if(mean === 0) return null;
+  const variance = vals.reduce((s,v)=>s+Math.pow(v-mean,2),0) / vals.length;
+  const cv = Math.sqrt(variance) / Math.abs(mean); // 0 = parfait, >1 = très volatile
+
+  // Score 0-100 (100 = parfaitement régulier)
+  const score = Math.max(0, Math.round(100 - cv * 100));
+
+  // Label et couleur
+  if(score >= 80) return { score, label:'Régulier',  emoji:'🟢', color:'var(--ok)',   cls:'ok'  };
+  if(score >= 55) return { score, label:'Irrégulier',emoji:'🟡', color:'var(--warn)', cls:'warn' };
+  return            { score, label:'Volatile',   emoji:'🔴', color:'var(--ko)',   cls:'ko'  };
+}
+
+function getGlobalRegularity(vendeur, year) {
+  const scores = KPI_KEYS.map(k => getRegularity(vendeur, k, year)).filter(r => r !== null);
+  if(scores.length === 0) return null;
+  const avg = Math.round(scores.reduce((s,r)=>s+r.score,0) / scores.length);
+  if(avg >= 80) return { score:avg, label:'Régularité globale', detail:'Performance constante et prévisible', color:'var(--ok)', emoji:'🟢' };
+  if(avg >= 55) return { score:avg, label:'Régularité globale', detail:'Quelques écarts à lisser', color:'var(--warn)', emoji:'🟡' };
+  return               { score:avg, label:'Régularité globale', detail:'Résultats irréguliers — sujet à travailler', color:'var(--ko)', emoji:'🔴' };
+}
+
+/* Fil rouge narratif — résumé de l'évolution */
+function getFilRouge(vendeur, year) {
+  const res = getRes(vendeur, year);
+  const md  = Object.keys(res).map(Number).sort((a,b)=>a-b);
+  const av  = getAv(vendeur, year);
+  const obj = state.objectifs[vendeur];
+  if(md.length < 2) return null;
+
+  const phrases = [];
+
+  // Progression globale
+  const score = globalScore(vendeur, year);
+  if(score >= 4) phrases.push(`📈 ${NOMS[vendeur]} est en bonne trajectoire sur ${score}/5 KPI.`);
+  else if(score >= 2) phrases.push(`📊 ${NOMS[vendeur]} progresse sur ${score}/5 KPI — des leviers restent à activer.`);
+  else phrases.push(`⚠ ${NOMS[vendeur]} est en difficulté sur la majorité des KPI — un point d'attention fort.`);
+
+  // KPI le plus en progression (trend M/M)
+  const trends = KPI_KEYS.map(k => ({ k, t: getTrend(vendeur,k,year) })).filter(x=>x.t!==null);
+  if(trends.length > 0) {
+    const best = trends.reduce((a,b)=>a.t>b.t?a:b);
+    const worst = trends.reduce((a,b)=>a.t<b.t?a:b);
+    if(best.t > 5) {
+      const ki = KPI_KEYS.indexOf(best.k);
+      phrases.push(`💪 Meilleure dynamique ce mois sur ${KPI_FULL[ki]} (+${Math.round(best.t)}% vs mois précédent).`);
+    }
+    if(worst.t < -10) {
+      const ki = KPI_KEYS.indexOf(worst.k);
+      phrases.push(`📉 ${KPI_FULL[ki]} est en recul ce mois (${Math.round(worst.t)}%) — à surveiller.`);
+    }
+  }
+
+  // Régularité globale
+  const reg = getGlobalRegularity(vendeur, year);
+  if(reg) {
+    if(reg.score >= 80) phrases.push(`${reg.emoji} Les résultats sont stables et réguliers — signe d'une méthode solide.`);
+    else if(reg.score < 55) phrases.push(`🎢 Les résultats sont irréguliers — travailler la constance plutôt que les pics.`);
+  }
+
+  // Engagement non tenu récent
+  const engs = (state.engagements&&state.engagements[vendeur])||[];
+  const nonTenus = engs.filter(e=>e.statut==='non_tenu');
+  if(nonTenus.length > 0) {
+    phrases.push(`📌 ${nonTenus.length} engagement${nonTenus.length>1?'s':''}  non tenu${nonTenus.length>1?'s':''} depuis le début de l'année — à reprendre en RDV.`);
+  }
+
+  return phrases;
+}
+
 function makeKpiCard(vendeur,k,i,av,moisDoneCount){
   const obj=state.objectifs[vendeur],pct=av[k].pct;
   // Vérifier si ce KPI spécifique a des données (pas juste des mois saisis)
@@ -1547,7 +1628,12 @@ function makeKpiCard(vendeur,k,i,av,moisDoneCount){
       </div>
       ${trajPct>0?`<div class="kpi-bar-target" style="left:calc(${trajPct}% - 1px)"><div class="kpi-bar-target-label">Attendu</div></div>`:''}
     </div>
-    <div class="kpi-footer">${remain}<span class="kpi-chip">${moisDoneCount} mois saisi${moisDoneCount>1?'s':''}</span></div>
+    <div class="kpi-footer">${remain}
+      <div style="display:flex;align-items:center;gap:6px">
+        ${(()=>{ const reg=getRegularity(vendeur,k,currentYear); return reg?`<span style="font-size:10px;color:${reg.color};font-weight:700">${reg.emoji} ${reg.label}</span>`:''; })()}
+        <span class="kpi-chip">${moisDoneCount} mois saisi${moisDoneCount>1?'s':''}</span>
+      </div>
+    </div>
   </div>`;
 }
 
@@ -1993,7 +2079,10 @@ function renderVendeur(v){
   const beLabelsTop=['Difficile','Compliqué','Neutre','Bien','Excellent'];
   const beBgTop=['#FEE2E2','#FEF3C7','#F2F6EE','#E0F2F1','#EAF5CC'];
   const beColorTop=['#B91C1C','#B45309','#4A6A35','#00796B','#3A7D00'];
-  html+=`<div class="section-label">Climat du moment</div>
+  html+=`<div class="section-label" style="display:flex;align-items:center;justify-content:space-between">
+    <span>Climat du moment</span>
+    ${beValTop>0?`<button onclick="clearBienetre('${v}')" style="font-size:11px;font-weight:600;color:var(--t3);background:none;border:1px solid var(--brd);border-radius:6px;padding:3px 10px;cursor:pointer;font-family:inherit">✕ Retirer</button>`:''}
+  </div>
   <div class="card" style="padding:12px 14px;margin-bottom:12px">
     <div style="font-size:12px;color:var(--t2);margin-bottom:4px">Comment ${NOMS[v]} se sent-il/elle en ce moment ?</div>
     <div style="font-size:10px;color:var(--t3);margin-bottom:8px;font-style:italic">Indicateur de dialogue — non évaluatif.</div>
@@ -2045,6 +2134,57 @@ function renderVendeur(v){
     }
   }
 
+  // ── FIL ROUGE NARRATIF ──
+  const filRouge = getFilRouge(v, currentYear);
+  if(filRouge && filRouge.length > 0){
+    html+=`<div class="section-label">Fil rouge</div>
+    <div class="card" style="padding:14px 16px;margin-bottom:12px;border-left:3px solid var(--teal)">
+      <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Depuis le début de l'année</div>
+      <div style="display:flex;flex-direction:column;gap:7px">`;
+    filRouge.forEach(p=>{
+      html+=`<div style="font-size:13px;color:var(--text);line-height:1.5">${p}</div>`;
+    });
+    html+=`</div></div>`;
+  }
+
+  // ── INDICATEUR DE RÉGULARITÉ GLOBALE ──
+  const regGlobal = getGlobalRegularity(v, currentYear);
+  if(regGlobal){
+    const barW = regGlobal.score;
+    html+=`<div class="section-label">Régularité globale</div>
+    <div class="card" style="padding:14px 16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <span style="font-size:24px">${regGlobal.emoji}</span>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+            <span style="font-size:14px;font-weight:800;color:${regGlobal.color}">${regGlobal.label} · ${regGlobal.score}/100</span>
+            <span style="font-size:11px;color:var(--t2)">${regGlobal.detail}</span>
+          </div>
+          <div style="height:6px;background:var(--surf2);border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:${barW}%;background:${regGlobal.color};border-radius:3px;transition:width 1s ease"></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">`;
+    KPI_KEYS.forEach((k,i)=>{
+      const reg = getRegularity(v, k, currentYear);
+      if(reg){
+        html+=`<div style="text-align:center;padding:7px 4px;background:var(--surf2);border-radius:8px;border:1px solid var(--brd)">
+          <div style="font-size:14px">${reg.emoji}</div>
+          <div style="font-size:9px;font-weight:700;color:var(--t2);margin-top:3px;text-transform:uppercase;letter-spacing:.3px">${KPI_LABELS[i]}</div>
+          <div style="font-size:10px;font-weight:700;color:${reg.color};margin-top:1px">${reg.score}</div>
+        </div>`;
+      } else {
+        html+=`<div style="text-align:center;padding:7px 4px;background:var(--surf2);border-radius:8px;border:1px solid var(--brd)">
+          <div style="font-size:14px">⚪</div>
+          <div style="font-size:9px;font-weight:700;color:var(--t3);margin-top:3px;text-transform:uppercase;letter-spacing:.3px">${KPI_LABELS[i]}</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:1px">—</div>
+        </div>`;
+      }
+    });
+    html+=`</div></div>`;
+  }
+
   // ── 5. PERFORMANCE ANNUELLE (jauges) ──
   html+=`<div class="section-label">Performance annuelle</div>
   <div class="gauges-row">`;
@@ -2068,7 +2208,10 @@ function renderVendeur(v){
   // ── 6. ÉVOLUTION MENSUELLE ──
   html+=`<div class="section-label">Évolution mensuelle</div>
   <div class="card">
-    <div class="chips" id="chips-${v}"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="chips" id="chips-${v}" style="margin-bottom:0;flex:1"></div>
+      <div id="reg-badge-${v}" style="font-size:11px;font-weight:700;margin-left:10px;white-space:nowrap"></div>
+    </div>
     <div class="chart-wrap h220"><canvas id="chart-${v}" role="img" aria-label="Évolution ${NOMS[v]}"></canvas></div>
   </div>`;
 
@@ -2211,14 +2354,23 @@ function renderVendeur(v){
     KPI_LABELS.forEach((lbl,i)=>{
       const chip=document.createElement('div');
       chip.className='chip'+(i===0?' active':'');chip.textContent=lbl;
-      chip.onclick=()=>{selKpi=i;chipsDiv.querySelectorAll('.chip').forEach((c,j)=>c.classList.toggle('active',j===i));drawChart('chart-'+v,v,selKpi);};
+      chip.onclick=()=>{selKpi=i;chipsDiv.querySelectorAll('.chip').forEach((c,j)=>c.classList.toggle('active',j===i));drawChart('chart-'+v,v,selKpi);updateRegBadge(selKpi);};
       chipsDiv.appendChild(chip);
     });
   }
 
   const _v=v,_md=md,_res=res,_av=av;
+
+  const updateRegBadge=(ki)=>{
+    const kk=KPI_KEYS[ki];
+    const reg=getRegularity(_v,kk,currentYear);
+    const el=document.getElementById('reg-badge-'+_v);
+    if(el) el.innerHTML=reg?`${reg.emoji} <span style="color:${reg.color}">${reg.label} · ${reg.score}/100</span>`:'';
+  };
+
   setTimeout(()=>{
     drawChart('chart-'+_v,_v,0);
+    updateRegBadge(0);
     const radarCanvas=document.getElementById('radar-'+_v);
     if(radarCanvas&&_md.length>0){
       if(chartInstances['radar-'+_v])chartInstances['radar-'+_v].destroy();
@@ -2389,7 +2541,16 @@ async function saveBienetre(v, val) {
   const mois = new Date().toISOString().slice(0,7);
   state.bienetre[v][mois] = val;
   await saveState();
-  toast('Bien-être enregistré ✓');
+  toast('Climat enregistré ✓');
+  renderVendeur(v);
+}
+
+async function clearBienetre(v) {
+  if(!state.bienetre||!state.bienetre[v]) return;
+  const mois = new Date().toISOString().slice(0,7);
+  delete state.bienetre[v][mois];
+  await saveState();
+  toast('Climat retiré');
   renderVendeur(v);
 }
 
