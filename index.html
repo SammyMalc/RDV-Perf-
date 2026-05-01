@@ -414,17 +414,30 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 .frein-block label{font-size:11px;font-weight:700;color:var(--warn);margin-bottom:5px;display:block}
 .frein-block input{width:100%;padding:9px 12px;border:1.5px solid var(--warn);border-radius:var(--rs);font-size:13px;font-family:inherit;background:var(--surf);color:var(--text);box-sizing:border-box}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
-/* ── HEATMAP ─────────────────────────────────────────────── */
-.heatmap-table{width:100%;border-collapse:collapse;font-size:12px}
-.heatmap-table th{padding:8px 6px;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;background:var(--surf2);border-bottom:1px solid var(--brd);text-align:center;white-space:nowrap}
-.heatmap-table th:first-child{text-align:left;padding-left:12px}
-.heatmap-table td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--brd)}
-.heatmap-table td:first-child{text-align:left;padding-left:12px}
-.hm-pill{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:24px;border-radius:20px;font-size:11px;font-weight:700;padding:0 6px}
-.hm-ok{background:var(--ok-bg);color:var(--ok)}.hm-warn{background:var(--warn-bg);color:var(--warn)}.hm-ko{background:var(--ko-bg);color:var(--ko)}.hm-na{background:var(--surf2);color:var(--t3);font-style:italic}
-.hm-best{font-size:11px;font-weight:800;color:var(--ok);background:var(--ok-bg);border-radius:6px;padding:2px 7px}
-.hm-neg{font-size:11px;font-weight:600;color:var(--ko);background:var(--ko-bg);border-radius:6px;padding:2px 7px}
-.hm-neu{font-size:11px;color:var(--t3);padding:2px 7px}
+/* ── SCORECARD MINI-BARRES (desktop uniquement) ──────────── */
+.scorecard-wrap{width:100%;border:1px solid var(--brd);border-radius:var(--r);overflow:hidden}
+.scorecard-head{display:grid;gap:0;background:var(--surf2);border-bottom:1px solid var(--brd)}
+.scorecard-th{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;padding:9px 8px;text-align:center;white-space:nowrap}
+.scorecard-th:first-child{text-align:left;padding-left:14px}
+.scorecard-row{display:grid;gap:0;border-bottom:1px solid var(--brd);align-items:center;transition:background .1s}
+.scorecard-row:last-child{border-bottom:none}
+.scorecard-row:hover{background:var(--surf2)}
+.sc-name{padding:10px 10px 10px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;min-width:0}
+.sc-name-text{display:flex;flex-direction:column;min-width:0}
+.sc-name-label{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-name-sub{font-size:10px;color:var(--t3);margin-top:1px;white-space:nowrap}
+.sc-cell{padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.sc-val{font-size:12px;font-weight:700;line-height:1;text-align:center}
+.sc-val.ok{color:var(--ok)}.sc-val.warn{color:var(--warn)}.sc-val.ko{color:var(--ko)}.sc-val.na{color:var(--t3);font-style:italic;font-weight:400}
+.sc-bar{width:100%;height:5px;background:var(--brd);border-radius:3px;overflow:hidden}
+.sc-bar-fill{height:100%;border-radius:3px;transition:width .8s ease}
+.sc-bar-fill.ok{background:var(--lm-green)}.sc-bar-fill.warn{background:#FFB300}.sc-bar-fill.ko{background:var(--ko)}
+.sc-trend{font-size:10px;font-weight:600;padding:1px 5px;border-radius:4px;white-space:nowrap}
+.sc-trend.up{background:var(--ok-bg);color:var(--ok)}
+.sc-trend.dn{background:var(--ko-bg);color:var(--ko)}
+.sc-trend.flat{color:var(--t3)}
+.sc-best-col{padding:8px;display:flex;align-items:center;justify-content:center}
+.sc-best-pill{font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;background:var(--ok-bg);color:var(--ok);text-align:center;line-height:1.4}
 
 .logout-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:var(--r);background:var(--surf);border:1px solid var(--brd);cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s}
 .logout-row:active{transform:scale(.98)}
@@ -476,17 +489,17 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
   .sidebar-logout:hover{background:var(--sidebar-hover);color:#fff}
 
   /* ── Main content ── */
-  .desktop-main{flex:1;overflow-y:auto;background:var(--bg);display:flex;flex-direction:column;height:100vh}
+  .desktop-main{flex:1;overflow-y:auto;background:var(--bg);display:flex;flex-direction:column;height:100vh;min-width:0}
   .desktop-topbar{background:var(--surf);border-bottom:1px solid var(--brd);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:var(--shadow)}
   .desktop-topbar-title{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.4px}
   .desktop-topbar-sub{font-size:12px;color:var(--t2);margin-top:2px}
-  .desktop-main-content{flex:1;padding:28px;max-width:1200px;width:100%}
+  .desktop-main-content{flex:1;padding:24px 28px;width:100%;box-sizing:border-box;min-width:0}
 
   /* ── Grid layouts ── */
   .desktop-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
   .desktop-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
   .desktop-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-  .desktop-vendor-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+  .desktop-vendor-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:20px;width:100%}
 
   /* ── Dashboard cards ── */
   .dash-stat-card{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:20px;box-shadow:var(--shadow)}
@@ -513,13 +526,24 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
   /* Sur desktop, screen.active reste en flex-direction:row pour home */
   #screen-home.active{flex-direction:row}
 
-  /* Dashboard desktop — plus grand */
-  #desktop-dashboard-view .desktop-grid-2{grid-template-columns:55% 43%;gap:20px}
-  #desktop-dashboard-view .radar-wrap{height:360px}
-  #desktop-dashboard-view .heatmap-table{font-size:13px}
-  #desktop-dashboard-view .heatmap-table th{font-size:11px;padding:10px 8px}
-  #desktop-dashboard-view .heatmap-table td{padding:10px 8px}
-  #desktop-dashboard-view .hm-pill{min-width:58px;height:28px;font-size:12px}
+  /* Home desktop — cartes 2 colonnes */
+  #desktop-home-view .vendor-card{padding:22px 20px;min-height:140px;display:flex;flex-direction:column}
+  #desktop-home-view .vendor-card-name{font-size:20px;font-weight:800;margin-top:10px}
+  #desktop-home-view .vendor-card-months{font-size:12px;margin-top:4px;color:var(--t2)}
+  #desktop-home-view .vendor-card-avatar{width:44px;height:44px;font-size:16px;border-radius:12px}
+  #desktop-home-view .vprog{margin-top:auto;padding-top:14px}
+  #desktop-dashboard-view{width:100%;box-sizing:border-box}
+  #desktop-dashboard-view .desktop-grid-2{grid-template-columns:3fr 2fr;gap:20px;width:100%;align-items:start}
+  #desktop-dashboard-view .radar-wrap{height:380px}
+  #desktop-dashboard-view .scorecard-wrap{font-size:13px;width:100%;overflow:hidden}
+  #desktop-dashboard-view .scorecard-th{font-size:11px;padding:10px 8px}
+  #desktop-dashboard-view .sc-name{padding:11px 10px 11px 16px}
+  #desktop-dashboard-view .sc-cell{padding:10px 6px}
+  #desktop-dashboard-view .sc-val{font-size:13px}
+  #desktop-dashboard-view .sc-bar{width:100%;max-width:70px;height:6px}
+  #desktop-dashboard-view .sc-name-label{font-size:14px}
+  #desktop-dashboard-view .scorecard-head,
+  #desktop-dashboard-view .scorecard-row{grid-template-columns:160px repeat(5,1fr) 90px!important}
   #desktop-dashboard-view .dash-stat-card{padding:24px}
   #desktop-dashboard-view .dash-stat-val{font-size:36px}
 
@@ -533,6 +557,10 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 
   /* Vendor card desktop */
   .vendor-card{padding:20px}
+  .vendor-card-name{font-size:17px}
+  .vendor-card-months{font-size:12px}
+  #desktop-home-view{width:100%}
+  .desktop-action-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
   .vendor-card-name{font-size:18px}
 
   /* KPI cards desktop */
@@ -771,13 +799,33 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
     <div style="flex:1;overflow-y:auto">
       <div class="desktop-main-content">
         <div id="desktop-home-view">
-          <div id="home-alerts-desktop" style="margin-bottom:16px"></div>
-          <div class="section-label" style="margin-top:0">Mes conseillers</div>
-          <div class="vendor-grid desktop-vendor-grid" id="vendor-grid-desktop"></div>
-          <div class="section-label">Actions rapides</div>
-          <div class="desktop-action-bar">
-            <button class="desktop-action-btn" onclick="showDesktopView('dashboard')">📊 Tableau de bord</button>
-            <button class="desktop-action-btn" onclick="showDesktopView('objectifs')">🎯 Objectifs annuels</button>
+          <div style="display:grid;grid-template-columns:1fr 280px;gap:24px;align-items:start">
+            <!-- Colonne principale : conseillers -->
+            <div>
+              <div class="section-label" style="margin-top:0">Mes conseillers</div>
+              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px" id="vendor-grid-desktop"></div>
+            </div>
+            <!-- Colonne latérale : alertes + actions + prochains RDV -->
+            <div style="display:flex;flex-direction:column;gap:14px;position:sticky;top:0">
+              <!-- Alertes -->
+              <div id="home-alerts-desktop"></div>
+              <!-- Actions rapides -->
+              <div style="background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)">
+                <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Navigation</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <button onclick="showDesktopView('dashboard')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surf2);border:1px solid var(--brd);border-radius:var(--rs);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);transition:border-color .15s;text-align:left;width:100%" onmouseenter="this.style.borderColor='var(--teal)'" onmouseleave="this.style.borderColor='var(--brd)'">
+                    <span style="font-size:18px">📊</span>
+                    <div><div>Tableau de bord</div><div style="font-size:10px;font-weight:400;color:var(--t3);margin-top:1px">Synthèse équipe · radar · tendances</div></div>
+                  </button>
+                  <button onclick="showDesktopView('objectifs')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surf2);border:1px solid var(--brd);border-radius:var(--rs);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);transition:border-color .15s;text-align:left;width:100%" onmouseenter="this.style.borderColor='var(--teal)'" onmouseleave="this.style.borderColor='var(--brd)'">
+                    <span style="font-size:18px">🎯</span>
+                    <div><div>Objectifs annuels</div><div style="font-size:10px;font-weight:400;color:var(--t3);margin-top:1px">Paramétrer les cibles par conseiller</div></div>
+                  </button>
+                </div>
+              </div>
+              <!-- Prochains RDV -->
+              <div id="home-rdv-desktop" style="background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)"></div>
+            </div>
           </div>
         </div>
         <div id="desktop-dashboard-view" style="display:none"><div id="dashboard-content"></div></div>
@@ -1405,9 +1453,19 @@ function getTrend(vendeur,k,year){
   if(last==null||prev==null||isNaN(last)||isNaN(prev)||prev===0)return null;
   return((last-prev)/Math.abs(prev))*100;
 }
-function statusCls(pct,moisDone){
+function statusCls(pct, moisDone, k){
+  // Pour les KPI % (Transfo, Optin) : objectif fixe mensuel
+  // pct = moyenne / obj * 100 — on compare directement sans prorata temporel
+  if(k && KPI_IS_PCT[k]){
+    if(pct>=95) return 'ok';   // dans les 5% de l'objectif
+    if(pct>=80) return 'warn';
+    return 'ko';
+  }
+  // Pour les KPI cumulatifs : on compare au prorata des mois écoulés
   const traj=moisDone>0?(moisDone/12)*100:0;
-  if(pct>=traj)return'ok'; if(pct>=traj*.85)return'warn'; return'ko';
+  if(pct>=traj) return 'ok';
+  if(pct>=traj*.85) return 'warn';
+  return 'ko';
 }
 function globalScore(vendeur,year){
   const av=getAv(vendeur,year);
@@ -1416,7 +1474,7 @@ function globalScore(vendeur,year){
   // Ne compter que les KPI qui ont des données réelles
   return KPI_KEYS.filter(k=>{
     const hasData=md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]));
-    return hasData && statusCls(av[k].pct,md.length)==='ok';
+    return hasData && statusCls(av[k].pct,md.length,k)==='ok';
   }).length;
 }
 // Retourne X/Y où Y = nombre de KPI réellement renseignés
@@ -1517,12 +1575,22 @@ function getRegularity(vendeur, k, year) {
 }
 
 function getGlobalRegularity(vendeur, year) {
-  const scores = KPI_KEYS.map(k => getRegularity(vendeur, k, year)).filter(r => r !== null);
+  const av  = getAv(vendeur, year);
+  const res = getRes(vendeur, year);
+  const md  = Object.keys(res).map(Number);
+  // Ne compter que les KPI à l'objectif ET avec assez de données
+  const scores = KPI_KEYS.map(k => {
+    const reg = getRegularity(vendeur, k, year);
+    if(!reg) return null;
+    const cls = statusCls(av[k].pct, md.length, k);
+    if(cls !== 'ok') return null; // pas valorisé si sous l'objectif
+    return reg;
+  }).filter(r => r !== null);
   if(scores.length === 0) return null;
   const avg = Math.round(scores.reduce((s,r)=>s+r.score,0) / scores.length);
-  if(avg >= 80) return { score:avg, label:'Régularité globale', detail:'Performance constante et prévisible', color:'var(--ok)', emoji:'🟢' };
+  if(avg >= 80) return { score:avg, label:'Régularité globale', detail:'Performance constante sur les KPI atteints', color:'var(--ok)', emoji:'🟢' };
   if(avg >= 55) return { score:avg, label:'Régularité globale', detail:'Quelques écarts à lisser', color:'var(--warn)', emoji:'🟡' };
-  return               { score:avg, label:'Régularité globale', detail:'Résultats irréguliers — sujet à travailler', color:'var(--ko)', emoji:'🔴' };
+  return               { score:avg, label:'Régularité globale', detail:'Résultats irréguliers', color:'var(--ko)', emoji:'🔴' };
 }
 
 /* Fil rouge narratif — résumé de l'évolution */
@@ -1556,11 +1624,29 @@ function getFilRouge(vendeur, year) {
     }
   }
 
-  // Régularité globale
+  // Régularité — uniquement sur les KPI en trajectoire
   const reg = getGlobalRegularity(vendeur, year);
   if(reg) {
-    if(reg.score >= 80) phrases.push(`${reg.emoji} Les résultats sont stables et réguliers — signe d'une méthode solide.`);
-    else if(reg.score < 55) phrases.push(`🎢 Les résultats sont irréguliers — travailler la constance plutôt que les pics.`);
+    const nbOk = KPI_KEYS.filter(k => {
+      const r = getRegularity(vendeur, k, year);
+      const cls = statusCls(av[k].pct, md.length, k);
+      return r && cls === 'ok';
+    }).length;
+    if(nbOk > 0 && reg.score >= 80)
+      phrases.push(`${reg.emoji} Les KPI atteints sont tenus avec régularité — signe d'une méthode solide.`);
+    else if(reg.score < 55 && nbOk > 0)
+      phrases.push(`🎢 Même sur les KPI atteints, les résultats manquent de constance — travailler la régularité.`);
+  }
+
+  // KPIs en difficulté de régularité ET sous l'objectif — signal fort
+  const volatilsSousObj = KPI_KEYS.filter(k => {
+    const reg2 = getRegularity(vendeur, k, year);
+    const cls = statusCls(av[k].pct, md.length, k);
+    return reg2 && reg2.score < 55 && cls !== 'ok';
+  });
+  if(volatilsSousObj.length > 0) {
+    const noms = volatilsSousObj.map(k => KPI_FULL[KPI_KEYS.indexOf(k)]).join(', ');
+    phrases.push(`🎢 Résultats irréguliers ET sous objectif sur : ${noms} — double enjeu à travailler.`);
   }
 
   // Engagement non tenu récent
@@ -1581,9 +1667,12 @@ function makeKpiCard(vendeur,k,i,av,moisDoneCount){
   const hasKpiData = KPI_IS_PCT[k]
     ? md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]))
     : md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]));
-  const cls=hasKpiData?statusCls(pct,moisDoneCount):'neutral';
+  const cls=hasKpiData?statusCls(pct,moisDoneCount,k):'neutral';
   const barPct=hasKpiData?Math.min(100,pct):0;
-  const trajPct=hasKpiData&&moisDoneCount>0?Math.min(100,(moisDoneCount/12)*100):0;
+  // Trait "Attendu" : pour cumulatifs = prorata mois écoulés ; pour % = objectif fixe (100% de la cible)
+  const trajPct = hasKpiData && moisDoneCount > 0
+    ? (KPI_IS_PCT[k] ? 100 : Math.min(100, (moisDoneCount/12)*100))
+    : 0;
   const trend=hasKpiData?getTrend(vendeur,k,currentYear):null;
   let trendHtml='';
   if(trend!==null){
@@ -1630,7 +1719,12 @@ function makeKpiCard(vendeur,k,i,av,moisDoneCount){
     </div>
     <div class="kpi-footer">${remain}
       <div style="display:flex;align-items:center;gap:6px">
-        ${(()=>{ const reg=getRegularity(vendeur,k,currentYear); return reg?`<span style="font-size:10px;color:${reg.color};font-weight:700">${reg.emoji} ${reg.label}</span>`:''; })()}
+        ${(()=>{
+          const reg=getRegularity(vendeur,k,currentYear);
+          // Ne valoriser la régularité que si le KPI est en trajectoire
+          if(!reg || cls!=='ok') return '';
+          return `<span style="font-size:10px;color:${reg.color};font-weight:700">${reg.emoji} ${reg.label}</span>`;
+        })()}
         <span class="kpi-chip">${moisDoneCount} mois saisi${moisDoneCount>1?'s':''}</span>
       </div>
     </div>
@@ -1706,7 +1800,7 @@ function renderDashboard() {
 
   const avgMois = Math.round(VENDEURS.map(v=>Object.keys(getRes(v,currentYear)).length).reduce((a,b)=>a+b,0)/VENDEURS.length);
   const nextRdvCount = VENDEURS.filter(v=>(state.rdv&&state.rdv[v]&&state.rdv[v].prochain)).length;
-  let html = `<div class="desktop-grid-2" style="margin-bottom:20px;max-width:500px">`;
+  let html = `<div class="desktop-grid-2" style="margin-bottom:20px;max-width:480px">`;
   const statCards = [
     { label:'Conseillers suivis', val:VENDEURS.length, icon:'👥', color:'var(--teal)' },
     { label:'Mois saisis (moy.)', val:avgMois, icon:'📅', color:'var(--violet)' },
@@ -1722,58 +1816,87 @@ function renderDashboard() {
   });
   html += `</div>`;
 
-  // ── Heatmap + Radar ──
+  // ── Scorecard + Radar ──
   const beMois=new Date().toISOString().slice(0,7);
+  const cols=`minmax(100px,140px) repeat(${KPI_KEYS.length},1fr) minmax(70px,90px)`;
   html += `<div class="desktop-grid-2" style="margin-bottom:20px">`;
 
-  // Heatmap
+  // Scorecard
   html += `<div class="card" style="padding:0;overflow:hidden">
-    <div style="padding:14px 20px;border-bottom:1px solid var(--brd)"><div class="card-title" style="margin:0">Performance · ${currentYear} — Heatmap</div></div>
-    <div style="overflow-x:auto"><table class="heatmap-table"><thead><tr>
-      <th>Conseiller</th>`;
-  KPI_LABELS.forEach(l=>{html+=`<th>${l}</th>`;});
-  html+=`<th>↗ Meilleure progression</th></tr></thead><tbody>`;
+    <div style="padding:14px 20px;border-bottom:1px solid var(--brd)"><div class="card-title" style="margin:0">Performance · ${currentYear}</div></div>
+    <div class="scorecard-wrap" style="border:none;border-radius:0">
+      <div class="scorecard-head" style="grid-template-columns:${cols}">
+        <div class="scorecard-th" style="text-align:left">Conseiller</div>`;
+  KPI_LABELS.forEach(l=>{ html+=`<div class="scorecard-th">${l}</div>`; });
+  html+=`<div class="scorecard-th">Tendance</div></div>`;
+
   VENDEURS.forEach(v=>{
     const av=getAv(v,currentYear);
     const res=getRes(v,currentYear);
     const md=Object.keys(res).map(Number).sort((a,b)=>a-b);
     const beVal=(state.bienetre&&state.bienetre[v]&&state.bienetre[v][beMois])||0;
+    const beEmojis=['','😞','😕','😐','🙂','😄'];
+    const score=globalScore(v,currentYear);
+    const scoreLabel=globalScoreLabel(v,currentYear);
+
+    // Progression M/M globale (CA comme proxy lisible)
     const progressions=KPI_KEYS.map(k=>{
-      if(md.length<2)return null;
+      if(md.length<2) return null;
       const last=md[md.length-1],prev=md[md.length-2];
       const vL=res[last]&&res[last][k]!=null?res[last][k]:null;
       const vP=res[prev]&&res[prev][k]!=null?res[prev][k]:null;
-      if(vL===null||vP===null||vP===0)return null;
+      if(vL===null||vP===null||vP===0) return null;
       return((vL-vP)/Math.abs(vP))*100;
     });
     const validProgs=progressions.map((p,i)=>({p,i})).filter(x=>x.p!==null);
     const bestProg=validProgs.length>0?validProgs.reduce((a,b)=>a.p>b.p?a:b):null;
-    html+=`<tr onclick="${isDesktop()?`showDesktopVendeur('${v}')`:`openVendeur('${v}')`}" style="cursor:pointer">
-      <td><div style="display:flex;align-items:center;gap:8px">
-        <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
-        <div><div style="font-weight:700;font-size:13px">${NOMS[v]}</div>
-        <div style="font-size:10px;color:var(--t3)">${md.length} mois · <b style="color:${scoreColor(globalScore(v,currentYear))}">${globalScore(v,currentYear)}/5</b>${beVal>0?' '+['','😞','😕','😐','🙂','😄'][beVal]:''}</div>
-      </div></div></td>`;
+
+    const onclick=isDesktop()?`showDesktopVendeur('${v}')`:`openVendeur('${v}')`;
+    html+=`<div class="scorecard-row" style="grid-template-columns:${cols};cursor:pointer" onclick="${onclick}">
+      <div class="sc-name">
+        <div style="width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
+        <div class="sc-name-text">
+          <span class="sc-name-label">${NOMS[v]}</span>
+          <span class="sc-name-sub">${md.length} mois${scoreLabel?' · '+scoreLabel+' ✓':''}${beVal>0?' · '+beEmojis[beVal]:''}</span>
+        </div>
+      </div>`;
+
     KPI_KEYS.forEach((k,ki)=>{
       const hasData=md.some(m=>res[m][k]!=null&&!isNaN(res[m][k]));
-      if(!hasData){html+=`<td><span class="hm-pill hm-na">—</span></td>`;return;}
-      const cls=statusCls(av[k].pct,md.length);
+      if(!hasData){
+        html+=`<div class="sc-cell"><span class="sc-val na">—</span></div>`;
+        return;
+      }
+      const cls=statusCls(av[k].pct,md.length,k);
       const progVal=progressions[ki];
-      // Pour les KPI % (Transfo, Optin) : afficher la valeur réelle, pas le % d'objectif
-      const displayVal = KPI_IS_PCT[k]
+      // Valeur affichée : réelle pour %, % d'atteinte pour cumulatifs
+      const displayVal=KPI_IS_PCT[k]
         ? KPI_FMT[k](Math.round(av[k].realise*10)/10)
         : Math.round(av[k].pct)+'%';
-      html+=`<td><span class="hm-pill hm-${cls}">${displayVal}</span>`;
-      if(progVal!==null){const sym=progVal>0?'+':'';html+=`<br><span style="font-size:9px;color:var(--t3)">${sym}${Math.round(progVal)}%</span>`;}
-      html+=`</td>`;
+      // Largeur barre : pour %, ratio réalisé/objectif (plafonné 100%). Pour cumulatif, % d'atteinte plafonné
+      const barW=Math.min(100, KPI_IS_PCT[k]
+        ? Math.round(av[k].realise/av[k].realise*Math.min(100,av[k].pct))
+        : Math.round(av[k].pct));
+      const progHtml=progVal!==null
+        ? `<span class="sc-trend ${progVal>2?'up':progVal<-2?'dn':'flat'}">${progVal>0?'+':''}${Math.round(progVal)}%</span>`
+        : '';
+      html+=`<div class="sc-cell">
+        <span class="sc-val ${cls}">${displayVal}</span>
+        <div class="sc-bar"><div class="sc-bar-fill ${cls}" style="width:${barW}%"></div></div>
+        ${progHtml}
+      </div>`;
     });
+
+    // Colonne tendance globale — meilleure progression
     if(bestProg){
       const sym=bestProg.p>0?'+':'';
-      html+=`<td><span class="${bestProg.p>5?'hm-best':bestProg.p<-5?'hm-neg':'hm-neu'}">${KPI_LABELS[bestProg.i]} ${sym}${Math.round(bestProg.p)}%</span></td>`;
-    }else{html+=`<td><span class="hm-neu">—</span></td>`;}
-    html+=`</tr>`;
+      html+=`<div class="sc-best-col"><div class="sc-best-pill">${KPI_LABELS[bestProg.i]}<br>${sym}${Math.round(bestProg.p)}%</div></div>`;
+    } else {
+      html+=`<div class="sc-best-col"><span style="font-size:11px;color:var(--t3)">—</span></div>`;
+    }
+    html+=`</div>`;
   });
-  html+=`</tbody></table></div></div>`;
+  html+=`</div></div>`;
 
   // Radar
   html += `<div class="card">
@@ -1951,7 +2074,6 @@ function renderHome(){
   });
 
   const buildAlerts=()=>{
-    // Grouper les alertes par vendeur
     const alertsByVendeur={};
     alerts.forEach(a=>{
       if(!alertsByVendeur[a.v]) alertsByVendeur[a.v]=[];
@@ -1959,30 +2081,71 @@ function renderHome(){
     });
     if(!Object.keys(alertsByVendeur).length) return '';
     const click=(v)=>isDesktop()?`showDesktopVendeur('${v}')`:`openVendeur('${v}')`;
-    let ah=`<div class="section-label" style="margin-top:0">⚠ Points d'attention</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">`;
+    let ah=`<div style="background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)">
+      <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">⚠ Points d'attention</div>
+      <div style="display:flex;flex-direction:column;gap:8px">`;
     Object.entries(alertsByVendeur).forEach(([v,list])=>{
       const n=list.length;
       const hasKo=list.some(a=>a.type==='ko');
       const bg=hasKo?'var(--ko-bg)':'var(--warn-bg)';
       const border=hasKo?'#FFCDD2':'#FFCC80';
       const col=hasKo?'var(--ko)':'var(--warn)';
-      ah+=`<div onclick="${click(v)}" style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;background:${bg};border:1.5px solid ${border};cursor:pointer;transition:opacity .15s" onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">
-        <div style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:rgba(255,255,255,.6);color:${COLORS[v]}">${NOMS[v][0]}</div>
+      ah+=`<div onclick="${click(v)}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:${bg};border:1.5px solid ${border};cursor:pointer;transition:opacity .15s" onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">
+        <div style="width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:rgba(255,255,255,.7);color:${COLORS[v]}">${NOMS[v][0]}</div>
         <div>
           <div style="font-size:13px;font-weight:700;color:${col}">${NOMS[v]}</div>
           <div style="font-size:11px;font-weight:600;color:${col};opacity:.8">${n} alerte${n>1?'s':''}</div>
         </div>
+        <div style="margin-left:auto;font-size:16px;opacity:.4;color:${col}">›</div>
       </div>`;
     });
-    ah+=`</div>`;
+    ah+=`</div></div>`;
     return ah;
   };
 
+  // Alerte mobile (format ancien)
+  const buildAlertsMobile=()=>{
+    const alertsByVendeur={};
+    alerts.forEach(a=>{ if(!alertsByVendeur[a.v])alertsByVendeur[a.v]=[];alertsByVendeur[a.v].push(a); });
+    if(!Object.keys(alertsByVendeur).length) return '';
+    const click=(v)=>`openVendeur('${v}')`;
+    let ah=`<div class="section-label" style="margin-top:0">⚠ Points d'attention</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">`;
+    Object.entries(alertsByVendeur).forEach(([v,list])=>{
+      const n=list.length; const hasKo=list.some(a=>a.type==='ko');
+      const bg=hasKo?'var(--ko-bg)':'var(--warn-bg)'; const border=hasKo?'#FFCDD2':'#FFCC80'; const col=hasKo?'var(--ko)':'var(--warn)';
+      ah+=`<div onclick="${click(v)}" style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;background:${bg};border:1.5px solid ${border};cursor:pointer">
+        <div style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:rgba(255,255,255,.6);color:${COLORS[v]}">${NOMS[v][0]}</div>
+        <div><div style="font-size:13px;font-weight:700;color:${col}">${NOMS[v]}</div><div style="font-size:11px;font-weight:600;color:${col};opacity:.8">${n} alerte${n>1?'s':''}</div></div>
+      </div>`;
+    });
+    ah+=`</div>`; return ah;
+  };
+
   const alertsHtml=buildAlerts();
-  ['home-alerts','home-alerts-desktop'].forEach(id=>{
-    const el=document.getElementById(id); if(el)el.innerHTML=alertsHtml;
-  });
+  const alertsMobileHtml=buildAlertsMobile();
+  const el1=document.getElementById('home-alerts'); if(el1)el1.innerHTML=alertsMobileHtml;
+  const el2=document.getElementById('home-alerts-desktop'); if(el2)el2.innerHTML=alertsHtml;
+
+  // Prochains RDV — panneau latéral desktop
+  const rdvPanel=document.getElementById('home-rdv-desktop');
+  if(rdvPanel){
+    const rdvList=VENDEURS.map(v=>({v,rdv:(state.rdv&&state.rdv[v])||{}}))
+      .filter(x=>x.rdv.prochain).sort((a,b)=>a.rdv.prochain.localeCompare(b.rdv.prochain));
+    if(rdvList.length>0){
+      let rh=`<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">📅 Prochains RDV</div>`;
+      rdvList.forEach(({v,rdv})=>{
+        const d=new Date(rdv.prochain);
+        const fmt=isNaN(d)?rdv.prochain:d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+        rh+=`<div onclick="showDesktopVendeur('${v}')" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--brd);cursor:pointer;transition:opacity .15s" onmouseenter="this.style.opacity='.7'" onmouseleave="this.style.opacity='1'">
+          <div style="width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:${AVATAR_BG[v]};color:${COLORS[v]}">${NOMS[v][0]}</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">${NOMS[v]}</div><div style="font-size:11px;color:var(--teal);font-weight:600;margin-top:1px">${fmt}</div></div>
+        </div>`;
+      });
+      rdvPanel.innerHTML=rh;
+    } else {
+      rdvPanel.innerHTML=`<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">📅 Prochains RDV</div><div style="font-size:12px;color:var(--t3);font-style:italic">Aucun RDV planifié</div>`;
+    }
+  }
 
   const buildCards=(gridId)=>{
     const grid=document.getElementById(gridId); if(!grid)return;
@@ -2028,15 +2191,11 @@ function renderVendeur(v){
   // ── 1. SAISIE DES RÉSULTATS (en premier, ouvert par défaut) ──
   let html=`<div class="section-label" style="display:flex;align-items:center;justify-content:space-between;margin-top:0">
     <span>✏️ Saisie des résultats</span>
-    <button class="saisie-toggle" id="saisie-icon-${v}" onclick="toggleSaisie('${v}')" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
-      ▼ Ouvrir
+    <button id="saisie-btn-${v}" onclick="toggleSaisie('${v}')" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
+      ▲ Fermer
     </button>
   </div>
   <div class="saisie-card" id="saisie-wrap-${v}">
-    <div class="saisie-toggle-header" onclick="toggleSaisie('${v}')">
-      <span class="saisie-toggle-label" id="saisie-label-${v}">Saisir les résultats</span>
-      <span class="saisie-toggle-icon" id="saisie-icon-${v}">›</span>
-    </div>
     <div class="saisie-form open" id="saisie-form-${v}">`;
 
   // Note cumul si premier mois saisi > janvier
@@ -2168,11 +2327,20 @@ function renderVendeur(v){
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">`;
     KPI_KEYS.forEach((k,i)=>{
       const reg = getRegularity(v, k, currentYear);
-      if(reg){
+      const cls = reg ? statusCls(av[k].pct, md.length, k) : null;
+      const onTrack = cls === 'ok';
+      if(reg && onTrack){
         html+=`<div style="text-align:center;padding:7px 4px;background:var(--surf2);border-radius:8px;border:1px solid var(--brd)">
           <div style="font-size:14px">${reg.emoji}</div>
           <div style="font-size:9px;font-weight:700;color:var(--t2);margin-top:3px;text-transform:uppercase;letter-spacing:.3px">${KPI_LABELS[i]}</div>
           <div style="font-size:10px;font-weight:700;color:${reg.color};margin-top:1px">${reg.score}</div>
+        </div>`;
+      } else if(reg && !onTrack){
+        // KPI sous objectif — montrer la volatilité mais en mode "attention"
+        html+=`<div style="text-align:center;padding:7px 4px;background:var(--surf2);border-radius:8px;border:1px solid var(--brd);opacity:.5">
+          <div style="font-size:14px">⚪</div>
+          <div style="font-size:9px;font-weight:700;color:var(--t3);margin-top:3px;text-transform:uppercase;letter-spacing:.3px">${KPI_LABELS[i]}</div>
+          <div style="font-size:9px;color:var(--t3);margin-top:1px;font-style:italic">hors obj.</div>
         </div>`;
       } else {
         html+=`<div style="text-align:center;padding:7px 4px;background:var(--surf2);border-radius:8px;border:1px solid var(--brd)">
@@ -2193,7 +2361,7 @@ function renderVendeur(v){
     const a=av[k];
     const hasData=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
     const pct=hasData?Math.min(100,a.pct):0;
-    const clsG=hasData?statusCls(a.pct,md.length):'';
+    const clsG=hasData?statusCls(a.pct,md.length,k):'';
     const gCol=clsG==='ok'?STATUS_BAR.ok:clsG==='warn'?STATUS_BAR.warn:clsG==='ko'?STATUS_BAR.ko:gaugeColors[i];
     const shortVal=hasData?KPI_FMT[k](a.realise).toString().replace('€\u202f','').replace(' ','')||'—':'—';
     html+=makeGauge(hasData?pct:0,KPI_LABELS[i],hasData?shortVal:'—',hasData?gCol:'var(--brd)');
@@ -2405,8 +2573,13 @@ function renderVendeur(v){
 }
 
 function toggleSaisie(v){
-  const form=document.getElementById(`saisie-form-${v}`),icon=document.getElementById(`saisie-icon-${v}`);
-  form.classList.toggle('open');icon.classList.toggle('open',form.classList.contains('open'));
+  const form = document.getElementById(`saisie-form-${v}`);
+  const wrap = document.getElementById(`saisie-wrap-${v}`);
+  const btn  = document.getElementById(`saisie-btn-${v}`);
+  if(!form) return;
+  const isOpen = form.classList.toggle('open');
+  if(wrap) wrap.style.display = isOpen ? '' : 'none';
+  if(btn)  btn.innerHTML = isOpen ? '▲ Fermer' : '▼ Ouvrir';
 }
 
 function adjustObj(v, k, step, ki) {
@@ -2560,7 +2733,28 @@ async function exportPDF(v) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
 
-  // ── Données ──
+  // ── Palette exacte de l'app ──────────────────────────────
+  const C = {
+    sidebar:  [13,33,55],
+    teal:     [0,150,136],
+    tealL:    [224,242,241],
+    lmGreen:  [120,190,32],
+    ok:       [58,125,0],
+    okBg:     [234,245,204],
+    warn:     [180,83,9],
+    warnBg:   [254,243,199],
+    ko:       [185,28,28],
+    koBg:     [254,226,226],
+    surf:     [255,255,255],
+    surf2:    [242,246,238],
+    brd:      [221,232,212],
+    text:     [26,26,26],
+    t2:       [74,106,53],
+    t3:       [138,171,106],
+    mgray:    [155,165,184],
+    tealMid:  [128,203,196],
+  };
+
   const obj   = state.objectifs[v];
   const av    = getAv(v, currentYear);
   const res   = getRes(v, currentYear);
@@ -2572,278 +2766,309 @@ async function exportPDF(v) {
   const comm  = yd.commentaires[v]||{};
   const sugg  = getSuggestion(v, currentYear);
   const now   = new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
-  const NR    = 'Non renseigné';
-  const premierMois = md.length>0 ? md[0] : 0;
-  const dernierMois = md.length>0 ? md[md.length-1] : 0;
+  const NR    = 'Non renseigne';
+  const pm    = md.length>0 ? md[0] : 0;
+  const dm    = md.length>0 ? md[md.length-1] : 0;
 
-  // ── Helpers ──
-  let y = 38;
-  const sT = () => doc.setTextColor(0,150,136);
-  const sD = () => doc.setTextColor(30,30,30);
-  const sG = () => doc.setTextColor(150,150,150);
-  const sL = () => doc.setTextColor(90,100,120);
-  const sW = () => doc.setTextColor(180,83,9);
+  const ML=12, MR=12, CW=210-ML-MR;
+  let y=0, pg=1;
 
-  const chk = (n) => { if(y+n > 272) { footer(); doc.addPage(); y = 20; } };
+  // ── Helpers ──────────────────────────────────────────────
+  const rgb  = (c) => doc.setTextColor(...c);
+  const fill = (c) => doc.setFillColor(...c);
+  const drw  = (c) => doc.setDrawColor(...c);
 
-  const footer = () => {
-    const pg = doc.internal.getCurrentPageInfo().pageNumber;
-    doc.setFontSize(7); doc.setFont('helvetica','italic'); sG();
-    doc.text('RDV Perf · Leroy Merlin · Document de suivi — challenger et accompagner', 105, 290, {align:'center'});
+  const fmtV = (k,val) => {
+    if(val==null||isNaN(val)) return '—';
+    return KPI_FMT[k](val).toString().replace(/\u202f/g,' ').replace(/€/g,'EUR');
+  };
+
+  // ── Card helper : fond blanc, bordure brd, coins arrondis ──
+  const card = (x,cy,w,h,bg) => {
+    fill(bg||C.surf); drw(C.brd);
+    doc.setLineWidth(0.4);
+    doc.rect(x, cy, w, h, 'FD');
+  };
+
+  // ── Section label (comme .section-label dans l'app) ──
+  const sectionLabel = (txt) => {
+    chk(10);
+    doc.setFontSize(8); doc.setFont('helvetica','bold');
+    rgb(C.t3);
+    doc.text(txt.toUpperCase(), ML, y);
+    y+=2.5;
+    drw(C.brd); doc.setLineWidth(0.35);
+    doc.line(ML, y, 210-MR, y);
+    y+=5;
+  };
+
+  const chk = (need) => { if(y+need>278) { drawFooter(); doc.addPage(); pg++; drawHeader(); y=36; } };
+
+  const drawHeader = () => {
+    // Bandeau sidebar
+    fill(C.sidebar); doc.rect(0,0,210,28,'F');
+    // Triangle LM vert
+    doc.setFillColor(...C.lmGreen);
+    doc.lines([[8,0],[-4,11],[-4,-11]], ML, 7, null, 'F');
+    // Titre
+    rgb([255,255,255]);
+    doc.setFontSize(11); doc.setFont('helvetica','bold');
+    doc.text('RDV Perf', ML+12, 12);
+    doc.setFontSize(8); doc.setFont('helvetica','normal');
+    rgb(C.tealMid);
+    doc.text('Suivi de performance - Leroy Merlin - '+currentYear, ML+12, 18);
+    // Signature
+    doc.setFontSize(7); doc.setFont('helvetica','italic');
+    rgb([74,122,106]);
+    doc.text('Crafted by Sammy Malc', ML+12, 24);
+    // Conseiller à droite
+    rgb([255,255,255]);
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text(NOMS[v], 210-MR, 12, {align:'right'});
+    doc.setFontSize(7); doc.setFont('helvetica','normal');
+    rgb(C.tealMid);
+    doc.text('Genere le '+now, 210-MR, 18, {align:'right'});
+    // Ligne teal
+    fill(C.teal); doc.rect(0,28,210,1.2,'F');
+    y=34;
+  };
+
+  const drawFooter = () => {
+    doc.setFontSize(6.5); doc.setFont('helvetica','italic'); rgb(C.mgray);
+    doc.text('RDV Perf - Leroy Merlin - Document de suivi', 105, 291, {align:'center'});
     doc.setFont('helvetica','normal');
-    doc.text('Page '+pg, 196, 290, {align:'right'});
+    doc.text('Page '+doc.internal.getCurrentPageInfo().pageNumber, 210-MR, 291, {align:'right'});
   };
 
-  const section = (title) => {
-    chk(14);
-    doc.setFontSize(8.5); doc.setFont('helvetica','bold');
-    doc.setTextColor(138,171,106);
-    doc.text(title.toUpperCase(), 14, y); y+=3;
-    doc.setDrawColor(221,232,212); doc.setLineWidth(0.4);
-    doc.line(14,y,196,y); y+=5;
-  };
+  // ══ Page 1 ══════════════════════════════════════════════
+  drawHeader();
 
-  const nr = (txt) => {
-    doc.setFontSize(9); doc.setFont('helvetica','italic'); sG();
-    doc.text(txt||NR, 14, y); y+=7;
-  };
+  // ── 1. INFOS ── carte blanche avec bord
+  chk(20);
+  card(ML, y, CW, 18, C.surf);
+  doc.setFontSize(8); doc.setFont('helvetica','bold'); rgb(C.t3);
+  doc.text('Conseiller', ML+4, y+6);
+  doc.text('Responsable', ML+CW/2, y+6);
+  doc.setFont('helvetica','normal'); rgb(C.text);
+  doc.setFontSize(9);
+  doc.text(NOMS[v], ML+32, y+6);
+  doc.text('Sammy M.', ML+CW/2+28, y+6);
+  doc.setFontSize(8); doc.setFont('helvetica','bold'); rgb(C.t3);
+  doc.text('Prochain RDV', ML+4, y+13);
+  doc.setFont('helvetica','bold'); rgb(C.teal);
+  doc.setFontSize(9);
+  doc.text(rdv.prochain||NR, ML+32, y+13);
+  y+=23;
 
-  // ── 1. EN-TÊTE ──
-  doc.setFillColor(13,33,55); doc.rect(0,0,210,30,'F');
-  doc.setFillColor(120,190,32); doc.setDrawColor(120,190,32);
-  doc.lines([[8,0],[-4,12],[-4,-12]],14,10,null,'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(13); doc.setFont('helvetica','bold');
-  doc.text('RDV Perf — Suivi de performance', 27, 13);
-  doc.setFontSize(8); doc.setFont('helvetica','normal');
-  doc.setTextColor(128,203,196);
-  doc.text('Leroy Merlin Livry-Gargan · Groupe ADEO · '+currentYear, 27, 20);
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(10); doc.setFont('helvetica','bold');
-  doc.text(NOMS[v], 196, 13, {align:'right'});
-  doc.setFontSize(8); doc.setFont('helvetica','normal');
-  doc.setTextColor(128,203,196);
-  doc.text('Généré le '+now, 196, 20, {align:'right'});
+  // ── 2. VICTOIRE & QUICK WIN ── deux cartes côte à côte
+  const kpiScores=KPI_KEYS.map((k,i)=>{
+    const hd=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
+    return{k,i,pct:hd?av[k].pct:null,hd};
+  }).filter(x=>x.hd);
+  if(kpiScores.length>0) {
+    chk(26);
+    sectionLabel('Mise en lumiere');
+    const winK=kpiScores.reduce((a,b)=>a.pct>b.pct?a:b);
+    const qwK=kpiScores.length>1?kpiScores.reduce((a,b)=>a.pct<b.pct?a:b):null;
+    const hw=(CW-4)/2;
+    // Carte Victoire — fond ok-bg
+    card(ML, y, hw, 20, C.okBg);
+    fill([221,232,212]); doc.rect(ML,y,2,20,'F'); // bordure gauche teal
+    fill(C.lmGreen); doc.rect(ML,y,2,20,'F');
+    doc.setFontSize(7); doc.setFont('helvetica','bold'); rgb(C.t3);
+    doc.text('VICTOIRE DU MOIS', ML+5, y+5);
+    doc.setFontSize(11); doc.setFont('helvetica','bold'); rgb(C.ok);
+    doc.text(KPI_FULL[winK.i], ML+5, y+12);
+    doc.setFontSize(8); doc.setFont('helvetica','normal'); rgb(C.t2);
+    doc.text(fmtV(winK.k,av[winK.k].realise)+' - '+Math.round(winK.pct)+'% obj.', ML+5, y+18);
+    // Carte Quick Win — fond warn-bg
+    if(qwK){
+      card(ML+hw+4, y, hw, 20, C.warnBg);
+      fill(C.warn); doc.rect(ML+hw+4,y,2,20,'F');
+      doc.setFontSize(7); doc.setFont('helvetica','bold'); rgb(C.t3);
+      doc.text('QUICK WIN - LEVIER', ML+hw+9, y+5);
+      doc.setFontSize(11); doc.setFont('helvetica','bold'); rgb(C.warn);
+      doc.text(KPI_FULL[qwK.i], ML+hw+9, y+12);
+      doc.setFontSize(8); doc.setFont('helvetica','normal'); rgb(C.t2);
+      doc.text(fmtV(qwK.k,av[qwK.k].realise)+' - '+Math.round(qwK.pct)+'%', ML+hw+9, y+18);
+    }
+    y+=26;
+  }
 
-  // ── 2. INFORMATIONS ──
-  section('Informations');
-  doc.setFontSize(8.5); sL();
-  doc.setFont('helvetica','bold'); doc.text('Conseiller', 14, y);
-  doc.setFont('helvetica','normal'); sD(); doc.text(NOMS[v], 50, y);
-  doc.setFont('helvetica','bold'); sL(); doc.text('Responsable Rayon', 110, y);
-  doc.setFont('helvetica','normal'); sD(); doc.text('Sammy M. — Responsable Rayon', 152, y);
-  y+=6;
-  doc.setFont('helvetica','bold'); sL(); doc.text('Prochain RDV', 14, y);
-  doc.setFont('helvetica','normal'); sD(); doc.text(rdv.prochain||NR, 50, y);
+  // ── 3. PERFORMANCE KPI ── tableau style app
+  const titPerf=md.length>0
+    ?'Performance - '+MOIS_L[pm]+(pm!==dm?'-'+MOIS_L[dm]:'')+' '+currentYear
+    :'Performance - Aucune saisie';
+  chk(12+KPI_KEYS.length*8);
+  sectionLabel(titPerf);
+  // Header tableau — bandeau sidebar
+  fill(C.sidebar); doc.rect(ML,y-1,CW,7,'F');
+  doc.setFontSize(7); doc.setFont('helvetica','bold'); rgb([255,255,255]);
+  const kX=[ML+2,ML+54,ML+86,ML+110,ML+130,ML+152];
+  ['KPI','Realise','Obj/mois','% mois','Statut','Regularite'].forEach((h,i)=>
+    doc.text(h, kX[i]+(i>0?8:0), y+3.5, {align:i>0?'center':'left'}));
   y+=8;
 
-  // ── 3. CLIMAT DU MOMENT ──
-  section('Climat du moment');
-  doc.setFontSize(7.5); doc.setFont('helvetica','italic'); sG();
-  doc.text('Ressenti partagé — à titre indicatif, non évaluatif.', 14, y); y+=7;
-  const beMoisList = Object.keys(beData).sort().slice(-6);
-  const beTexts = ['Difficile','Compliqué','Neutre','Bien','Excellent'];
-  const beCols = [[239,68,68],[249,115,22],[155,165,184],[0,150,136],[120,190,32]];
-  if(beMoisList.length > 0) {
-    chk(36);
-    const cX=20,cW=170,cH=26,pL=10,pR=10,dW=cW-pL-pR,n=beMoisList.length;
-    doc.setDrawColor(232,234,240); doc.setLineWidth(0.2);
-    for(let lv=1;lv<=5;lv++) doc.line(cX+pL,y+cH-(lv-1)/4*cH,cX+cW-pR,y+cH-(lv-1)/4*cH);
-    const pts=beMoisList.map((m,i)=>({
-      px:cX+pL+(n>1?i/(n-1)*dW:dW/2),
-      py:y+cH-(beData[m]-1)/4*cH,
-      val:beData[m], mois:MOIS_S[parseInt(m.slice(5))-1]||m
-    }));
-    doc.setDrawColor(0,150,136); doc.setLineWidth(1.5);
-    for(let i=1;i<pts.length;i++) doc.line(pts[i-1].px,pts[i-1].py,pts[i].px,pts[i].py);
-    pts.forEach(({px,py,val,mois})=>{
-      const [r,g,b]=beCols[val-1];
-      doc.setFillColor(r,g,b); doc.setDrawColor(255,255,255); doc.setLineWidth(1);
-      doc.circle(px,py,2.5,'FD');
-      doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(r,g,b);
-      doc.text(beTexts[val-1],px,py-5,{align:'center'});
-      doc.setFontSize(7); doc.setFont('helvetica','normal'); sG();
-      doc.text(mois,px,py+5.5,{align:'center'});
-    });
-    y+=cH+10;
-  } else { nr(NR); }
-
-  // ── 4. VICTOIRE & QUICK WIN ──
-  section('Mise en lumière');
-  const kpiScores = KPI_KEYS.map((k,i)=>{
-    const hasData = md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
-    return {k,i,pct:hasData?av[k].pct:null,hasData};
-  }).filter(x=>x.hasData);
-  if(kpiScores.length > 0) {
-    chk(20);
-    const winKpi = kpiScores.reduce((a,b)=>a.pct>b.pct?a:b);
-    const qwKpi  = kpiScores.length>1 ? kpiScores.reduce((a,b)=>a.pct<b.pct?a:b) : null;
-    // Victoire
-    doc.setFillColor(234,245,204); doc.rect(14,y-2,86,22,'F');
-    doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(58,125,0);
-    doc.text('🏆 Victoire du mois', 17, y+3);
-    doc.setFontSize(11); doc.text(KPI_FULL[winKpi.i], 17, y+10);
-    doc.setFontSize(9); doc.setFont('helvetica','normal');
-    doc.text(KPI_FMT[winKpi.k](av[winKpi.k].realise)+' · '+Math.round(winKpi.pct)+"% de l'objectif", 17, y+17);
-    // Quick Win
-    if(qwKpi) {
-      doc.setFillColor(255,248,225); doc.rect(110,y-2,86,22,'F');
-      doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(180,83,9);
-      doc.text('⚡ Quick Win', 113, y+3);
-      doc.setFontSize(11); doc.text(KPI_FULL[qwKpi.i], 113, y+10);
-      doc.setFontSize(9); doc.setFont('helvetica','normal');
-      doc.text(KPI_FMT[qwKpi.k](av[qwKpi.k].realise)+' · '+Math.round(qwKpi.pct)+"% — levier", 113, y+17);
-    }
-    y+=28;
-  } else { nr(NR); }
-
-  // ── 5. PERFORMANCE KPI ──
-  const titrePerf = md.length>0
-    ? `Performance — ${md.length} mois (${MOIS_L[premierMois]}${premierMois!==dernierMois?' → '+MOIS_L[dernierMois]:''}) · ${currentYear}`
-    : `Performance — Aucune saisie · ${currentYear}`;
-  section(titrePerf);
-  // En-tête tableau
-  const kX=[14,72,104,132,154]; const kW=[58,32,28,22,42];
-  doc.setFillColor(13,33,55); doc.rect(14,y-2,182,8,'F');
-  doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
-  ['KPI','Réalisé','Obj/mois','% mois','Statut'].forEach((h,i)=>{
-    doc.text(h, kX[i]+(i>0?kW[i]/2:0), y+3, {align:i>0?'center':'left'});
-  }); y+=9;
   KPI_KEYS.forEach((k,i)=>{
     chk(8);
-    const a = av[k];
-    const hasData = md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
-    const realStr = hasData ? KPI_FMT[k](KPI_IS_PCT[k]?Math.round(a.realise*10)/10:a.realise).toString() : NR;
-    const objM    = KPI_IS_PCT[k] ? obj[k] : Math.round(obj[k]/12);
-    const objStr  = KPI_FMT[k](objM).toString();
-    const pct     = hasData ? Math.round(a.pct) : null;
-    let statStr='', bg=null, fg=null;
-    if(!hasData){ statStr=NR; }
-    else {
-      const cls = statusCls(a.pct, md.length);
-      if(cls==='ok'){  statStr='✓ En trajectoire';  bg=[234,245,204]; fg=[58,125,0]; }
-      else if(cls==='warn'){ statStr='→ À consolider'; bg=[254,243,199]; fg=[180,83,9]; }
-      else { statStr=pct+"% de l'obj."; bg=[254,226,226]; fg=[185,28,28]; }
+    const a=av[k];
+    const hd=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
+    const realS=hd?fmtV(k,KPI_IS_PCT[k]?Math.round(a.realise*10)/10:a.realise):NR;
+    const objM=KPI_IS_PCT[k]?obj[k]:Math.round(obj[k]/12);
+    const pct=hd?Math.round(a.pct):null;
+    let cls='',bgS=null,fgS=null,statS=NR;
+    if(hd){
+      cls=statusCls(a.pct,md.length,k);
+      if(cls==='ok'){statS='En trajectoire';bgS=C.okBg;fgS=C.ok;}
+      else if(cls==='warn'){statS='A consolider';bgS=C.warnBg;fgS=C.warn;}
+      else{statS=pct+"% obj.";bgS=C.koBg;fgS=C.ko;}
     }
-    if(i%2===0){ doc.setFillColor(245,246,250); doc.rect(14,y-2,182,7,'F'); }
-    doc.setFontSize(8.5); doc.setFont('helvetica','bold'); sD();
-    doc.text(KPI_FULL[i], kX[0], y+2.5);
-    doc.setFont('helvetica','normal');
-    doc.text(realStr, kX[1]+kW[1]/2, y+2.5, {align:'center'});
-    doc.text(objStr,  kX[2]+kW[2]/2, y+2.5, {align:'center'});
-    doc.text(pct!==null?pct+'%':'—', kX[3]+kW[3]/2, y+2.5, {align:'center'});
-    if(bg){ doc.setFillColor(...bg); doc.rect(kX[4],y-1.5,kW[4],6,'F');
-      doc.setTextColor(...fg); doc.setFont('helvetica','bold'); doc.setFontSize(7); }
-    else { sG(); doc.setFont('helvetica','italic'); doc.setFontSize(7); }
-    doc.text(statStr, kX[4]+kW[4]/2, y+2.5, {align:'center'});
-    y+=7;
-  });
-  doc.setFontSize(6.5); doc.setFont('helvetica','italic'); sG();
-  doc.text('* Réalisé = cumul pour CA/Chantiers/Fidélité · moyenne pour Transfo/Opt-in', 14, y+1);
-  y+=7;
-
-  // ── 6. HISTORIQUE MENSUEL ──
-  chk(20); section('Historique mensuel');
-  if(md.length===0){ nr(NR); }
-  else {
-    doc.setFillColor(13,33,55); doc.rect(14,y-2,182,7,'F');
-    doc.setTextColor(255,255,255); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
-    const hX=[14,34,64,82,100,114,130];
-    ['Mois','CA','Transfo','Opt-in','Chant.','Fidél.','Contexte'].forEach((h,i)=>{ doc.text(h,hX[i],y+2.5); });
+    // Ligne alternée
+    if(i%2===0){fill(C.surf2); doc.rect(ML,y-1,CW,7,'F');}
+    doc.setFontSize(8); doc.setFont('helvetica','bold'); rgb(C.sidebar);
+    doc.text(KPI_FULL[i], kX[0], y+3.5);
+    doc.setFont('helvetica','normal'); rgb(C.text);
+    doc.text(realS, kX[1]+8, y+3.5, {align:'center'});
+    doc.text(fmtV(k,objM), kX[2]+8, y+3.5, {align:'center'});
+    doc.text(pct!=null?pct+'%':'—', kX[3]+8, y+3.5, {align:'center'});
+    // Badge statut
+    if(bgS){
+      fill(bgS); doc.rect(kX[4],y,22,5.5,'F');
+      doc.setFontSize(6.5); doc.setFont('helvetica','bold'); rgb(fgS);
+      doc.text(statS, kX[4]+11, y+3.5, {align:'center'});
+    } else {
+      doc.setFontSize(6.5); doc.setFont('helvetica','italic'); rgb(C.mgray);
+      doc.text(NR, kX[4]+8, y+3.5, {align:'center'});
+    }
+    // Barre de progression (mini)
+    const barX=kX[5], barW=36, barH=3;
+    fill(C.brd); doc.rect(barX, y+2, barW, barH,'F');
+    if(hd&&pct!=null){
+      const fw=Math.min(barW, barW*Math.min(pct,100)/100);
+      const barCol=cls==='ok'?C.lmGreen:cls==='warn'?[255,179,0]:C.ko;
+      fill(barCol); doc.rect(barX, y+2, fw, barH,'F');
+    }
     y+=8;
+  });
+  y+=4;
+
+  // ── 4. HISTORIQUE MENSUEL ──
+  chk(18);
+  sectionLabel('Historique mensuel');
+  if(md.length===0){
+    doc.setFontSize(8); doc.setFont('helvetica','italic'); rgb(C.mgray);
+    doc.text(NR, ML, y); y+=8;
+  } else {
+    // Header
+    fill(C.sidebar); doc.rect(ML,y-1,CW,6.5,'F');
+    doc.setFontSize(6.5); doc.setFont('helvetica','bold'); rgb([255,255,255]);
+    const hX=[ML+2,ML+18,ML+52,ML+74,ML+92,ML+108,ML+124];
+    ['Mois','CA','Transfo','Opt-in','Chant.','Fidel.','Contexte'].forEach((h,ci)=>doc.text(h,hX[ci],y+3));
+    y+=7.5;
     md.forEach((m,idx)=>{
-      chk(7);
+      chk(6);
       const r=res[m];
-      if(idx%2===0){ doc.setFillColor(245,246,250); doc.rect(14,y-2,182,6,'F'); }
-      doc.setFontSize(8); doc.setFont('helvetica','bold'); sD();
-      doc.text(MOIS_S[m], hX[0], y+1.5);
-      doc.setFont('helvetica','normal');
-      [
-        r.ca!=null?KPI_FMT.ca(r.ca).toString():'—',
-        r.taux!=null?KPI_FMT.taux(r.taux).toString():'—',
-        r.optin!=null?KPI_FMT.optin(r.optin).toString():'—',
-        r.chantiers!=null?KPI_FMT.chantiers(r.chantiers).toString():'—',
-        r.fidelite!=null?KPI_FMT.fidelite(r.fidelite).toString():'—',
-      ].forEach((val,ci)=>{ doc.text(val, hX[ci+1], y+1.5); });
-      if(comm[m]){ doc.setFont('helvetica','italic'); sL(); doc.text(comm[m].slice(0,28), hX[6], y+1.5); }
-      y+=6;
+      if(idx%2===0){fill(C.surf2); doc.rect(ML,y-1,CW,5.5,'F');}
+      doc.setFontSize(7); doc.setFont('helvetica','bold'); rgb(C.sidebar);
+      doc.text(MOIS_S[m], hX[0], y+2.5);
+      doc.setFont('helvetica','normal'); rgb(C.text);
+      [fmtV('ca',r.ca),fmtV('taux',r.taux),fmtV('optin',r.optin),
+       fmtV('chantiers',r.chantiers),fmtV('fidelite',r.fidelite)
+      ].forEach((val,ci)=>doc.text(val,hX[ci+1],y+2.5));
+      if(comm[m]){doc.setFont('helvetica','italic');rgb(C.t2);doc.text(String(comm[m]).slice(0,22),hX[6],y+2.5);}
+      y+=5.5;
     });
   }
   y+=4;
 
-  // ── 7. ENGAGEMENTS ──
-  chk(20); section('Engagements');
-  const engsOuverts  = engs.filter(e=>e.statut==='ouvert');
-  const engsArchives = engs.filter(e=>e.statut!=='ouvert');
-  if(engs.length===0){ nr(NR); }
-  else {
-    const eMap = {
-      'ouvert':   ['●','OUVERT',   [0,150,136], [224,242,241]],
-      'tenu':     ['✓','TENU',     [58,125,0],  [234,245,204]],
-      'non_tenu': ['✗','NON TENU', [185,28,28], [254,226,226]],
+  // ── 5. ENGAGEMENTS ──
+  chk(14);
+  sectionLabel('Engagements');
+  const eOuv=engs.filter(e=>e.statut==='ouvert');
+  const eArc=engs.filter(e=>e.statut!=='ouvert');
+  if(engs.length===0){doc.setFontSize(8);doc.setFont('helvetica','italic');rgb(C.mgray);doc.text(NR,ML,y);y+=7;}
+  else{
+    const eMap={
+      'ouvert':   [C.teal,   C.tealL, 'OUVERT'],
+      'tenu':     [C.ok,     C.okBg,  'TENU'],
+      'non_tenu': [C.ko,     C.koBg,  'NON TENU'],
     };
-    [...engsOuverts,...engsArchives].forEach(e=>{
-      const [bu,lab,fg,bg] = eMap[e.statut]||eMap['ouvert'];
-      const who = e.auteur==='manager'?'👤 Manager':'🙋 Conseiller';
-      const lines = doc.splitTextToSize(e.texte, 148);
-      chk(6+lines.length*4.5);
-      doc.setFillColor(...bg); doc.rect(168,y-1,28,5,'F');
-      doc.setFontSize(7.5); doc.setFont('helvetica','bold'); doc.setTextColor(...fg);
-      doc.text(lab, 182, y+2.5, {align:'center'});
-      doc.setFontSize(8.5); doc.setFont('helvetica','bold'); sD();
-      doc.text(bu+' '+who+' · '+e.date, 14, y+2.5); y+=6;
-      doc.setFont('helvetica','normal');
-      doc.text(lines, 18, y); y+=lines.length*4.5+2;
+    [...eOuv,...eArc].forEach(e=>{
+      const[fg,bg,lab]=eMap[e.statut]||eMap['ouvert'];
+      const who=e.auteur==='manager'?'Manager':'Conseiller';
+      const lines=doc.splitTextToSize(e.texte, CW-36);
+      chk(5+lines.length*4.2);
+      // Carte engagement
+      const rowH=5+lines.length*4.2;
+      card(ML,y-1,CW,rowH,C.surf);
+      // Pastille statut
+      fill(bg); doc.rect(210-MR-28,y,26,4.5,'F');
+      doc.setFontSize(6); doc.setFont('helvetica','bold'); rgb(fg);
+      doc.text(lab,210-MR-15,y+3,{align:'center'});
+      // Texte
+      doc.setFontSize(7.5); doc.setFont('helvetica','bold'); rgb(C.text);
+      doc.text('['+who+'] '+e.date, ML+3, y+3.5);
+      y+=5.5;
+      doc.setFont('helvetica','normal'); rgb(C.t2);
+      doc.text(lines, ML+5, y);
+      y+=lines.length*4.2+3;
     });
   }
-  y+=4;
+  y+=3;
 
-  // ── 8. OBJECTIF MOIS SUIVANT ──
-  chk(20);
-  section(sugg ? 'Objectif conseillé — '+MOIS_L[sugg.moisSuivant]+' '+currentYear : 'Objectif mois suivant');
-  if(!sugg){ nr(NR); }
-  else {
-    const mr = 12-sugg.moisSuivant;
+  // ── 6. OBJECTIF MOIS SUIVANT ── vignette bleue marine
+  chk(16);
+  sectionLabel(sugg?'Objectif conseille - '+MOIS_L[sugg.moisSuivant]+' '+currentYear:'Objectif mois suivant');
+  if(!sugg){doc.setFontSize(8);doc.setFont('helvetica','italic');rgb(C.mgray);doc.text(NR,ML,y);y+=7;}
+  else{
+    const mr=12-sugg.moisSuivant;
     if(sugg.moisSuivant===4||sugg.moisSuivant===5){
       chk(10);
-      doc.setFillColor(254,243,199); doc.rect(14,y-2,182,8,'F');
-      doc.setFontSize(8); doc.setFont('helvetica','italic'); sW();
-      doc.text('⚠  Travaux R05 prévus — cibles ajustées en conséquence.', 17, y+3.5);
-      y+=11;
+      fill(C.warnBg); doc.rect(ML,y-1,CW,8,'F');
+      drw(C.warnBg); doc.setLineWidth(0.3);
+      doc.setFontSize(7.5); doc.setFont('helvetica','italic'); rgb(C.warn);
+      doc.text('Travaux R05 prevus - cibles ajustees en consequence.', ML+3, y+4); y+=11;
     }
-    chk(KPI_KEYS.length*9+6);
-    doc.setFillColor(242,246,238); doc.rect(14,y-2,182,KPI_KEYS.length*9+2,'F');
+    // Carte objectif style goal-card
+    const goH=KPI_KEYS.length*8+6;
+    chk(goH);
+    fill(C.sidebar); doc.rect(ML,y-1,CW,goH,'F');
+    // Label mois
+    doc.setFontSize(8); doc.setFont('helvetica','bold'); rgb(C.tealMid);
+    doc.text('Objectif conseille - '+MOIS_L[sugg.moisSuivant], ML+5, y+5);
+    doc.setFontSize(7); doc.setFont('helvetica','normal'); rgb([100,130,120]);
+    doc.text(mr+' mois restant'+(mr>1?'s':'')+' - lisse et atteignable', ML+5, y+10);
+    let gy=y+15;
     KPI_KEYS.forEach((k,i)=>{
-      const val = sugg.sugg[k].algo;
-      const objM = KPI_IS_PCT[k] ? obj[k] : obj[k]/12;
-      const diff = val - objM;
-      let deltaStr = '→ rythme de croisière';
-      let dCol = [90,100,120];
-      if(diff>0.5){ deltaStr='↑ rattrapage'; dCol=[180,83,9]; }
-      else if(diff<-0.5){ deltaStr='↓ en avance'; dCol=[58,125,0]; }
-      doc.setFontSize(8); doc.setFont('helvetica','bold'); sL();
-      doc.text(KPI_FULL[i], 16, y+3);
-      doc.setFontSize(11); doc.setFont('helvetica','bold'); sT();
-      doc.text(KPI_FMT[k](KPI_IS_PCT[k]?Math.round(val*10)/10:Math.round(val)).toString(), 82, y+3);
-      doc.setFontSize(7.5); doc.setFont('helvetica','italic'); doc.setTextColor(...dCol);
-      doc.text(deltaStr, 112, y+3);
-      y+=9;
+      const val=sugg.sugg[k].algo;
+      const objM=KPI_IS_PCT[k]?obj[k]:obj[k]/12;
+      const diff=val-objM;
+      const dStr=diff>0.5?'rattrapage':diff<-0.5?'en avance':'rythme de croisiere';
+      const dCol=diff>0.5?C.warn:diff<-0.5?C.lmGreen:C.mgray;
+      doc.setFontSize(7.5); doc.setFont('helvetica','bold'); rgb(C.tealMid);
+      doc.text(KPI_FULL[i], ML+5, gy);
+      doc.setFontSize(11); doc.setFont('helvetica','bold'); rgb(C.teal);
+      doc.text(fmtV(k,KPI_IS_PCT[k]?Math.round(val*10)/10:Math.round(val)), ML+75, gy);
+      doc.setFontSize(7); doc.setFont('helvetica','italic'); rgb(dCol);
+      doc.text(dStr, ML+115, gy);
+      gy+=8;
     });
-    doc.setFontSize(6.5); doc.setFont('helvetica','italic'); sG();
-    doc.text('Objectif lissé sur '+mr+' mois restant'+(mr>1?'s':'')+" — plafonné à 120% de l'objectif mensuel.", 14, y+1);
-    y+=6;
+    y+=goH+4;
   }
 
-  // ── 9. PROCHAIN RDV ──
-  chk(16); section('Prochain RDV');
-  doc.setFontSize(11); doc.setFont('helvetica','bold'); sT();
-  doc.text(rdv.prochain||NR, 16, y+2);
-  y+=10;
+  // ── 7. PROCHAIN RDV ──
+  chk(16);
+  sectionLabel('Prochain RDV');
+  // Carte teal-light
+  card(ML, y, CW, 12, C.tealL);
+  fill(C.teal); doc.rect(ML,y,3,12,'F');
+  doc.setFontSize(11); doc.setFont('helvetica','bold'); rgb(C.teal);
+  doc.text(rdv.prochain||NR, ML+8, y+8);
+  y+=17;
 
-  footer();
-  const filename = 'RDV-Perf_'+NOMS[v]+'_'+currentYear+'_'+now.replace(/ /g,'-')+'.pdf';
-  doc.save(filename);
-  toast('PDF généré ✓ — '+filename);
+  drawFooter();
+  doc.save('RDV-Perf_'+NOMS[v]+'_'+currentYear+'_'+now.replace(/ /g,'-')+'.pdf');
+  toast('PDF genere !');
 }
 
 
@@ -2933,7 +3158,7 @@ function renderAdvisor(v){
     const a=av[k];
     const hasData=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
     const pct=hasData?Math.min(100,a.pct):0;
-    const cls=hasData?statusCls(pct,md.length):'';
+    const cls=hasData?statusCls(pct,md.length,k):'';
     const gCol=cls==='ok'?STATUS_BAR.ok:cls==='warn'?STATUS_BAR.warn:cls==='ko'?STATUS_BAR.ko:'var(--brd)';
     const shortVal=hasData?KPI_FMT[k](a.realise).toString().replace('€\u202f','').replace(' ','')||'—':'—';
     html+=makeGauge(hasData?pct:0,KPI_LABELS[i],hasData?shortVal:'—',hasData?gCol:'var(--brd)');
