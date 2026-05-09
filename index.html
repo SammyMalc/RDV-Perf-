@@ -3251,9 +3251,9 @@ function renderAdvisor(v){
       <div class="goal-sub">${sl}</div>
       <div class="goal-grid">`;
     KPI_KEYS.forEach((k,i)=>{
-      const val=suggestion.sugg[k].val,base=KPI_IS_PCT[k]?obj[k]:obj[k]/12,diff=val-base;
+      const val=suggestion.sugg[k].algo,base=KPI_IS_PCT[k]?obj[k]:obj[k]/12,diff=val-base;
       let dl,dc;
-      if(diff>.5){dl='↑ rattrapage';dc='down';}else if(diff<-.5){dl='↓ en avance';dc='up';}else{dl='→ rythme de croisière';dc='same';}
+      if(diff>.5){dl='↑ rattrapage';dc='down';}else{dl='→ rythme de croisière';dc='same';}
       html+=`<div class="goal-item"><div class="goal-kpi">${KPI_FULL[i]}</div><div class="goal-val">${KPI_FMT[k](val)}</div><div class="goal-delta ${dc}">${dl}</div></div>`;
     });
     html+=`</div></div>`;
