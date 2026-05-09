@@ -1197,10 +1197,43 @@ async function loadState() {
 function setSyncIcon(status) {
   ['sync-icon','sync-icon-mobile','sync-icon-desktop'].forEach(id=>{
     const el=document.getElementById(id); if(!el)return;
+    // Rendre cliquable
+    el.style.cursor='pointer';
+    el.title='Cliquer pour forcer la synchronisation';
+    el.onclick=forceSyncFromCloud;
     if(status==='loading'){el.textContent='↻';el.className='sync-status sync-load spin';}
-    else if(status==='ok'){el.textContent='✓';el.className='sync-status sync-ok';setTimeout(()=>{el.textContent='';el.className='sync-status sync-load';},3000);}
+    else if(status==='ok'){el.textContent='✓';el.className='sync-status sync-ok';setTimeout(()=>{el.textContent='⟳';el.className='sync-status sync-load';},3000);}
     else{el.textContent='⚠';el.className='sync-status sync-err';}
   });
+}
+
+async function forceSyncFromCloud() {
+  if(!confirm('Forcer la synchronisation depuis le cloud ?\n(Les données locales non synchronisées seront écrasées)')) return;
+  setSyncIcon('loading');
+  try {
+    const remote = await remoteRead();
+    if(remote && remote.objectifs){
+      state = JSON.parse(JSON.stringify(remote));
+      migrateOldFormat();
+      localSave();
+      setSyncIcon('ok');
+      toast('Données synchronisées ✓');
+      if(currentUser){
+        if(currentUser.role==='manager'){
+          renderHome();
+          if(isDesktop()) showDesktopView('home');
+        } else {
+          renderAdvisor(currentUser.id);
+        }
+      }
+    } else {
+      setSyncIcon('error');
+      toast('⚠ Impossible de récupérer les données distantes');
+    }
+  } catch(e){
+    setSyncIcon('error');
+    toast('⚠ Erreur réseau : '+e.message);
+  }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1373,7 +1406,9 @@ function doLogout() {
 }
 
 async function afterLogin() {
+  // 1. Charger les données locales (peut être vide sur un nouveau device)
   localLoad();
+  // 2. Affichage initial (même si vide — le distant viendra écraser)
   if(currentUser.role==='manager'){
     renderHome();
     goScreen('screen-home');
@@ -1382,10 +1417,37 @@ async function afterLogin() {
     renderAdvisor(currentUser.id);
     goScreen('screen-advisor');
   }
-  const remote = await remoteRead();
-  if(remote && remote.objectifs && remote.resultats){ state=remote; localSave();
-    if(currentUser.role==='manager') renderHome();
-    else renderAdvisor(currentUser.id);
+  // 3. Charger depuis JSONBin et écraser
+  setSyncIcon('loading');
+  try {
+    const remote = await remoteRead();
+    if(remote && remote.objectifs){
+      // Format actuel : objectifs + annees + rdv + engagements + bienetre + pins
+      state = JSON.parse(JSON.stringify(remote));
+      migrateOldFormat();
+      localSave();
+      setSyncIcon('ok');
+      // Re-render avec les données fraîches
+      if(currentUser.role==='manager'){
+        renderHome();
+        if(isDesktop()) showDesktopView('home');
+      } else {
+        renderAdvisor(currentUser.id);
+      }
+    } else {
+      // Pas de données distantes valides
+      setSyncIcon('error');
+      console.warn('Pas de données distantes — utilisation locale uniquement');
+      // Si on est sur un nouveau device sans local non plus, prévenir l'utilisateur
+      const hasLocal = !!localStorage.getItem(LOCAL_KEY);
+      if(!hasLocal){
+        toast('⚠ Impossible de charger les données — vérifie ta connexion');
+      }
+    }
+  } catch(e){
+    console.error('Erreur loadState:', e);
+    setSyncIcon('error');
+    toast('⚠ Erreur de synchronisation — données locales utilisées');
   }
 }
 
@@ -1493,21 +1555,28 @@ function getSuggestion(vendeur,year){
   const mr=12-ms,sugg={};
   KPI_KEYS.forEach(k=>{
     const objMensuel=obj[k]/12;
-    const maxVal=KPI_IS_PCT[k]?100:objMensuel*2.2; // plafond 120% de l'objectif mensuel
+    // Plancher = cible mensuelle normale. La suggestion ne descend jamais sous l'objectif.
+    const minVal=KPI_IS_PCT[k]?obj[k]:objMensuel;
+    const maxVal=KPI_IS_PCT[k]?Math.min(100,obj[k]*1.2):objMensuel*1.2; // plafond 120%
     if(md.length===0){
-      sugg[k]={val:KPI_IS_PCT[k]?obj[k]:objMensuel,algo:KPI_IS_PCT[k]?obj[k]:objMensuel};
+      sugg[k]={val:minVal,algo:minVal};
     }else if(KPI_IS_PCT[k]){
+      // Pour les % : on conserve la cible fixe, ou on rehausse si moyenne sous l'objectif (rattrapage)
       const vals=md.map(m=>res[m][k]).filter(v=>v!=null&&!isNaN(v));
       const moy=vals.length>0?vals.reduce((a,b)=>a+b,0)/vals.length:obj[k];
-      const raw=Math.max(0,Math.min(maxVal,obj[k]+(obj[k]-moy)*.3));
+      // Si moyenne < objectif → rehausser légèrement pour viser le rattrapage. Sinon cible normale.
+      const raw=moy<obj[k]
+        ? Math.min(maxVal, obj[k]+(obj[k]-moy)*.3)
+        : obj[k];
       sugg[k]={val:raw,algo:raw};
     }else{
+      // Pour cumulatifs : si retard, lisser le rattrapage. Si avance, cible normale (jamais en-dessous).
       const realise=md.reduce((s,m)=>s+(res[m][k]!=null&&!isNaN(res[m][k])?res[m][k]:0),0);
       const retard=(obj[k]/12*ms)-realise;
-      // Lissage : on rattrape le retard sur les mois restants, plafonné à 120% de l'objectif mensuel
-      const rattrapageMensuel=retard>0?retard/mr:retard/mr; // négatif si avance
-      const raw=Math.max(0,Math.min(maxVal,objMensuel+rattrapageMensuel));
-      sugg[k]={val:raw,algo:raw};
+      const raw=retard>0
+        ? Math.min(maxVal, objMensuel+retard/mr) // rattrapage lissé
+        : objMensuel;                             // déjà en avance → cible normale
+      sugg[k]={val:Math.max(minVal,raw),algo:Math.max(minVal,raw)};
     }
   });
   return{sugg,moisSuivant:ms};
@@ -2400,7 +2469,6 @@ function renderVendeur(v){
       const diff=val-objM;
       let dl,dc;
       if(diff>0.5){dl='↑ rattrapage';dc='down';}
-      else if(diff<-0.5){dl='↓ en avance';dc='up';}
       else{dl='→ rythme de croisière';dc='same';}
       html+=`<div class="goal-item">
         <div class="goal-kpi">${KPI_FULL[i]}</div>
@@ -2676,8 +2744,9 @@ async function addEngagement(v) {
   if(!state.engagements[v]) state.engagements[v]=[];
   const now = new Date();
   const date = now.toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'});
+  const newId = Date.now().toString();
   state.engagements[v].push({
-    id: Date.now().toString(),
+    id: newId,
     date,
     auteur: _engWho[v]||'manager',
     texte,
@@ -2686,6 +2755,21 @@ async function addEngagement(v) {
   input.value='';
   await saveState();
   renderVendeur(v);
+  toast('Engagement ajouté ✓');
+
+  // Mise en évidence visuelle du nouvel engagement
+  setTimeout(()=>{
+    // Trouver la liste d'engagements et flasher le 1er ouvert (le plus récent)
+    const lists = document.querySelectorAll('.eng-list');
+    if(lists.length === 0) return;
+    const firstItem = lists[0].querySelector('.eng-item');
+    if(firstItem){
+      firstItem.scrollIntoView({behavior:'smooth', block:'center'});
+      firstItem.style.transition='background .3s';
+      firstItem.style.background='var(--teal-l)';
+      setTimeout(()=>{ firstItem.style.background=''; }, 1500);
+    }
+  }, 100);
 }
 
 async function updateEngagement(v, id, action) {
@@ -2726,28 +2810,7 @@ async function exportPDF(v) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
 
-  // ── Palette exacte de l'app ──────────────────────────────
-  const C = {
-    sidebar:  [13,33,55],
-    teal:     [0,150,136],
-    tealL:    [224,242,241],
-    lmGreen:  [120,190,32],
-    ok:       [58,125,0],
-    okBg:     [234,245,204],
-    warn:     [180,83,9],
-    warnBg:   [254,243,199],
-    ko:       [185,28,28],
-    koBg:     [254,226,226],
-    surf:     [255,255,255],
-    surf2:    [242,246,238],
-    brd:      [221,232,212],
-    text:     [26,26,26],
-    t2:       [74,106,53],
-    t3:       [138,171,106],
-    mgray:    [155,165,184],
-    tealMid:  [128,203,196],
-  };
-
+  // ── Données ──────────────────────────────────────────────
   const obj   = state.objectifs[v];
   const av    = getAv(v, currentYear);
   const res   = getRes(v, currentYear);
@@ -2755,313 +2818,299 @@ async function exportPDF(v) {
   const md    = Object.keys(res).map(Number).sort((a,b)=>a-b);
   const rdv   = (state.rdv&&state.rdv[v])||{};
   const engs  = (state.engagements&&state.engagements[v])||[];
-  const beData= (state.bienetre&&state.bienetre[v])||{};
   const comm  = yd.commentaires[v]||{};
   const sugg  = getSuggestion(v, currentYear);
   const now   = new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
-  const NR    = 'Non renseigne';
+  const NR    = '—';
   const pm    = md.length>0 ? md[0] : 0;
   const dm    = md.length>0 ? md[md.length-1] : 0;
 
-  const ML=12, MR=12, CW=210-ML-MR;
-  let y=0, pg=1;
+  // ── Layout constants ─────────────────────────────────────
+  const PW=210, PH=297;
+  const ML=15, MR=15, CW=PW-ML-MR;
+  let y=20;
 
   // ── Helpers ──────────────────────────────────────────────
-  const rgb  = (c) => doc.setTextColor(...c);
-  const fill = (c) => doc.setFillColor(...c);
-  const drw  = (c) => doc.setDrawColor(...c);
-
-  const fmtV = (k,val) => {
-    if(val==null||isNaN(val)) return '—';
+  const fmt = (k,val) => {
+    if(val==null||isNaN(val)) return NR;
     return KPI_FMT[k](val).toString().replace(/\u202f/g,' ').replace(/€/g,'EUR');
   };
 
-  // ── Card helper : fond blanc, bordure brd, coins arrondis ──
-  const card = (x,cy,w,h,bg) => {
-    fill(bg||C.surf); drw(C.brd);
-    doc.setLineWidth(0.4);
-    doc.rect(x, cy, w, h, 'FD');
+  const setColor = (r,g,b) => doc.setTextColor(r,g,b);
+  const COL = {
+    text:  [30,30,30],
+    light: [110,110,110],
+    teal:  [0,128,116],
+    ok:    [58,125,0],
+    warn:  [180,83,9],
+    ko:    [185,28,28],
+    line:  [220,220,220],
+    soft:  [248,248,248],
   };
 
-  // ── Section label (comme .section-label dans l'app) ──
-  const sectionLabel = (txt) => {
-    chk(10);
-    doc.setFontSize(8); doc.setFont('helvetica','bold');
-    rgb(C.t3);
-    doc.text(txt.toUpperCase(), ML, y);
-    y+=2.5;
-    drw(C.brd); doc.setLineWidth(0.35);
-    doc.line(ML, y, 210-MR, y);
-    y+=5;
+  const checkPage = (need) => {
+    if(y + need > PH-20) {
+      drawFooter();
+      doc.addPage();
+      drawHeader();
+      y=32;
+    }
   };
 
-  const chk = (need) => { if(y+need>278) { drawFooter(); doc.addPage(); pg++; drawHeader(); y=36; } };
+  const sectionTitle = (txt) => {
+    checkPage(12);
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    setColor(...COL.teal);
+    doc.text(txt, ML, y);
+    y+=2;
+    doc.setDrawColor(...COL.teal); doc.setLineWidth(0.6);
+    doc.line(ML, y, ML+30, y);
+    y+=6;
+  };
 
   const drawHeader = () => {
-    // Bandeau sidebar
-    fill(C.sidebar); doc.rect(0,0,210,28,'F');
-    // Triangle LM vert
-    doc.setFillColor(...C.lmGreen);
-    doc.lines([[8,0],[-4,11],[-4,-11]], ML, 7, null, 'F');
+    // Bandeau bleu marine en haut
+    doc.setFillColor(13,33,55);
+    doc.rect(0,0,PW,22,'F');
     // Titre
-    rgb([255,255,255]);
-    doc.setFontSize(11); doc.setFont('helvetica','bold');
-    doc.text('RDV Perf', ML+12, 12);
-    doc.setFontSize(8); doc.setFont('helvetica','normal');
-    rgb(C.tealMid);
-    doc.text('Suivi de performance - Leroy Merlin - '+currentYear, ML+12, 18);
-    // Signature
-    doc.setFontSize(7); doc.setFont('helvetica','italic');
-    rgb([74,122,106]);
-    doc.text('Crafted by Sammy Malc', ML+12, 24);
-    // Conseiller à droite
-    rgb([255,255,255]);
-    doc.setFontSize(10); doc.setFont('helvetica','bold');
-    doc.text(NOMS[v], 210-MR, 12, {align:'right'});
-    doc.setFontSize(7); doc.setFont('helvetica','normal');
-    rgb(C.tealMid);
-    doc.text('Genere le '+now, 210-MR, 18, {align:'right'});
-    // Ligne teal
-    fill(C.teal); doc.rect(0,28,210,1.2,'F');
-    y=34;
+    setColor(255,255,255);
+    doc.setFontSize(13); doc.setFont('helvetica','bold');
+    doc.text('Suivi de performance', ML, 10);
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    setColor(180,200,210);
+    doc.text(NOMS[v]+' · '+currentYear+' · Leroy Merlin', ML, 16);
+    // Date à droite
+    setColor(180,200,210); doc.setFontSize(9);
+    doc.text(now, PW-MR, 16, {align:'right'});
   };
 
   const drawFooter = () => {
-    doc.setFontSize(6.5); doc.setFont('helvetica','italic'); rgb(C.mgray);
-    doc.text('RDV Perf - Leroy Merlin - Document de suivi', 105, 291, {align:'center'});
+    setColor(...COL.light);
+    doc.setFontSize(7); doc.setFont('helvetica','italic');
+    doc.text('Crafted by Sammy Malc · RDV Perf · Leroy Merlin', PW/2, PH-8, {align:'center'});
     doc.setFont('helvetica','normal');
-    doc.text('Page '+doc.internal.getCurrentPageInfo().pageNumber, 210-MR, 291, {align:'right'});
+    doc.text('Page '+doc.internal.getCurrentPageInfo().pageNumber, PW-MR, PH-8, {align:'right'});
   };
 
-  // ══ Page 1 ══════════════════════════════════════════════
+  // ════ DÉBUT DU DOCUMENT ════════════════════════════════════
   drawHeader();
+  y = 32;
 
-  // ── 1. INFOS ── carte blanche avec bord
-  chk(20);
-  card(ML, y, CW, 18, C.surf);
-  doc.setFontSize(8); doc.setFont('helvetica','bold'); rgb(C.t3);
-  doc.text('Conseiller', ML+4, y+6);
-  doc.text('Responsable', ML+CW/2, y+6);
-  doc.setFont('helvetica','normal'); rgb(C.text);
-  doc.setFontSize(9);
-  doc.text(NOMS[v], ML+32, y+6);
-  doc.text('Sammy M.', ML+CW/2+28, y+6);
-  doc.setFontSize(8); doc.setFont('helvetica','bold'); rgb(C.t3);
-  doc.text('Prochain RDV', ML+4, y+13);
-  doc.setFont('helvetica','bold'); rgb(C.teal);
-  doc.setFontSize(9);
-  doc.text(rdv.prochain||NR, ML+32, y+13);
-  y+=23;
+  // ── 1. INFORMATIONS ──
+  sectionTitle('Informations');
+  doc.setFontSize(9); doc.setFont('helvetica','normal'); setColor(...COL.light);
+  doc.text('Conseiller', ML, y);
+  doc.text('Responsable', ML+95, y);
+  doc.setFont('helvetica','bold'); setColor(...COL.text);
+  doc.text(NOMS[v], ML+30, y);
+  doc.text('Sammy M.', ML+125, y);
+  y+=6;
+  doc.setFont('helvetica','normal'); setColor(...COL.light);
+  doc.text('Prochain RDV', ML, y);
+  doc.setFont('helvetica','bold'); setColor(...COL.teal);
+  doc.text(rdv.prochain||NR, ML+30, y);
+  y+=10;
 
-  // ── 2. VICTOIRE & QUICK WIN ── deux cartes côte à côte
-  const kpiScores=KPI_KEYS.map((k,i)=>{
-    const hd=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
-    return{k,i,pct:hd?av[k].pct:null,hd};
-  }).filter(x=>x.hd);
-  if(kpiScores.length>0) {
-    chk(26);
-    sectionLabel('Mise en lumiere');
-    const winK=kpiScores.reduce((a,b)=>a.pct>b.pct?a:b);
-    const qwK=kpiScores.length>1?kpiScores.reduce((a,b)=>a.pct<b.pct?a:b):null;
-    const hw=(CW-4)/2;
-    // Carte Victoire — fond ok-bg
-    card(ML, y, hw, 20, C.okBg);
-    fill([221,232,212]); doc.rect(ML,y,2,20,'F'); // bordure gauche teal
-    fill(C.lmGreen); doc.rect(ML,y,2,20,'F');
-    doc.setFontSize(7); doc.setFont('helvetica','bold'); rgb(C.t3);
-    doc.text('VICTOIRE DU MOIS', ML+5, y+5);
-    doc.setFontSize(11); doc.setFont('helvetica','bold'); rgb(C.ok);
-    doc.text(KPI_FULL[winK.i], ML+5, y+12);
-    doc.setFontSize(8); doc.setFont('helvetica','normal'); rgb(C.t2);
-    doc.text(fmtV(winK.k,av[winK.k].realise)+' - '+Math.round(winK.pct)+'% obj.', ML+5, y+18);
-    // Carte Quick Win — fond warn-bg
-    if(qwK){
-      card(ML+hw+4, y, hw, 20, C.warnBg);
-      fill(C.warn); doc.rect(ML+hw+4,y,2,20,'F');
-      doc.setFontSize(7); doc.setFont('helvetica','bold'); rgb(C.t3);
-      doc.text('QUICK WIN - LEVIER', ML+hw+9, y+5);
-      doc.setFontSize(11); doc.setFont('helvetica','bold'); rgb(C.warn);
-      doc.text(KPI_FULL[qwK.i], ML+hw+9, y+12);
-      doc.setFontSize(8); doc.setFont('helvetica','normal'); rgb(C.t2);
-      doc.text(fmtV(qwK.k,av[qwK.k].realise)+' - '+Math.round(qwK.pct)+'%', ML+hw+9, y+18);
-    }
-    y+=26;
-  }
+  // ── 2. PERFORMANCE — TABLEAU SIMPLE ──
+  const titre = md.length>0
+    ? 'Performance · '+MOIS_L[pm]+(pm!==dm?' à '+MOIS_L[dm]:'')
+    : 'Performance · Aucune saisie';
+  sectionTitle(titre);
 
-  // ── 3. PERFORMANCE KPI ── tableau style app
-  const titPerf=md.length>0
-    ?'Performance - '+MOIS_L[pm]+(pm!==dm?'-'+MOIS_L[dm]:'')+' '+currentYear
-    :'Performance - Aucune saisie';
-  chk(12+KPI_KEYS.length*8);
-  sectionLabel(titPerf);
-  // Header tableau — bandeau sidebar
-  fill(C.sidebar); doc.rect(ML,y-1,CW,7,'F');
-  doc.setFontSize(7); doc.setFont('helvetica','bold'); rgb([255,255,255]);
-  const kX=[ML+2,ML+54,ML+86,ML+110,ML+130,ML+152];
-  ['KPI','Realise','Obj/mois','% mois','Statut','Regularite'].forEach((h,i)=>
-    doc.text(h, kX[i]+(i>0?8:0), y+3.5, {align:i>0?'center':'left'}));
-  y+=8;
+  // En-tête de tableau
+  doc.setFillColor(13,33,55);
+  doc.rect(ML, y, CW, 7, 'F');
+  setColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
+  // Colonnes : KPI(60) | Réalisé(35) | Objectif/mois(35) | % atteint(25) | Statut(25)
+  const cX = [ML+2, ML+78, ML+118, ML+148, ML+170];
+  doc.text('KPI', cX[0], y+4.8);
+  doc.text('Réalisé',     cX[1], y+4.8, {align:'center'});
+  doc.text('Obj. mensuel',cX[2], y+4.8, {align:'center'});
+  doc.text('% atteint',   cX[3], y+4.8, {align:'center'});
+  doc.text('Statut',      cX[4], y+4.8, {align:'center'});
+  y+=7;
 
   KPI_KEYS.forEach((k,i)=>{
-    chk(8);
+    checkPage(8);
     const a=av[k];
     const hd=md.some(m=>res[m]&&res[m][k]!=null&&!isNaN(res[m][k]));
-    const realS=hd?fmtV(k,KPI_IS_PCT[k]?Math.round(a.realise*10)/10:a.realise):NR;
-    const objM=KPI_IS_PCT[k]?obj[k]:Math.round(obj[k]/12);
-    const pct=hd?Math.round(a.pct):null;
-    let cls='',bgS=null,fgS=null,statS=NR;
+    const realStr = hd ? fmt(k, KPI_IS_PCT[k]?Math.round(a.realise*10)/10:a.realise) : NR;
+    const objM    = KPI_IS_PCT[k] ? obj[k] : Math.round(obj[k]/12);
+    const objStr  = fmt(k, objM);
+    const pctStr  = hd ? Math.round(a.pct)+'%' : NR;
+    let statutStr=NR, statutColor=COL.light;
     if(hd){
-      cls=statusCls(a.pct,md.length,k);
-      if(cls==='ok'){statS='En trajectoire';bgS=C.okBg;fgS=C.ok;}
-      else if(cls==='warn'){statS='A consolider';bgS=C.warnBg;fgS=C.warn;}
-      else{statS=pct+"% obj.";bgS=C.koBg;fgS=C.ko;}
+      const cls=statusCls(a.pct, md.length, k);
+      if(cls==='ok')     { statutStr='✓ En trajectoire'; statutColor=COL.ok; }
+      else if(cls==='warn'){ statutStr='À consolider';   statutColor=COL.warn; }
+      else                 { statutStr='Sous objectif';  statutColor=COL.ko; }
     }
-    // Ligne alternée
-    if(i%2===0){fill(C.surf2); doc.rect(ML,y-1,CW,7,'F');}
-    doc.setFontSize(8); doc.setFont('helvetica','bold'); rgb(C.sidebar);
-    doc.text(KPI_FULL[i], kX[0], y+3.5);
-    doc.setFont('helvetica','normal'); rgb(C.text);
-    doc.text(realS, kX[1]+8, y+3.5, {align:'center'});
-    doc.text(fmtV(k,objM), kX[2]+8, y+3.5, {align:'center'});
-    doc.text(pct!=null?pct+'%':'—', kX[3]+8, y+3.5, {align:'center'});
-    // Badge statut
-    if(bgS){
-      fill(bgS); doc.rect(kX[4],y,22,5.5,'F');
-      doc.setFontSize(6.5); doc.setFont('helvetica','bold'); rgb(fgS);
-      doc.text(statS, kX[4]+11, y+3.5, {align:'center'});
-    } else {
-      doc.setFontSize(6.5); doc.setFont('helvetica','italic'); rgb(C.mgray);
-      doc.text(NR, kX[4]+8, y+3.5, {align:'center'});
-    }
-    // Barre de progression (mini)
-    const barX=kX[5], barW=36, barH=3;
-    fill(C.brd); doc.rect(barX, y+2, barW, barH,'F');
-    if(hd&&pct!=null){
-      const fw=Math.min(barW, barW*Math.min(pct,100)/100);
-      const barCol=cls==='ok'?C.lmGreen:cls==='warn'?[255,179,0]:C.ko;
-      fill(barCol); doc.rect(barX, y+2, fw, barH,'F');
-    }
+    // Ligne alternée fond très clair
+    if(i%2===0){ doc.setFillColor(...COL.soft); doc.rect(ML, y, CW, 8, 'F'); }
+    doc.setFontSize(9); doc.setFont('helvetica','bold'); setColor(...COL.text);
+    doc.text(KPI_FULL[i], cX[0], y+5);
+    doc.setFont('helvetica','normal');
+    doc.text(realStr, cX[1], y+5, {align:'center'});
+    doc.text(objStr,  cX[2], y+5, {align:'center'});
+    doc.text(pctStr,  cX[3], y+5, {align:'center'});
+    doc.setFont('helvetica','bold'); setColor(...statutColor);
+    doc.setFontSize(8);
+    doc.text(statutStr, cX[4], y+5, {align:'center'});
     y+=8;
   });
-  y+=4;
+  // Trait de fin
+  doc.setDrawColor(...COL.line); doc.setLineWidth(0.3);
+  doc.line(ML, y, PW-MR, y);
+  y+=2;
+  // Note
+  doc.setFontSize(7); doc.setFont('helvetica','italic'); setColor(...COL.light);
+  doc.text('Réalisé : cumul pour CA, Chantiers, Fidélité · moyenne pour Transfo, Opt-in. Obj. mensuel = annuel ÷ 12.', ML, y+3);
+  y+=10;
 
-  // ── 4. HISTORIQUE MENSUEL ──
-  chk(18);
-  sectionLabel('Historique mensuel');
+  // ── 3. HISTORIQUE MENSUEL ──
+  sectionTitle('Historique mensuel');
   if(md.length===0){
-    doc.setFontSize(8); doc.setFont('helvetica','italic'); rgb(C.mgray);
-    doc.text(NR, ML, y); y+=8;
+    doc.setFontSize(9); doc.setFont('helvetica','italic'); setColor(...COL.light);
+    doc.text('Aucun mois renseigné', ML, y);
+    y+=8;
   } else {
-    // Header
-    fill(C.sidebar); doc.rect(ML,y-1,CW,6.5,'F');
-    doc.setFontSize(6.5); doc.setFont('helvetica','bold'); rgb([255,255,255]);
-    const hX=[ML+2,ML+18,ML+52,ML+74,ML+92,ML+108,ML+124];
-    ['Mois','CA','Transfo','Opt-in','Chant.','Fidel.','Contexte'].forEach((h,ci)=>doc.text(h,hX[ci],y+3));
-    y+=7.5;
-    md.forEach((m,idx)=>{
-      chk(6);
+    // En-tête
+    doc.setFillColor(13,33,55);
+    doc.rect(ML, y, CW, 7, 'F');
+    setColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
+    // Largeurs : Mois(15) | CA(35) | Transfo(25) | Opt-in(25) | Chant(20) | Fidél(20) | Contexte(40)
+    const hPos = [ML+2, ML+18, ML+55, ML+85, ML+108, ML+128, ML+143];
+    doc.text('Mois',     hPos[0], y+4.8);
+    doc.text('CA',       hPos[1]+15, y+4.8, {align:'center'});
+    doc.text('Transfo',  hPos[2]+12, y+4.8, {align:'center'});
+    doc.text('Opt-in',   hPos[3]+10, y+4.8, {align:'center'});
+    doc.text('Chant.',   hPos[4]+8,  y+4.8, {align:'center'});
+    doc.text('Fidél.',   hPos[5]+8,  y+4.8, {align:'center'});
+    doc.text('Contexte', hPos[6], y+4.8);
+    y+=7;
+    md.forEach((m, idx)=>{
+      checkPage(7);
       const r=res[m];
-      if(idx%2===0){fill(C.surf2); doc.rect(ML,y-1,CW,5.5,'F');}
-      doc.setFontSize(7); doc.setFont('helvetica','bold'); rgb(C.sidebar);
-      doc.text(MOIS_S[m], hX[0], y+2.5);
-      doc.setFont('helvetica','normal'); rgb(C.text);
-      [fmtV('ca',r.ca),fmtV('taux',r.taux),fmtV('optin',r.optin),
-       fmtV('chantiers',r.chantiers),fmtV('fidelite',r.fidelite)
-      ].forEach((val,ci)=>doc.text(val,hX[ci+1],y+2.5));
-      if(comm[m]){doc.setFont('helvetica','italic');rgb(C.t2);doc.text(String(comm[m]).slice(0,22),hX[6],y+2.5);}
-      y+=5.5;
+      if(idx%2===0){ doc.setFillColor(...COL.soft); doc.rect(ML, y, CW, 7, 'F'); }
+      doc.setFontSize(8); doc.setFont('helvetica','bold'); setColor(...COL.text);
+      doc.text(MOIS_S[m], hPos[0], y+4.5);
+      doc.setFont('helvetica','normal');
+      doc.text(r.ca       != null ? fmt('ca', r.ca)               : NR, hPos[1]+15, y+4.5, {align:'center'});
+      doc.text(r.taux     != null ? fmt('taux', r.taux)           : NR, hPos[2]+12, y+4.5, {align:'center'});
+      doc.text(r.optin    != null ? fmt('optin', r.optin)         : NR, hPos[3]+10, y+4.5, {align:'center'});
+      doc.text(r.chantiers!= null ? fmt('chantiers', r.chantiers) : NR, hPos[4]+8,  y+4.5, {align:'center'});
+      doc.text(r.fidelite != null ? fmt('fidelite', r.fidelite)   : NR, hPos[5]+8,  y+4.5, {align:'center'});
+      if(comm[m]){
+        doc.setFont('helvetica','italic'); setColor(...COL.light); doc.setFontSize(7);
+        const ctx = String(comm[m]).length > 30 ? String(comm[m]).slice(0,28)+'…' : String(comm[m]);
+        doc.text(ctx, hPos[6], y+4.5);
+      }
+      y+=7;
     });
   }
-  y+=4;
+  y+=6;
+
+  // ── 4. OBJECTIF MOIS SUIVANT ──
+  if(sugg){
+    checkPage(50);
+    sectionTitle('Objectif conseillé · '+MOIS_L[sugg.moisSuivant]+' '+currentYear);
+    const mr = 12-sugg.moisSuivant;
+    doc.setFontSize(8); doc.setFont('helvetica','italic'); setColor(...COL.light);
+    doc.text('Objectif lissé sur '+mr+' mois restant'+(mr>1?'s':'')+' — atteignable et ancré dans la trajectoire annuelle.', ML, y);
+    y+=8;
+    if(sugg.moisSuivant===4||sugg.moisSuivant===5){
+      doc.setFillColor(254,243,199);
+      doc.rect(ML, y, CW, 7, 'F');
+      doc.setFontSize(8); doc.setFont('helvetica','bold'); setColor(...COL.warn);
+      doc.text('⚠  Travaux R05 prévus — cibles ajustées en conséquence.', ML+3, y+4.8);
+      y+=10;
+    }
+    KPI_KEYS.forEach((k,i)=>{
+      checkPage(7);
+      const val  = sugg.sugg[k].algo;
+      const objM = KPI_IS_PCT[k] ? obj[k] : obj[k]/12;
+      const diff = val-objM;
+      const dStr = diff>0.5 ? 'rattrapage' : 'rythme de croisière';
+      const dCol = diff>0.5 ? COL.warn : COL.light;
+      if(i%2===0){ doc.setFillColor(...COL.soft); doc.rect(ML, y, CW, 7, 'F'); }
+      doc.setFontSize(9); doc.setFont('helvetica','bold'); setColor(...COL.text);
+      doc.text(KPI_FULL[i], ML+3, y+4.8);
+      doc.setFont('helvetica','bold'); setColor(...COL.teal);
+      doc.text(fmt(k, KPI_IS_PCT[k] ? Math.round(val*10)/10 : Math.round(val)), ML+95, y+4.8);
+      doc.setFontSize(8); doc.setFont('helvetica','italic'); setColor(...dCol);
+      doc.text(dStr, ML+135, y+4.8);
+      y+=7;
+    });
+    y+=6;
+  }
 
   // ── 5. ENGAGEMENTS ──
-  chk(14);
-  sectionLabel('Engagements');
-  const eOuv=engs.filter(e=>e.statut==='ouvert');
-  const eArc=engs.filter(e=>e.statut!=='ouvert');
-  if(engs.length===0){doc.setFontSize(8);doc.setFont('helvetica','italic');rgb(C.mgray);doc.text(NR,ML,y);y+=7;}
-  else{
-    const eMap={
-      'ouvert':   [C.teal,   C.tealL, 'OUVERT'],
-      'tenu':     [C.ok,     C.okBg,  'TENU'],
-      'non_tenu': [C.ko,     C.koBg,  'NON TENU'],
-    };
-    [...eOuv,...eArc].forEach(e=>{
-      const[fg,bg,lab]=eMap[e.statut]||eMap['ouvert'];
-      const who=e.auteur==='manager'?'Manager':'Conseiller';
-      const lines=doc.splitTextToSize(e.texte, CW-36);
-      chk(5+lines.length*4.2);
-      // Carte engagement
-      const rowH=5+lines.length*4.2;
-      card(ML,y-1,CW,rowH,C.surf);
-      // Pastille statut
-      fill(bg); doc.rect(210-MR-28,y,26,4.5,'F');
-      doc.setFontSize(6); doc.setFont('helvetica','bold'); rgb(fg);
-      doc.text(lab,210-MR-15,y+3,{align:'center'});
-      // Texte
-      doc.setFontSize(7.5); doc.setFont('helvetica','bold'); rgb(C.text);
-      doc.text('['+who+'] '+e.date, ML+3, y+3.5);
-      y+=5.5;
-      doc.setFont('helvetica','normal'); rgb(C.t2);
-      doc.text(lines, ML+5, y);
-      y+=lines.length*4.2+3;
-    });
-  }
-  y+=3;
-
-  // ── 6. OBJECTIF MOIS SUIVANT ── vignette bleue marine
-  chk(16);
-  sectionLabel(sugg?'Objectif conseille - '+MOIS_L[sugg.moisSuivant]+' '+currentYear:'Objectif mois suivant');
-  if(!sugg){doc.setFontSize(8);doc.setFont('helvetica','italic');rgb(C.mgray);doc.text(NR,ML,y);y+=7;}
-  else{
-    const mr=12-sugg.moisSuivant;
-    if(sugg.moisSuivant===4||sugg.moisSuivant===5){
-      chk(10);
-      fill(C.warnBg); doc.rect(ML,y-1,CW,8,'F');
-      drw(C.warnBg); doc.setLineWidth(0.3);
-      doc.setFontSize(7.5); doc.setFont('helvetica','italic'); rgb(C.warn);
-      doc.text('Travaux R05 prevus - cibles ajustees en consequence.', ML+3, y+4); y+=11;
+  sectionTitle('Engagements');
+  const eOuv = engs.filter(e=>e.statut==='ouvert');
+  const eArc = engs.filter(e=>e.statut!=='ouvert');
+  if(engs.length===0){
+    doc.setFontSize(9); doc.setFont('helvetica','italic'); setColor(...COL.light);
+    doc.text('Aucun engagement', ML, y);
+    y+=8;
+  } else {
+    if(eOuv.length>0){
+      doc.setFontSize(8); doc.setFont('helvetica','bold'); setColor(...COL.teal);
+      doc.text('En cours', ML, y); y+=5;
+      eOuv.forEach(e=>{
+        const who = e.auteur==='manager' ? 'Manager' : 'Conseiller';
+        const lines = doc.splitTextToSize(e.texte, CW-10);
+        const blockH = 5 + lines.length*4;
+        checkPage(blockH+2);
+        // Trait teal à gauche
+        doc.setFillColor(...COL.teal);
+        doc.rect(ML, y, 1.2, blockH, 'F');
+        doc.setFontSize(8); doc.setFont('helvetica','bold'); setColor(...COL.text);
+        doc.text(who+' · '+e.date, ML+5, y+4);
+        doc.setFont('helvetica','normal'); setColor(...COL.text);
+        doc.text(lines, ML+5, y+9);
+        y += blockH+3;
+      });
     }
-    // Carte objectif style goal-card
-    const goH=KPI_KEYS.length*8+6;
-    chk(goH);
-    fill(C.sidebar); doc.rect(ML,y-1,CW,goH,'F');
-    // Label mois
-    doc.setFontSize(8); doc.setFont('helvetica','bold'); rgb(C.tealMid);
-    doc.text('Objectif conseille - '+MOIS_L[sugg.moisSuivant], ML+5, y+5);
-    doc.setFontSize(7); doc.setFont('helvetica','normal'); rgb([100,130,120]);
-    doc.text(mr+' mois restant'+(mr>1?'s':'')+' - lisse et atteignable', ML+5, y+10);
-    let gy=y+15;
-    KPI_KEYS.forEach((k,i)=>{
-      const val=sugg.sugg[k].algo;
-      const objM=KPI_IS_PCT[k]?obj[k]:obj[k]/12;
-      const diff=val-objM;
-      const dStr=diff>0.5?'rattrapage':diff<-0.5?'en avance':'rythme de croisiere';
-      const dCol=diff>0.5?C.warn:diff<-0.5?C.lmGreen:C.mgray;
-      doc.setFontSize(7.5); doc.setFont('helvetica','bold'); rgb(C.tealMid);
-      doc.text(KPI_FULL[i], ML+5, gy);
-      doc.setFontSize(11); doc.setFont('helvetica','bold'); rgb(C.teal);
-      doc.text(fmtV(k,KPI_IS_PCT[k]?Math.round(val*10)/10:Math.round(val)), ML+75, gy);
-      doc.setFontSize(7); doc.setFont('helvetica','italic'); rgb(dCol);
-      doc.text(dStr, ML+115, gy);
-      gy+=8;
-    });
-    y+=goH+4;
+    if(eArc.length>0){
+      y+=2;
+      doc.setFontSize(8); doc.setFont('helvetica','bold'); setColor(...COL.light);
+      doc.text('Archivés', ML, y); y+=5;
+      eArc.forEach(e=>{
+        const isTenu = e.statut==='tenu';
+        const lab    = isTenu ? '✓ Tenu' : '✗ Non tenu';
+        const labCol = isTenu ? COL.ok : COL.ko;
+        const who = e.auteur==='manager' ? 'Manager' : 'Conseiller';
+        const lines = doc.splitTextToSize(e.texte, CW-10);
+        const blockH = 5 + lines.length*4;
+        checkPage(blockH+2);
+        // Trait gris
+        doc.setFillColor(...COL.line);
+        doc.rect(ML, y, 1.2, blockH, 'F');
+        doc.setFontSize(8); doc.setFont('helvetica','bold'); setColor(...COL.light);
+        doc.text(who+' · '+e.date, ML+5, y+4);
+        setColor(...labCol);
+        doc.text(lab, PW-MR, y+4, {align:'right'});
+        doc.setFont('helvetica','normal'); setColor(...COL.light);
+        doc.text(lines, ML+5, y+9);
+        y += blockH+3;
+      });
+    }
   }
+  y+=6;
 
-  // ── 7. PROCHAIN RDV ──
-  chk(16);
-  sectionLabel('Prochain RDV');
-  // Carte teal-light
-  card(ML, y, CW, 12, C.tealL);
-  fill(C.teal); doc.rect(ML,y,3,12,'F');
-  doc.setFontSize(11); doc.setFont('helvetica','bold'); rgb(C.teal);
-  doc.text(rdv.prochain||NR, ML+8, y+8);
-  y+=17;
+  // ── 6. PROCHAIN RDV ──
+  checkPage(15);
+  sectionTitle('Prochain RDV');
+  doc.setFontSize(11); doc.setFont('helvetica','bold'); setColor(...COL.teal);
+  doc.text(rdv.prochain || 'À planifier', ML, y+2);
+  y+=10;
 
+  // ── FOOTER ──
   drawFooter();
+
+  // Save
   doc.save('RDV-Perf_'+NOMS[v]+'_'+currentYear+'_'+now.replace(/ /g,'-')+'.pdf');
-  toast('PDF genere !');
+  toast('PDF généré ✓');
 }
 
 
