@@ -248,6 +248,10 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
 .htable tr:last-child td{border-bottom:none}
 .htable tr:hover td{background:var(--surf2)}
 .num{text-align:right;font-size:11px;font-variant-numeric:tabular-nums}
+.mobile-rayon-tabs{display:flex;gap:8px;margin-bottom:14px}
+.mobile-rayon-tab{flex:1;padding:10px 14px;background:var(--surf);border:1.5px solid var(--brd);border-radius:10px;color:var(--t2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.mobile-rayon-tab.active{background:var(--teal);border-color:var(--teal);color:#fff}
+.mobile-rayon-tab:not(.active):active{background:var(--surf2)}
 .htable th:first-child,.htable td:first-child{width:60px}
 .stable{width:100%;border-collapse:collapse;font-size:12px}
 .stable th{padding:7px 6px;text-align:center;color:var(--t3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;border-bottom:2px solid var(--brd)}
@@ -477,6 +481,9 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
   .sidebar-vendor-item{display:flex;align-items:center;gap:10px;padding:8px 20px;cursor:pointer;transition:background .15s;color:rgba(255,255,255,.6);font-size:13px;font-weight:500;position:relative}
   .sidebar-vendor-item:hover{background:var(--sidebar-hover);color:#fff}
   .sidebar-vendor-item.active{background:var(--sidebar-active);color:#fff}
+  .sidebar-rayon-btn{display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;width:100%}
+  .sidebar-rayon-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+  .sidebar-rayon-btn.active{background:var(--teal);border-color:var(--teal);color:#fff}
   .sidebar-vendor-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
   .sidebar-bottom{padding:16px;border-top:1px solid rgba(255,255,255,.07)}
   .sidebar-sync{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.35);margin-bottom:10px}
@@ -635,7 +642,7 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
       <svg width="56" height="50" viewBox="0 0 32 28" fill="none"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
       <div class="splash-title">RDV Perf</div>
       <div class="splash-subtitle">Être acteur de sa performance</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.5);letter-spacing:1px;font-style:italic;font-family:Georgia,serif;margin-top:8px;font-weight:400">Crafted by Sammy Malc</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);letter-spacing:1.2px;font-style:italic;font-family:Georgia,serif;margin-top:10px;font-weight:500">Crafted by Sammy Malc</div>
     </div>
 
   <!-- KPI animés -->
@@ -738,13 +745,23 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
       <div class="sidebar-logo-text"><span class="my">my</span><span class="dev">DEV'</span> <span style="color:rgba(255,255,255,.3);font-weight:400;font-size:12px">Perf</span></div>
     </div>
     <div style="padding:6px 20px 12px;border-bottom:1px solid rgba(255,255,255,.07)">
-      <div style="font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.5px;font-style:italic;font-family:Georgia,serif;font-weight:400">Crafted by Sammy Malc</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.55);letter-spacing:.6px;font-style:italic;font-family:Georgia,serif;font-weight:400">Crafted by Sammy Malc</div>
     </div>
     <div class="sidebar-year">
       <span class="sidebar-year-label">Année</span>
       <select id="year-selector-desktop" onchange="switchYear(this.value)"></select>
     </div>
     <nav class="sidebar-nav">
+      <div class="sidebar-nav-section">Navigation</div>
+      <div class="sidebar-nav-section" style="margin-top:0">Rayon</div>
+      <div style="padding:0 14px 8px;display:flex;flex-direction:column;gap:5px">
+        <button class="sidebar-rayon-btn active" data-rayon="cuisine" onclick="switchRayon('cuisine')">
+          <span style="font-size:16px">🍳</span> Cuisine
+        </button>
+        <button class="sidebar-rayon-btn" data-rayon="sanitaire" onclick="switchRayon('sanitaire')">
+          <span style="font-size:16px">🚿</span> Sanitaire
+        </button>
+      </div>
       <div class="sidebar-nav-section">Navigation</div>
       <div class="sidebar-nav-item active" id="nav-home" onclick="showDesktopView('home')">
         <span class="sidebar-nav-icon">🏠</span> Accueil
@@ -756,17 +773,19 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
         <span class="sidebar-nav-icon">🎯</span> Objectifs annuels
       </div>
       <div class="sidebar-nav-section" style="margin-top:8px">Conseillers</div>
-      <div class="sidebar-vendor-item" id="nav-karim" onclick="showDesktopVendeur('karim')">
-        <div class="sidebar-vendor-dot" style="background:#003087"></div> Karim
-      </div>
-      <div class="sidebar-vendor-item" id="nav-evan" onclick="showDesktopVendeur('evan')">
-        <div class="sidebar-vendor-dot" style="background:#009688"></div> Evan
-      </div>
-      <div class="sidebar-vendor-item" id="nav-laura" onclick="showDesktopVendeur('laura')">
-        <div class="sidebar-vendor-dot" style="background:#5C6BC0"></div> Laura
-      </div>
-      <div class="sidebar-vendor-item" id="nav-thomas" onclick="showDesktopVendeur('thomas')">
-        <div class="sidebar-vendor-dot" style="background:#546E7A"></div> Thomas
+      <div id="sidebar-vendor-list">
+        <div class="sidebar-vendor-item" id="nav-karim" onclick="showDesktopVendeur('karim')">
+          <div class="sidebar-vendor-dot" style="background:#003087"></div> <span>Karim</span>
+        </div>
+        <div class="sidebar-vendor-item" id="nav-evan" onclick="showDesktopVendeur('evan')">
+          <div class="sidebar-vendor-dot" style="background:#009688"></div> <span>Evan</span>
+        </div>
+        <div class="sidebar-vendor-item" id="nav-laura" onclick="showDesktopVendeur('laura')">
+          <div class="sidebar-vendor-dot" style="background:#5C6BC0"></div> <span>Laura</span>
+        </div>
+        <div class="sidebar-vendor-item" id="nav-thomas" onclick="showDesktopVendeur('thomas')">
+          <div class="sidebar-vendor-dot" style="background:#546E7A"></div> <span>Thomas</span>
+        </div>
       </div>
     </nav>
     <div class="sidebar-bottom">
@@ -848,7 +867,7 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
       <svg width="26" height="23" viewBox="0 0 32 28" fill="none" style="flex-shrink:0"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
       <div class="topbar-center">
         <div class="topbar-title">Pilotage Performance</div>
-        <div class="topbar-sub">Responsable Rayon · <span style="font-size:10px;opacity:.55;font-style:italic;font-family:Georgia,serif">Crafted by Sammy Malc</span></div>
+        <div class="topbar-sub">Responsable Rayon · <span style="font-size:11px;opacity:.75;font-style:italic;font-family:Georgia,serif">Crafted by Sammy Malc</span></div>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
@@ -862,7 +881,15 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
     <div class="home-banner">
       <div class="home-banner-label">Tableau de bord</div>
       <div class="home-banner-title">Bonjour, Sammy 👋</div>
-      <div class="home-banner-sub">Suivi de performance · <span id="home-date"></span></div>
+      <div class="home-banner-sub"><span id="home-rayon-label">Rayon Cuisine</span> · <span id="home-date"></span></div>
+    </div>
+    <div class="mobile-rayon-tabs">
+      <button class="mobile-rayon-tab active" data-rayon="cuisine" onclick="switchRayon('cuisine');refreshMobileRayonTabs()">
+        🍳 Cuisine
+      </button>
+      <button class="mobile-rayon-tab" data-rayon="sanitaire" onclick="switchRayon('sanitaire');refreshMobileRayonTabs()">
+        🚿 Sanitaire
+      </button>
     </div>
     <div id="home-alerts"></div>
     <div class="section-label">Mes conseillers</div>
@@ -910,7 +937,7 @@ select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 
       <svg width="26" height="23" viewBox="0 0 32 28" fill="none" style="flex-shrink:0"><polygon points="16,0 32,28 0,28" fill="#78BE20"/></svg>
       <div class="topbar-center">
         <div class="topbar-title" id="advisor-title">Mon suivi</div>
-        <div class="topbar-sub">Leroy Merlin · myDEV' · <span style="font-size:10px;opacity:.55;font-style:italic;font-family:Georgia,serif">Crafted by Sammy Malc</span></div>
+        <div class="topbar-sub">Leroy Merlin · myDEV' · <span style="font-size:11px;opacity:.75;font-style:italic;font-family:Georgia,serif">Crafted by Sammy Malc</span></div>
       </div>
     </div>
     <button class="topbar-action" onclick="doLogout()">🔒 Quitter</button>
@@ -974,19 +1001,70 @@ const JSONBIN_ID  = '69e49d9736566621a8cbedfd';
    Modifie les PIN ci-dessous avant de distribuer le fichier.
    PIN = 4 chiffres.
    ══════════════════════════════════════════════════════════ */
-const ACCOUNTS = {
-  manager: { label:'Manager',    role:'manager', pin:'1234', color:'#005C2E', bg:'#E6F4ED' },
-  karim:   { label:'Karim',      role:'advisor', pin:'2001', color:'#003087', bg:'#E8EEF8' },
-  evan:    { label:'Evan',       role:'advisor', pin:'2002', color:'#005C2E', bg:'#E6F4ED' },
-  laura:   { label:'Laura',      role:'advisor', pin:'2003', color:'#78BE20', bg:'#F0F8E6' },
-  thomas:  { label:'Thomas',     role:'advisor', pin:'2004', color:'#1A1A1A', bg:'#F2F2F2' },
+/* ─── RAYONS (multi-secteurs) ────────────────────────────── */
+const RAYONS = {
+  cuisine: {
+    label: 'Rayon Cuisine',
+    short: 'Cuisine',
+    icon: '🍳',
+    vendeurs: ['karim','evan','laura','thomas'],
+  },
+  sanitaire: {
+    label: 'Rayon Sanitaire',
+    short: 'Sanitaire',
+    icon: '🚿',
+    vendeurs: ['nevzer','laurent','alice','charlene'],
+  },
 };
 
-/* ─── Data constants ─────────────────────────────────────── */
-const VENDEURS = ['karim','evan','laura','thomas'];
-const NOMS = { karim:'Karim', evan:'Evan', laura:'Laura', thomas:'Thomas' };
-const COLORS = { karim:'#003087', evan:'#009688', laura:'#5C6BC0', thomas:'#546E7A' };
-const AVATAR_BG = { karim:'#E8EEF8', evan:'#E0F2F1', laura:'#E8EAF6', thomas:'#ECEFF1' };
+const NOMS_ALL = {
+  // Cuisine
+  karim:'Karim', evan:'Evan', laura:'Laura', thomas:'Thomas',
+  // Sanitaire
+  nevzer:'Nevzer', laurent:'Laurent', alice:'Alice', charlene:'Charlène',
+};
+
+const COLORS_ALL = {
+  karim:'#003087', evan:'#009688', laura:'#5C6BC0', thomas:'#546E7A',
+  nevzer:'#00838F', laurent:'#6D4C41', alice:'#AD1457', charlene:'#7B1FA2',
+};
+
+const AVATAR_BG_ALL = {
+  karim:'#E8EEF8', evan:'#E0F2F1', laura:'#E8EAF6', thomas:'#ECEFF1',
+  nevzer:'#E0F2F1', laurent:'#EFEBE9', alice:'#FCE4EC', charlene:'#F3E5F5',
+};
+
+const ACCOUNTS_ALL = {
+  manager:  { label:'Manager', role:'manager', pin:'1234', color:'#005C2E', bg:'#E6F4ED' },
+  // Cuisine
+  karim:    { label:'Karim',   role:'advisor', rayon:'cuisine', pin:'2001', color:'#003087', bg:'#E8EEF8' },
+  evan:     { label:'Evan',    role:'advisor', rayon:'cuisine', pin:'2002', color:'#005C2E', bg:'#E6F4ED' },
+  laura:    { label:'Laura',   role:'advisor', rayon:'cuisine', pin:'2003', color:'#78BE20', bg:'#F0F8E6' },
+  thomas:   { label:'Thomas',  role:'advisor', rayon:'cuisine', pin:'2004', color:'#1A1A1A', bg:'#F2F2F2' },
+  // Sanitaire (PIN à choisir à 1ère connexion)
+  nevzer:   { label:'Nevzer',  role:'advisor', rayon:'sanitaire', pin:null, color:'#00838F', bg:'#E0F2F1' },
+  laurent:  { label:'Laurent', role:'advisor', rayon:'sanitaire', pin:null, color:'#6D4C41', bg:'#EFEBE9' },
+  alice:    { label:'Alice',   role:'advisor', rayon:'sanitaire', pin:null, color:'#AD1457', bg:'#FCE4EC' },
+  charlene: { label:'Charlène',role:'advisor', rayon:'sanitaire', pin:null, color:'#7B1FA2', bg:'#F3E5F5' },
+};
+
+let currentRayon = 'cuisine'; // rayon affiché — modifiable par le manager
+
+// Proxys dynamiques — les variables globales pointent toujours sur le rayon courant
+const ACCOUNTS = ACCOUNTS_ALL;
+const NOMS = new Proxy(NOMS_ALL, { get:(t,k)=>t[k] });
+const COLORS = new Proxy(COLORS_ALL, { get:(t,k)=>t[k] });
+const AVATAR_BG = new Proxy(AVATAR_BG_ALL, { get:(t,k)=>t[k] });
+const VENDEURS = new Proxy([], {
+  get(t,p){
+    if(p==='length') return RAYONS[currentRayon].vendeurs.length;
+    if(p===Symbol.iterator) return RAYONS[currentRayon].vendeurs[Symbol.iterator].bind(RAYONS[currentRayon].vendeurs);
+    if(!isNaN(p)) return RAYONS[currentRayon].vendeurs[p];
+    if(typeof RAYONS[currentRayon].vendeurs[p]==='function')
+      return RAYONS[currentRayon].vendeurs[p].bind(RAYONS[currentRayon].vendeurs);
+    return RAYONS[currentRayon].vendeurs[p];
+  }
+});
 const MOIS_L = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const MOIS_S = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
 const KPI_KEYS = ['ca','taux','optin','chantiers','fidelite'];
@@ -1005,25 +1083,123 @@ const STATUS_LABEL = { ok:'En ligne', warn:'À surveiller', ko:'Retard' };
 
 /* ─── App state ──────────────────────────────────────────── */
 let currentUser = null;
-let state = defaultState();
 let currentVendeur = null;
 let currentYear = new Date().getFullYear();
-const LOCAL_KEY = 'lm_perf_v10';
+const LOCAL_KEY = 'lm_perf_v11';
+
+function defaultDataForRayon(rayon){
+  const vendeurs = RAYONS[rayon].vendeurs;
+  const data = {
+    objectifs: {},
+    annees: {},
+    rdv: {},
+    pins: {},
+    engagements: {},
+    bienetre: {},
+  };
+  vendeurs.forEach(v=>{
+    data.objectifs[v] = { ca:450000, taux:30, optin:80, chantiers:55, fidelite:120 };
+    data.rdv[v] = {};
+    data.engagements[v] = [];
+    data.bienetre[v] = {};
+  });
+  // Objectifs spécifiques cuisine (existants)
+  if(rayon === 'cuisine'){
+    data.objectifs.karim  = { ca:480000, taux:30, optin:80, chantiers:60, fidelite:120 };
+    data.objectifs.evan   = { ca:420000, taux:30, optin:80, chantiers:50, fidelite:120 };
+    data.objectifs.laura  = { ca:500000, taux:30, optin:80, chantiers:65, fidelite:120 };
+    data.objectifs.thomas = { ca:380000, taux:30, optin:80, chantiers:45, fidelite:120 };
+  }
+  return data;
+}
 
 function defaultState() {
   return {
-    objectifs: {
-      karim:  { ca:480000, taux:30, optin:80, chantiers:60, fidelite:120 },
-      evan:   { ca:420000, taux:30, optin:80, chantiers:50, fidelite:120 },
-      laura:  { ca:500000, taux:30, optin:80, chantiers:65, fidelite:120 },
-      thomas: { ca:380000, taux:30, optin:80, chantiers:45, fidelite:120 },
+    rayons: {
+      cuisine:   defaultDataForRayon('cuisine'),
+      sanitaire: defaultDataForRayon('sanitaire'),
     },
-    annees: {},
-    rdv: { karim:{}, evan:{}, laura:{}, thomas:{} },
-    pins: {},
-    engagements: { karim:[], evan:[], laura:[], thomas:[] },
-    bienetre: { karim:{}, evan:{}, laura:{}, thomas:{} },
+    currentRayon: 'cuisine',
   };
+}
+
+/**
+ * `state` est un proxy : state.objectifs → state.rayons[currentRayon].objectifs
+ * Tout le code legacy continue à fonctionner sans modification.
+ */
+let _rawState = defaultState();
+const STATE_KEYS = ['objectifs','annees','rdv','pins','engagements','bienetre'];
+let state = new Proxy({}, {
+  get(_, p){
+    if(p === 'rayons') return _rawState.rayons;
+    if(p === 'currentRayon') return currentRayon;
+    if(p === '_raw') return _rawState;
+    if(STATE_KEYS.includes(p)){
+      // Auto-init du rayon courant si manquant
+      if(!_rawState.rayons) _rawState.rayons = {};
+      if(!_rawState.rayons[currentRayon]) _rawState.rayons[currentRayon] = defaultDataForRayon(currentRayon);
+      if(!_rawState.rayons[currentRayon][p]) _rawState.rayons[currentRayon][p] = {};
+      return _rawState.rayons[currentRayon][p];
+    }
+    return _rawState[p];
+  },
+  set(_, p, value){
+    if(p === 'rayons'){ _rawState.rayons = value; return true; }
+    if(p === 'currentRayon'){ currentRayon = value; return true; }
+    if(p === '_raw'){ _rawState = value; return true; }
+    if(STATE_KEYS.includes(p)){
+      if(!_rawState.rayons) _rawState.rayons = {};
+      if(!_rawState.rayons[currentRayon]) _rawState.rayons[currentRayon] = defaultDataForRayon(currentRayon);
+      _rawState.rayons[currentRayon][p] = value;
+      return true;
+    }
+    _rawState[p] = value;
+    return true;
+  }
+});
+
+function switchRayon(newRayon){
+  if(!RAYONS[newRayon]) return;
+  if(newRayon === currentRayon) return;
+  currentRayon = newRayon;
+  _rawState.currentRayon = newRayon;
+  // Init si vide
+  if(!_rawState.rayons[newRayon]) _rawState.rayons[newRayon] = defaultDataForRayon(newRayon);
+  // Sauvegarde + re-render
+  localSave();
+  remoteWrite(_rawState);
+  // Re-render selon l'écran courant
+  if(currentUser && currentUser.role === 'manager'){
+    renderHome();
+    updateSidebarRayon();
+    refreshMobileRayonTabs();
+    if(isDesktop()) showDesktopView('home');
+  }
+}
+
+function refreshMobileRayonTabs(){
+  document.querySelectorAll('.mobile-rayon-tab').forEach(b=>{
+    b.classList.toggle('active', b.dataset.rayon === currentRayon);
+  });
+}
+
+function updateSidebarRayon(){
+  // Met à jour les boutons rayon dans la sidebar et la liste des conseillers
+  document.querySelectorAll('.sidebar-rayon-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.rayon === currentRayon);
+  });
+  const list = document.getElementById('sidebar-vendor-list');
+  if(list){
+    list.innerHTML = '';
+    RAYONS[currentRayon].vendeurs.forEach(v=>{
+      const div = document.createElement('div');
+      div.className = 'sidebar-vendor-item';
+      div.id = 'nav-'+v;
+      div.onclick = ()=>showDesktopVendeur(v);
+      div.innerHTML = `<div class="sidebar-vendor-dot" style="background:${COLORS_ALL[v]}"></div><span>${NOMS_ALL[v]}</span>`;
+      list.appendChild(div);
+    });
+  }
 }
 
 // Retourne les données de l'année sélectionnée
@@ -1136,43 +1312,77 @@ async function remoteWrite(data) {
   } catch(e) { console.warn('JSONBin write error', e); setSyncIcon('error'); }
 }
 
-function localSave() { try{localStorage.setItem(LOCAL_KEY,JSON.stringify(state));}catch(e){} }
+function localSave() {
+  try{
+    // Sauvegarde le rawState complet (rayons + currentRayon)
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(_rawState));
+  }catch(e){}
+}
+
 function localLoad() {
   try {
-    const s=localStorage.getItem(LOCAL_KEY);
-    if(s){
-      const p=JSON.parse(s);
-      if(p&&p.objectifs){
-        state=JSON.parse(JSON.stringify(p));
+    const s = localStorage.getItem(LOCAL_KEY);
+    if(!s) return;
+    const p = JSON.parse(s);
+    if(!p) return;
+    // Détection du format
+    if(p.rayons){
+      // Format multi-rayon (nouveau)
+      _rawState = JSON.parse(JSON.stringify(p));
+      currentRayon = _rawState.currentRayon || 'cuisine';
+    } else if(p.objectifs){
+      // Ancien format mono-rayon → migration vers cuisine
+      _rawState = {
+        rayons: {
+          cuisine: JSON.parse(JSON.stringify(p)),
+          sanitaire: defaultDataForRayon('sanitaire'),
+        },
+        currentRayon: 'cuisine',
+      };
+      currentRayon = 'cuisine';
+    } else {
+      return;
+    }
+    // Garantir tous les rayons présents
+    if(!_rawState.rayons.cuisine)   _rawState.rayons.cuisine   = defaultDataForRayon('cuisine');
+    if(!_rawState.rayons.sanitaire) _rawState.rayons.sanitaire = defaultDataForRayon('sanitaire');
+    // Migration + init pour chaque rayon
+    Object.keys(RAYONS).forEach(r=>{
+      const tempRayon = currentRayon;
+      currentRayon = r;
+      try {
         migrateOldFormat();
-        // Garantir que tous les champs existent
-        const def=defaultState();
-        if(!state.objectifs) state.objectifs=def.objectifs;
-        VENDEURS.forEach(v=>{ if(!state.objectifs[v]) state.objectifs[v]=def.objectifs[v]; });
-        if(!state.annees) state.annees={};
-        if(!state.rdv) state.rdv=def.rdv;
-        if(!state.pins) state.pins={};
-        if(!state.engagements) state.engagements=def.engagements;
-        if(!state.bienetre) state.bienetre=def.bienetre;
-        VENDEURS.forEach(v=>{
-          if(!state.rdv[v]) state.rdv[v]={};
-          if(!state.engagements[v]) state.engagements[v]=[];
-          if(!state.bienetre[v]) state.bienetre[v]={};
+        const def = defaultDataForRayon(r);
+        if(!state.objectifs) state.objectifs = def.objectifs;
+        RAYONS[r].vendeurs.forEach(v=>{
+          if(!state.objectifs[v]) state.objectifs[v] = def.objectifs[v];
+        });
+        if(!state.annees) state.annees = {};
+        if(!state.rdv) state.rdv = def.rdv;
+        if(!state.pins) state.pins = {};
+        if(!state.engagements) state.engagements = def.engagements;
+        if(!state.bienetre) state.bienetre = def.bienetre;
+        RAYONS[r].vendeurs.forEach(v=>{
+          if(!state.rdv[v]) state.rdv[v] = {};
+          if(!state.engagements[v]) state.engagements[v] = [];
+          if(!state.bienetre[v]) state.bienetre[v] = {};
         });
         if(state.annees){
           Object.keys(state.annees).forEach(y=>{
-            const yr=state.annees[y];
-            if(!yr.resultats) yr.resultats={};
-            if(!yr.commentaires) yr.commentaires={};
-            VENDEURS.forEach(v=>{
-              if(!yr.resultats[v]) yr.resultats[v]={};
-              if(!yr.commentaires[v]) yr.commentaires[v]={};
+            const yr = state.annees[y];
+            if(!yr.resultats) yr.resultats = {};
+            if(!yr.commentaires) yr.commentaires = {};
+            RAYONS[r].vendeurs.forEach(v=>{
+              if(!yr.resultats[v]) yr.resultats[v] = {};
+              if(!yr.commentaires[v]) yr.commentaires[v] = {};
             });
           });
         }
+      } finally {
+        currentRayon = tempRayon;
       }
-    }
-  } catch(e){ console.warn('localLoad error',e); }
+    });
+  } catch(e){ console.warn('localLoad error', e); }
 }
 
 // Réinitialisation d'urgence — accessible via console : resetAllData()
@@ -1183,7 +1393,7 @@ function resetAllData(){
   loadState().then(()=>{ renderHome(); toast('Données réinitialisées'); });
 }
 
-async function saveState() { localSave(); await remoteWrite(state); }
+async function saveState() { localSave(); await remoteWrite(_rawState); }
 
 async function loadState() {
   localLoad();
@@ -1214,15 +1424,39 @@ async function forceSyncFromCloud() {
   setSyncIcon('loading');
   try {
     const remote = await remoteRead();
-    if(remote && remote.objectifs){
-      state = JSON.parse(JSON.stringify(remote));
-      migrateOldFormat();
+    if(remote){
+      if(remote.rayons){
+        _rawState = JSON.parse(JSON.stringify(remote));
+      } else if(remote.objectifs){
+        _rawState = {
+          rayons: {
+            cuisine: JSON.parse(JSON.stringify(remote)),
+            sanitaire: defaultDataForRayon('sanitaire'),
+          },
+          currentRayon: 'cuisine',
+        };
+      } else {
+        throw new Error('Format de données non reconnu');
+      }
+      if(!_rawState.rayons.cuisine)   _rawState.rayons.cuisine   = defaultDataForRayon('cuisine');
+      if(!_rawState.rayons.sanitaire) _rawState.rayons.sanitaire = defaultDataForRayon('sanitaire');
+      if(currentUser && currentUser.role === 'advisor' && currentUser.rayon){
+        currentRayon = currentUser.rayon;
+      } else {
+        currentRayon = _rawState.currentRayon || 'cuisine';
+      }
+      Object.keys(RAYONS).forEach(r=>{
+        const tmp = currentRayon;
+        currentRayon = r;
+        try { migrateOldFormat(); } finally { currentRayon = tmp; }
+      });
       localSave();
       setSyncIcon('ok');
       toast('Données synchronisées ✓');
       if(currentUser){
         if(currentUser.role==='manager'){
           renderHome();
+          updateSidebarRayon();
           if(isDesktop()) showDesktopView('home');
         } else {
           renderAdvisor(currentUser.id);
@@ -1285,6 +1519,8 @@ function selectAccount(id) {
     btn.classList.toggle('selected',Object.keys(ACCOUNTS)[i]===id);
   });
   const acc=ACCOUNTS[id];
+  // Pour un conseiller, basculer sur son rayon avant de chercher son PIN
+  if(acc.role === 'advisor' && acc.rayon) currentRayon = acc.rayon;
   const pinSection=document.getElementById('login-pin-section');
   pinSection.style.display='block';
   document.getElementById('login-error').textContent='';
@@ -1408,8 +1644,16 @@ function doLogout() {
 }
 
 async function afterLogin() {
+  // Pour un conseiller, basculer sur son rayon (data isolée)
+  if(currentUser.role === 'advisor' && currentUser.rayon){
+    currentRayon = currentUser.rayon;
+  }
   // 1. Charger les données locales (peut être vide sur un nouveau device)
   localLoad();
+  // Re-positionner sur rayon conseiller au cas où localLoad aurait changé
+  if(currentUser.role === 'advisor' && currentUser.rayon){
+    currentRayon = currentUser.rayon;
+  }
   // 2. Affichage initial (même si vide — le distant viendra écraser)
   if(currentUser.role==='manager'){
     renderHome();
@@ -1423,24 +1667,50 @@ async function afterLogin() {
   setSyncIcon('loading');
   try {
     const remote = await remoteRead();
-    if(remote && remote.objectifs){
-      // Format actuel : objectifs + annees + rdv + engagements + bienetre + pins
-      state = JSON.parse(JSON.stringify(remote));
-      migrateOldFormat();
+    if(remote){
+      // Détection format multi-rayon ou ancien mono-rayon
+      if(remote.rayons){
+        _rawState = JSON.parse(JSON.stringify(remote));
+      } else if(remote.objectifs){
+        // Ancien format → migration vers cuisine
+        _rawState = {
+          rayons: {
+            cuisine: JSON.parse(JSON.stringify(remote)),
+            sanitaire: defaultDataForRayon('sanitaire'),
+          },
+          currentRayon: 'cuisine',
+        };
+      } else {
+        throw new Error('Format de données non reconnu');
+      }
+      // Garantir rayons présents
+      if(!_rawState.rayons.cuisine)   _rawState.rayons.cuisine   = defaultDataForRayon('cuisine');
+      if(!_rawState.rayons.sanitaire) _rawState.rayons.sanitaire = defaultDataForRayon('sanitaire');
+      // Re-positionner rayon
+      if(currentUser.role === 'advisor' && currentUser.rayon){
+        currentRayon = currentUser.rayon;
+      } else {
+        currentRayon = _rawState.currentRayon || 'cuisine';
+      }
+      // Migrations
+      Object.keys(RAYONS).forEach(r=>{
+        const tmp = currentRayon;
+        currentRayon = r;
+        try { migrateOldFormat(); } finally { currentRayon = tmp; }
+      });
       localSave();
       setSyncIcon('ok');
-      // Re-render avec les données fraîches
+      // Re-render
       if(currentUser.role==='manager'){
         renderHome();
+        updateSidebarRayon();
         if(isDesktop()) showDesktopView('home');
       } else {
         renderAdvisor(currentUser.id);
       }
     } else {
-      // Pas de données distantes valides
       setSyncIcon('error');
       console.warn('Pas de données distantes — utilisation locale uniquement');
-      // Si on est sur un nouveau device sans local non plus, prévenir l'utilisateur
       const hasLocal = !!localStorage.getItem(LOCAL_KEY);
       if(!hasLocal){
         toast('⚠ Impossible de charger les données — vérifie ta connexion');
@@ -2118,7 +2388,12 @@ function renderHome(){
   const dateStr=nowH.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})+' · '+currentYear;
   ['home-date'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=dateStr;});
   const dsub=document.getElementById('desktop-view-sub');
-  if(dsub)dsub.textContent='Sammy M. — Responsable Rayon · '+dateStr;
+  if(dsub)dsub.textContent='Sammy M. — '+RAYONS[currentRayon].label+' · '+dateStr;
+  // Mettre à jour le label rayon mobile et les onglets
+  const rayonLbl=document.getElementById('home-rayon-label');
+  if(rayonLbl) rayonLbl.textContent = RAYONS[currentRayon].label;
+  refreshMobileRayonTabs();
+  updateSidebarRayon();
   const moisCourant=nowH.getMonth();
 
   // Alertes
@@ -3157,7 +3432,7 @@ async function saveVendeurEntry(v){
   if(comm) yd.commentaires[v][m]=comm;
 
   // Sauvegarder avec deep copy globale pour JSONBin
-  const stateCopy=JSON.parse(JSON.stringify(state));
+  const stateCopy = JSON.parse(JSON.stringify(_rawState));
   localStorage.setItem(LOCAL_KEY, JSON.stringify(stateCopy));
   await remoteWrite(stateCopy);
 
